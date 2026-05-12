@@ -1,0 +1,44 @@
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  costPrice: number;
+  stock: number;
+  description: string;
+  imageUrl?: string;
+  barcode?: string;
+}
+
+export interface CartItem extends Product {
+  quantity: number;
+}
+
+export interface Sale {
+  id: string;
+  timestamp: number;
+  total: number;
+  subtotal: number; 
+  discount: number; 
+  surcharge: number; // Valor da taxa/acréscimo em R$
+  profit: number;   
+  customerName?: string; 
+  items: CartItem[];
+  paymentMethod: 'credit' | 'debit' | 'cash' | 'pix';
+  status?: 'completed' | 'canceled';
+}
+
+export type ViewState = 'dashboard' | 'pos' | 'inventory' | 'history' | 'settings' | 'admin' | 'subscription';
+
+export interface Profile {
+  id: string;
+  email: string;
+  role: 'admin' | 'customer';
+  subscription_status: 'active' | 'inactive' | 'trial';
+  subscription_expiry: string | null;
+  store_name?: string;
+  last_seen_at?: string;
+  last_sale_at?: string;
+  created_at: string;
+}
