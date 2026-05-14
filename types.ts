@@ -16,7 +16,7 @@ export interface CartItem extends Product {
 }
 
 export interface Sale {
-  id: number;
+  id: string;
   timestamp: number;
   total: number;
   subtotal: number; 

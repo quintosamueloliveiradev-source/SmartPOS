@@ -139,7 +139,7 @@ export const SalesHistory: React.FC = () => {
               <div className="flex items-center gap-4 min-w-[180px]">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${isCanceled ? 'bg-red-50 border-red-200 text-red-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}><Clock size={24} /></div>
                 <div>
-                  <p className="font-black text-slate-900 leading-tight">#{sale.id.toString().padStart(4, '0')}</p>
+                  <p className="font-black text-slate-900 leading-tight">#{sale.id.length > 8 ? sale.id.slice(0, 8).toUpperCase() : sale.id}</p>
                   <p className="text-[10px] text-slate-400 font-bold uppercase">{new Date(sale.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(sale.timestamp).toLocaleDateString()}</p>
                 </div>
               </div>
