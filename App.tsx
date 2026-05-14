@@ -82,7 +82,7 @@ const MainContent: React.FC = () => {
     if (isMasterAdmin && profile?.role === 'admin' && currentView === 'dashboard') {
       setCurrentView('admin');
     }
-  }, [profile, user]);
+  }, [profile?.role, user?.email, currentView]);
 
   if (loading) {
     return (

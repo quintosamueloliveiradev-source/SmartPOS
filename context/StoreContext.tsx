@@ -91,7 +91,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Carregar Perfil e Dados quando o usuário mudar
   useEffect(() => {
-    if (!user) {
+    if (!user?.id) {
       setProducts([]);
       setSales([]);
       setLoading(false);
@@ -224,7 +224,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
 
     loadProfileData();
-  }, [user]);
+  }, [user?.id]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
