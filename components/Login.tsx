@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../context/StoreContext';
 import { LogIn, UserPlus, Info, BarChart3, Store, ShieldCheck, Mail, Lock, Eye, EyeOff, Check, ArrowRight, Loader2, LogOut, LayoutDashboard, ShoppingCart, Package, Leaf, Hexagon, CircleDashed, SquareDashed, Sprout, Grid, ArrowUpRight, Sun, Home, Wheat, Layers, Coffee, Flame, Heart, ShoppingBag, Crown, Power, Zap } from 'lucide-react';
-import { motion, animate } from 'motion/react';
+import { motion, animate, AnimatePresence } from 'motion/react';
 
 const AnimatedCounter = ({ from, to, duration = 2, isCurrency = false, prefix = '', suffix = '', decimals = 0 }: { from: number, to: number, duration?: number, isCurrency?: boolean, prefix?: string, suffix?: string, decimals?: number }) => {
   const [value, setValue] = useState(from);
@@ -308,6 +308,8 @@ const MarqueeLogos = () => {
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [storeName, setStoreName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -318,20 +320,33 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       if (isSignUp) {
+        if (password.length < 6) {
+          throw new Error('A senha deve ter pelo menos 6 caracteres');
+        }
         const { error } = await supabase.auth.signUp({ 
           email, 
           password,
           options: {
             data: {
-              store_name: 'Minha Loja'
+              full_name: fullName,
+              store_name: storeName || 'Minha Loja'
             }
           }
         });
         if (error) throw error;
-        addToast('Conta criada! Verifique seu e-mail (se habilitado) ou tente entrar.', 'success');
+        addToast('Conta criada com sucesso! Redirecionando...', 'success');
+        // Some servers automatically login or require email confirm
+        // To be safe we switch back to login
+        setIsSignUp(false);
+        setPassword('');
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('E-mail ou senha incorretos');
+          }
+          throw error;
+        }
         addToast('Bem-vindo de volta!', 'success');
       }
     } catch (err: any) {
@@ -418,6 +433,28 @@ export const Login: React.FC = () => {
               <div>
                 <h3 className="font-bold text-slate-800 text-lg mb-1">Seguro e Confiável</h3>
                 <p className="text-slate-500 font-medium leading-snug">Seus dados protegidos com as melhores <br className="hidden xl:block"/> práticas de segurança</p>
+              </div>
+            </div>
+            
+            {/* Testimonial Card */}
+            <div className="mt-8 bg-white/70 backdrop-blur-md border border-emerald-100 p-5 rounded-2xl shadow-lg shadow-emerald-500/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 -mt-2 -mr-2 text-emerald-100 group-hover:text-emerald-200 transition-colors">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+              </div>
+              <div className="flex gap-1 text-amber-400 mb-3 relative z-10">
+                 {[1, 2, 3, 4, 5].map((s) => (
+                    <svg key={s} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                 ))}
+              </div>
+              <p className="text-slate-600 font-medium leading-relaxed mb-4 relative z-10 italic">
+                 "O SmartPOS transformou minha padaria. Antes eu perdia horas com o fluxo de caixa, hoje tenho tudo em tempo real na tela do celular."
+              </p>
+              <div className="flex items-center gap-3 relative z-10">
+                 <img src="https://i.pravatar.cc/100?img=47" className="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="Ana Silva" />
+                 <div>
+                    <h4 className="font-bold text-slate-800 text-sm">Ana Silva</h4>
+                    <p className="font-medium text-slate-500 text-xs">Proprietária da Pão & Cia</p>
+                 </div>
               </div>
             </div>
           </motion.div>
@@ -536,6 +573,48 @@ export const Login: React.FC = () => {
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5">
+            <AnimatePresence mode="popLayout">
+              {isSignUp && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-5 overflow-hidden"
+                >
+                  <div className="pt-2">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Nome completo</label>
+                    <div className="relative group">
+                      <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                      <input 
+                        type="text" 
+                        required={isSignUp}
+                        placeholder="João da Silva"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border-2 border-slate-200 focus:border-emerald-500 rounded-xl outline-none font-medium text-slate-700 placeholder:text-slate-400 focus:ring-4 focus:ring-emerald-500/10 transition-all font-sans"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Nome da Loja</label>
+                    <div className="relative group">
+                      <Store className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                      <input 
+                        type="text" 
+                        required={isSignUp}
+                        placeholder="Minha Loja"
+                        value={storeName}
+                        onChange={(e) => setStoreName(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border-2 border-slate-200 focus:border-emerald-500 rounded-xl outline-none font-medium text-slate-700 placeholder:text-slate-400 focus:ring-4 focus:ring-emerald-500/10 transition-all font-sans"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">E-mail</label>
               <div className="relative group">
@@ -571,6 +650,26 @@ export const Login: React.FC = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+
+              <AnimatePresence>
+                {isSignUp && password.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-3"
+                  >
+                    <div className="flex gap-1.5 mb-2">
+                      <div className={`h-1.5 flex-1 rounded-full ${password.length >= 4 ? 'bg-red-500' : 'bg-slate-200'} transition-colors`}></div>
+                      <div className={`h-1.5 flex-1 rounded-full ${password.length >= 6 ? 'bg-amber-500' : 'bg-slate-200'} transition-colors`}></div>
+                      <div className={`h-1.5 flex-1 rounded-full ${password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password) ? 'bg-emerald-500' : 'bg-slate-200'} transition-colors`}></div>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-500">
+                      {password.length < 6 ? 'Muito curta' : (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password) ? 'Forte' : 'Razoável')}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="flex items-center justify-between pt-1">
@@ -584,7 +683,7 @@ export const Login: React.FC = () => {
                 <span className="text-sm font-medium text-slate-600 select-none">Lembrar de mim</span>
               </label>
 
-              <button type="button" className="text-sm font-bold text-emerald-500 hover:text-emerald-600 transition-colors">
+              <button type="button" onClick={() => addToast('Redefinição de senha em fase de testes. Tente novamente mais tarde.', 'info')} className="text-sm font-bold text-emerald-500 hover:text-emerald-600 transition-colors">
                 Esqueci minha senha
               </button>
             </div>
@@ -609,6 +708,7 @@ export const Login: React.FC = () => {
 
             <button 
               type="button" 
+              onClick={() => addToast('Login via Google será habilitado em breve.', 'info')}
               className="w-full bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-bold py-3.5 rounded-xl transition-all flex justify-center items-center gap-3"
             >
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-[18px] h-[18px]" />
