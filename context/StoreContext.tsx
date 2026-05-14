@@ -359,7 +359,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const profit = total - costTotal;
 
     const nextSequentialId = allTimeStats.salesCount + 1;
-    const formattedId = crypto.randomUUID();
+    const formattedId = Date.now().toString();
 
     const newSale: Sale = {
       id: formattedId,
@@ -442,7 +442,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         await supabase.from('profiles').update({ last_sale_at: new Date().toISOString() }).eq('id', user.id);
       }
 
-      addToast(`Venda #${formattedId.slice(0, 8).toUpperCase()} realizada!`, 'success');
+      addToast(`Venda #${formattedId} realizada!`, 'success');
       return newSale;
 
     } catch (err: any) {
