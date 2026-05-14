@@ -395,6 +395,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (saleError) throw saleError;
 
       const saleItems = cart.map(item => ({
+        user_id: user.id,
         sale_id: formattedId,
         product_id: item.id,
         name: item.name,
@@ -444,8 +445,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       addToast(`Venda #${formattedId} realizada!`, 'success');
       return newSale;
 
-    } catch (err) {
-      addToast('Erro ao processar venda', 'error');
+    } catch (err: any) {
+      console.error('Sale error:', err);
+      addToast(`Erro ao processar venda: ${err.message || 'Desconhecido'}`, 'error');
       return null;
     }
   };
