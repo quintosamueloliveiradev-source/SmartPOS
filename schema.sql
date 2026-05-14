@@ -40,7 +40,7 @@ CREATE TABLE products (
 
 -- 4. Tabela de Vendas
 CREATE TABLE sales (
-  id TEXT PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   timestamp TIMESTAMPTZ DEFAULT NOW(),
   subtotal DECIMAL(10,2) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE sales (
 CREATE TABLE sale_items (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  sale_id TEXT REFERENCES sales(id) ON DELETE CASCADE,
+  sale_id BIGINT REFERENCES sales(id) ON DELETE CASCADE,
   product_id TEXT,
   name TEXT NOT NULL,
   quantity INTEGER NOT NULL,

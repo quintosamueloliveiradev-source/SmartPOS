@@ -31,7 +31,7 @@ interface StoreContextType {
   updateCartQuantity: (productId: string, delta: number) => void;
   clearCart: () => void;
   completeSale: (paymentMethod: Sale['paymentMethod'], discount: number, customerName: string, surcharge: number) => Promise<Sale | null>;
-  cancelSale: (saleId: string, password: string) => Promise<{ success: boolean; message: string }>;
+  cancelSale: (saleId: number, password: string) => Promise<{ success: boolean; message: string }>;
   clearSalesHistory: (password: string) => Promise<boolean>;
   resetSystem: (password: string) => Promise<boolean>;
   updateAdminPassword: (currentPw: string, newPw: string) => Promise<boolean>;
@@ -358,41 +358,41 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const costTotal = cart.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0);
     const profit = total - costTotal;
 
-    const nextSequentialId = allTimeStats.salesCount + 1;
-    const formattedId = crypto.randomUUID();
-
-    const newSale: Sale = {
-      id: formattedId,
-      timestamp: Date.now(),
-      subtotal,
-      total,
-      discount,
-      surcharge,
-      profit,
-      customerName: customerName.trim() || undefined,
-      items: [...cart],
-      paymentMethod,
-      status: 'completed'
-    };
-
     try {
-      const { error: saleError } = await supabase
+      const { data: saleData, error: saleError } = await supabase
         .from('sales')
         .insert([{
-          id: formattedId,
           user_id: user.id,
           subtotal,
           total,
           discount,
           surcharge,
           profit,
-          customer_name: newSale.customerName,
+          customer_name: customerName.trim() || undefined,
           payment_method: paymentMethod,
           status: 'completed',
           timestamp: new Date().toISOString()
-        }]);
+        }])
+        .select()
+        .single();
 
       if (saleError) throw saleError;
+
+      const formattedId = saleData.id;
+
+      const newSale: Sale = {
+        id: formattedId,
+        timestamp: Date.now(),
+        subtotal,
+        total,
+        discount,
+        surcharge,
+        profit,
+        customerName: customerName.trim() || undefined,
+        items: [...cart],
+        paymentMethod,
+        status: 'completed'
+      };
 
       const saleItems = cart.map(item => ({
         user_id: user.id,
@@ -442,7 +442,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         await supabase.from('profiles').update({ last_sale_at: new Date().toISOString() }).eq('id', user.id);
       }
 
-      addToast(`Venda #${formattedId.slice(0, 8).toUpperCase()} realizada!`, 'success');
+      addToast(`Venda #${formattedId.toString().padStart(4, '0')} realizada!`, 'success');
       return newSale;
 
     } catch (err: any) {
@@ -452,7 +452,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  const cancelSale = async (saleId: string, password: string) => {
+  const cancelSale = async (saleId: number, password: string) => {
     if (password !== adminPassword) {
       addToast('Senha administrativa incorreta', 'error');
       return { success: false, message: 'Senha incorreta.' };
