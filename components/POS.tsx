@@ -173,28 +173,28 @@ export const POS: React.FC = () => {
               <input 
                 type="text" 
                 placeholder="Cliente" 
-                className="w-full pl-9 pr-3 py-2.5 bg-white border-2 border-slate-300 rounded-xl text-xs focus:border-emerald-500 focus:outline-none transition-all font-bold text-slate-900 placeholder:text-slate-500 shadow-sm"
+                className="w-full pl-9 pr-3 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-xs focus:border-emerald-500 focus:outline-none transition-all font-bold text-slate-900 placeholder:text-slate-500 shadow-sm"
                 value={customerName}
                 onChange={e => setCustomerName(e.target.value)}
               />
             </div>
             <div className="flex gap-2">
               <div className="relative flex-1 group">
-                <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-red-500 transition-colors" size={12} />
+                <Tag className="absolute left-[6px] top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-red-500 transition-colors" size={12} />
                 <input 
                   type="number" 
                   placeholder="Desc." 
-                  className="w-full pl-8 pr-1 py-2.5 bg-white border-2 border-slate-300 rounded-xl text-xs font-black text-red-600 focus:border-red-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
+                  className="w-full pl-[22px] pr-1 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-xs font-black text-red-600 focus:border-red-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
                   value={discount || ''}
                   onChange={e => setDiscount(Number(e.target.value))}
                 />
               </div>
               <div className="relative flex-1 group">
-                <Percent className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={12} />
+                <Percent className="absolute left-[6px] top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={12} />
                 <input 
                   type="number" 
                   placeholder="Taxa" 
-                  className="w-full pl-8 pr-1 py-2.5 bg-white border-2 border-slate-300 rounded-xl text-xs font-black text-indigo-600 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
+                  className="w-full pl-[22px] pr-1 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-xs font-black text-indigo-600 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
                   value={cardTaxPercent || ''}
                   onChange={e => setCardTaxPercent(Number(e.target.value))}
                 />
