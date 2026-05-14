@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Clock, CreditCard, Banknote, QrCode, AlertTriangle, X, RotateCcw, Ban, ShieldCheck, ShieldAlert, Key, Info, Calendar, Filter, ChevronRight, FileDown, User, PlusCircle, Printer, Ticket, FileText } from 'lucide-react';
+import { Clock, CreditCard, Banknote, QrCode, AlertTriangle, X, RotateCcw, Ban, ShieldCheck, ShieldAlert, Key, Info, Calendar, Filter, ChevronRight, FileDown, User, PlusCircle, Printer, Ticket, FileText, Search } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 
 export const SalesHistory: React.FC = () => {
@@ -18,15 +18,28 @@ export const SalesHistory: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const filteredSales = useMemo(() => {
     const now = Date.now();
     const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
     return sales.filter(sale => {
-      if (filterMode === '24h') return sale.timestamp >= twentyFourHoursAgo;
-      const selectedStart = new Date(startDate + 'T00:00:00').getTime();
-      return sale.timestamp >= selectedStart;
+      let matchesTime = false;
+      if (filterMode === '24h') {
+        matchesTime = sale.timestamp >= twentyFourHoursAgo;
+      } else {
+        const selectedStart = new Date(startDate + 'T00:00:00').getTime();
+        matchesTime = sale.timestamp >= selectedStart;
+      }
+
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm || 
+        sale.id.toLowerCase().includes(searchLower) ||
+        (sale.customerName && sale.customerName.toLowerCase().includes(searchLower));
+        
+      return matchesTime && matchesSearch;
     });
-  }, [sales, filterMode, startDate]);
+  }, [sales, filterMode, startDate, searchTerm]);
 
   const getPaymentIcon = (method: string) => {
     switch (method) {
@@ -105,9 +118,20 @@ export const SalesHistory: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6">
-        <div className="flex items-center gap-3 text-slate-500 font-black text-xs uppercase tracking-widest">
+      <div className="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col xl:flex-row items-center gap-6">
+        <div className="flex items-center gap-3 text-slate-500 font-black text-xs uppercase tracking-widest min-w-[150px]">
           <Filter size={18} className="text-indigo-500" /> Filtros de Busca
+        </div>
+
+        <div className="relative flex-1 w-full min-w-[200px] group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 group-focus-within:scale-110 transition-all" size={18} />
+          <input 
+            type="text" 
+            placeholder="Buscar por ID (ex: #1778) ou Cliente..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-6 py-3 bg-white border-2 border-slate-300 rounded-xl text-sm font-black text-slate-700 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all shadow-sm placeholder:font-medium placeholder:text-slate-400"
+          />
         </div>
 
         <div className="flex p-1.5 bg-slate-100 rounded-2xl w-full md:w-auto border border-slate-200">

@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
 import { Plus, Search, Edit2, Trash2, X, Box, Image as ImageIcon, Filter, ChevronDown, ChevronUp, DollarSign, Tag, Archive, AlertCircle, Barcode } from 'lucide-react';
@@ -7,13 +7,35 @@ import { Plus, Search, Edit2, Trash2, X, Box, Image as ImageIcon, Filter, Chevro
 export const Inventory: React.FC = () => {
   const { products, deleteProduct, addProduct, updateProduct } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(() => {
+    return sessionStorage.getItem('inventory_modal_open') === 'true';
+  });
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [formData, setFormData] = useState<Partial<Product>>({ name: '', category: '', price: 0, costPrice: 0, stock: 0, description: '', imageUrl: '', barcode: '' });
-  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<Partial<Product>>(() => {
+    const saved = sessionStorage.getItem('inventory_form_data');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return { name: '', category: '', price: 0, costPrice: 0, stock: 0, description: '', imageUrl: '', barcode: '' };
+  });
+  const [isEditing, setIsEditing] = useState(() => {
+    return sessionStorage.getItem('inventory_is_editing') === 'true';
+  });
   
   // Estado para o modal de confirmação de exclusão
   const [deleteTarget, setDeleteTarget] = useState<{id: string, name: string} | null>(null);
+
+  useEffect(() => {
+    sessionStorage.setItem('inventory_modal_open', isModalOpen.toString());
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    sessionStorage.setItem('inventory_form_data', JSON.stringify(formData));
+  }, [formData]);
+
+  useEffect(() => {
+    sessionStorage.setItem('inventory_is_editing', isEditing.toString());
+  }, [isEditing]);
 
   const categories = useMemo(() => Array.from(new Set(products.map(p => p.category))).sort(), [products]);
 

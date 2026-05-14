@@ -75,7 +75,14 @@ const ToastContainer: React.FC = () => {
 
 const MainContent: React.FC = () => {
   const { user, profile, loading, checkSubscription } = useStore();
-  const [currentView, setCurrentView] = useState<ViewState>('dashboard');
+  const [currentView, setCurrentView] = useState<ViewState>(() => {
+    const saved = sessionStorage.getItem('pos_current_view');
+    return (saved as ViewState) || 'dashboard';
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('pos_current_view', currentView);
+  }, [currentView]);
 
   useEffect(() => {
     const isMasterAdmin = user?.email === 'backup02atelietetemimos@gmail.com';
