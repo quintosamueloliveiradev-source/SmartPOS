@@ -57,7 +57,7 @@ export const generateReceiptHTML = (sale: Sale, type: 'thermal' | 'a4'): string 
 
   const layout = isThermal ? `
     <div class="header">
-      <h1>SMART POS</h1>
+      <h1>VENDEEI</h1>
       <p>Comprovante de Venda</p>
     </div>
     <div class="divider"></div>
@@ -77,11 +77,11 @@ export const generateReceiptHTML = (sale: Sale, type: 'thermal' | 'a4'): string 
     <p>PAGAMENTO: ${sale.paymentMethod.toUpperCase()}</p>
     <div class="footer">
       <p>Obrigado pela preferência!</p>
-      <p>Desenvolvido por SmartPOS</p>
+      <p>Desenvolvido por Vendeei</p>
     </div>
   ` : `
     <div class="header">
-      <h1>SMART POS - GESTÃO INTELIGENTE</h1>
+      <h1>VENDEEI - GESTÃO INTELIGENTE</h1>
       <p>RECEPÇÃO DE PAGAMENTO E COMPROVANTE</p>
     </div>
     <div class="sale-info">

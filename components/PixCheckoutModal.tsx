@@ -194,7 +194,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: profile.store_name || 'Assinante SmartPOS',
+          name: profile.store_name || 'Assinante Vendeei',
           email: profile.email,
           cpfCnpj: rawCpfCnpj,
           userId: profile.id
@@ -270,7 +270,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <p className="text-sm font-bold text-slate-800">Assinatura SmartPOS Mensal</p>
+            <p className="text-sm font-bold text-slate-800">Assinatura Vendeei Mensal</p>
           </div>
           <button 
             onClick={onClose} 

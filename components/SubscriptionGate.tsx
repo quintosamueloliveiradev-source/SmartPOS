@@ -205,7 +205,7 @@ export const SubscriptionGate: React.FC = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: profile.store_name || 'Assinante SmartPOS',
+          name: profile.store_name || 'Assinante Vendeei',
           email: profile.email,
           cpfCnpj: rawCpfCnpj,
           userId: profile.id
@@ -294,7 +294,7 @@ export const SubscriptionGate: React.FC = () => {
             </h2>
             
             <p className="text-slate-400 mb-8 text-sm lg:text-base leading-relaxed">
-              Obrigado por usar o SmartPOS para gerenciar seu negócio! Seu período de demonstração gratuita expirou. Escolha um plano para ativar o acesso total.
+              Obrigado por usar o Vendeei para gerenciar seu negócio! Seu período de demonstração gratuita expirou. Escolha um plano para ativar o acesso total.
             </p>
             
             <div className="space-y-4">
@@ -518,7 +518,7 @@ export const SubscriptionGate: React.FC = () => {
               <div>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">Pagamento Confirmado!</h3>
                 <p className="text-slate-500 text-xs mt-2 max-w-[260px] mx-auto leading-relaxed">
-                  Perfeito! O Asaas processou sua transação de R$ 14,90. Sua assinatura SmartPOS foi ativada por mais 30 dias com sucesso.
+                  Perfeito! O Asaas processou sua transação de R$ 14,90. Sua assinatura Vendeei foi ativada por mais 30 dias com sucesso.
                 </p>
               </div>
 
@@ -530,7 +530,7 @@ export const SubscriptionGate: React.FC = () => {
           )}
 
           <p className="mt-8 text-[10px] text-slate-400 text-center leading-relaxed font-bold uppercase tracking-wide">
-            SmartPOS © 2026 • GESTÃO INTELIGENTE MVP
+            Vendeei © 2026 • GESTÃO INTELIGENTE MVP
           </p>
         </div>
 
@@ -568,7 +568,7 @@ export const SubscriptionGate: React.FC = () => {
                   Para utilizar a API real do Asaas, abra o arquivo <code className="bg-slate-900 px-1 py-0.5 rounded font-mono text-emerald-400">.env</code> na raiz do projeto e declare a chave do Token Sandbox obtido direto no painel do parceiro do Asaas:
                 </p>
                 <pre className="bg-slate-900 text-[11px] p-4 rounded-xl font-mono text-slate-200 overflow-x-auto border border-slate-800">
-{`# smartpos/.env
+{`# vendeei/.env
 ASAAS_API_KEY=$your_sandbox_access_token_copied_from_asaas`}
                 </pre>
                 <p className="text-xs text-slate-400 leading-relaxed">
@@ -592,7 +592,7 @@ async function handleCheckout(userId, userEmail) {
     line_items: [{
       price_data: {
         currency: 'brl',
-        product_data: { name: 'Assinatura Mensal SmartPOS' },
+        product_data: { name: 'Assinatura Mensal Vendeei' },
         unit_amount: 1490, // R$ 14,90
         recurring: { interval: 'month' },
       },
@@ -601,8 +601,8 @@ async function handleCheckout(userId, userEmail) {
     mode: 'subscription',
     client_reference_id: userId,
     customer_email: userEmail,
-    success_url: 'https://smartpos.com/dashboard?payment=success',
-    cancel_url: 'https://smartpos.com/dashboard?payment=fail',
+    success_url: 'https://vendeei.com/dashboard?payment=success',
+    cancel_url: 'https://vendeei.com/dashboard?payment=fail',
   });
   return session.url;
 }`}
@@ -642,7 +642,7 @@ app.post('/api/asaas/webhook', async (req, res) => {
 
             <div className="mt-6 pt-4 border-t border-slate-800 text-center">
               <p className="text-[11px] text-slate-400">
-                O SmartPOS está preparado para rodar em larga escala integrando com múltiplos gateways de pagamento com segurança absoluta!
+                O Vendeei está preparado para rodar em larga escala integrando com múltiplos gateways de pagamento com segurança absoluta!
               </p>
             </div>
           </div>

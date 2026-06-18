@@ -114,7 +114,7 @@ const MainContent: React.FC = () => {
           <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
         </div>
         <div className="space-y-2">
-          <p className="text-2xl font-black text-slate-900 tracking-tight">SmartPOS SaaS</p>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">Vendeei SaaS</p>
           <p className="font-bold text-slate-600 uppercase tracking-widest text-[10px]">Preparando seu ambiente seguro</p>
         </div>
       </div>
@@ -159,7 +159,7 @@ const MainContent: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm font-black tracking-tight leading-snug">
-                    Sua demonstração gratuita do SmartPOS expira em {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}.
+                    Sua demonstração gratuita do Vendeei expira em {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}.
                   </p>
                   <p className="text-xs text-white/85 mt-0.5 font-semibold">
                     Evite bloqueios indesejados e ative sua assinatura mensal por apenas R$ 14,90!

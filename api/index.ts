@@ -115,7 +115,7 @@ app.post('/api/asaas/create-pix', async (req, res) => {
         billingType: 'PIX',
         value: 14.90,
         dueDate,
-        description: 'Assinatura SmartPOS Mensal - ' + email,
+        description: 'Assinatura Vendeei Mensal - ' + email,
         externalReference: userId
       })
     });

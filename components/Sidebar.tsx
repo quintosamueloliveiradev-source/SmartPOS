@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
           <Store size={24} className="text-white" />
         </div>
         <div className="hidden lg:block overflow-hidden">
-          <h1 className="text-xl font-bold truncate">SmartPOS</h1>
+          <h1 className="text-xl font-bold truncate">Vendeei</h1>
           <p className="text-[10px] text-emerald-400 truncate uppercase tracking-widest font-black">{profile?.role === 'admin' ? 'Super Admin' : 'SaaS Pro'}</p>
           <p className="text-[11px] text-white truncate mt-1 font-bold" title={user?.email}>{user?.email}</p>
         </div>

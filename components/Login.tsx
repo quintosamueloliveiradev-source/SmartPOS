@@ -286,7 +286,7 @@ const MarqueeLogos = () => {
   return (
     <div className="w-full bg-white border-t border-slate-200 py-6 relative z-20 overflow-hidden flex flex-col items-center">
       <p className="text-[13px] font-bold text-slate-400 mb-6 text-center z-10 w-full">
-        +151 mil <span className="font-medium text-slate-400">histórias de crescimento começam com a SmartPOS.</span>
+        +151 mil <span className="font-medium text-slate-400">histórias de crescimento começam com a Vendeei.</span>
       </p>
       <div className="relative w-full flex items-center h-[40px]">
         <div className="absolute left-0 top-0 bottom-0 w-16 md:w-48 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
@@ -376,7 +376,7 @@ export const Login: React.FC = () => {
           <div className="bg-emerald-500 rounded-xl p-2.5 shadow-md shadow-emerald-500/20">
             <LogIn className="text-white" size={24} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-800">SmartPOS SaaS</span>
+          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei SaaS</span>
         </motion.div>
 
         <div className="max-w-xl">
@@ -447,7 +447,7 @@ export const Login: React.FC = () => {
                  ))}
               </div>
               <p className="text-slate-600 font-medium leading-relaxed mb-4 relative z-10 italic">
-                 "O SmartPOS transformou minha padaria. Antes eu perdia horas com o fluxo de caixa, hoje tenho tudo em tempo real na tela do celular."
+                 "O Vendeei transformou minha padaria. Antes eu perdia horas com o fluxo de caixa, hoje tenho tudo em tempo real na tela do celular."
               </p>
               <div className="flex items-center gap-3 relative z-10">
                  <img src="https://i.pravatar.cc/100?img=47" className="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="Ana Silva" />
@@ -551,7 +551,7 @@ export const Login: React.FC = () => {
           <div className="bg-emerald-500 rounded-xl p-2 w-10 h-10 flex items-center justify-center shadow-md">
             <LogIn className="text-white" size={20} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-800">SmartPOS</span>
+          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei</span>
         </div>
 
         <motion.div 
@@ -568,7 +568,7 @@ export const Login: React.FC = () => {
           </div>
           
           <div className="text-center mb-8">
-             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3">SmartPOS SaaS</h2>
+             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3">Vendeei SaaS</h2>
              <p className="text-slate-500 font-medium">Acesse sua conta para continuar</p>
           </div>
 
@@ -749,7 +749,7 @@ export const Login: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-12 text-slate-400 text-[13px] font-medium tracking-wide"
         >
-          © 2024 SmartPOS SaaS. Todos os direitos reservados.
+          © 2024 Vendeei SaaS. Todos os direitos reservados.
         </motion.div>
 
       </div>
