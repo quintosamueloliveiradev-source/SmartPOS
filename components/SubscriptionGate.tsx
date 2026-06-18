@@ -18,6 +18,87 @@ import {
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
 
+// Função de máscara dinâmica para CPF / CNPJ
+const formatCpfCnpj = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 14);
+  
+  if (digits.length <= 11) {
+    // Máscara CPF: 000.000.000-00
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  } else {
+    // Máscara CNPJ: 00.000.000/0000-00
+    return digits
+      .replace(/^(\d{2})(\d)/, '$1.$2')
+      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d)/, '.$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+};
+
+// Validação de CPF Real (Algoritmo de Dígito Verificador)
+const isValidCPF = (cpf: string): boolean => {
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1+$/.test(cpf)) return false;
+  
+  let sum = 0;
+  let remainder;
+  
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+  
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+  
+  return true;
+};
+
+// Validação de CNPJ Real (Algoritmo de Dígito Verificador)
+const isValidCNPJ = (cnpj: string): boolean => {
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  
+  let size = cnpj.length - 2;
+  let numbers = cnpj.substring(0, size);
+  const digits = cnpj.substring(size);
+  let sum = 0;
+  let pos = size - 7;
+  
+  for (let i = size; i >= 1; i--) {
+    sum += parseInt(numbers.charAt(size - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+  
+  let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  if (result !== parseInt(digits.charAt(0))) return false;
+  
+  size = size + 1;
+  numbers = cnpj.substring(0, size);
+  sum = 0;
+  pos = size - 7;
+  
+  for (let i = size; i >= 1; i--) {
+    sum += parseInt(numbers.charAt(size - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+  
+  result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  if (result !== parseInt(digits.charAt(1))) return false;
+  
+  return true;
+};
+
 export const SubscriptionGate: React.FC = () => {
   const { profile, addToast, signOut } = useStore();
   const [showIntegrationsGuide, setShowIntegrationsGuide] = useState(false);
@@ -94,10 +175,20 @@ export const SubscriptionGate: React.FC = () => {
     e.preventDefault();
     if (!profile) return;
     
-    // Validação básica do CPF ou CNPJ
+    // Validação robusta de CPF ou CNPJ com algoritmo de dígito verificador
     const rawCpfCnpj = cpfCnpj.replace(/\D/g, '');
-    if (rawCpfCnpj.length !== 11 && rawCpfCnpj.length !== 14) {
-      addToast('Por favor, digite um CPF (11 números) ou CNPJ (14 números) válido.', 'error');
+    if (rawCpfCnpj.length === 11) {
+      if (!isValidCPF(rawCpfCnpj)) {
+        addToast('O CPF inserido é inválido. Por favor, verifique os dígitos corretos.', 'error');
+        return;
+      }
+    } else if (rawCpfCnpj.length === 14) {
+      if (!isValidCNPJ(rawCpfCnpj)) {
+        addToast('O CNPJ inserido é inválido. Por favor, verifique os dígitos corretos.', 'error');
+        return;
+      }
+    } else {
+      addToast('Por favor, digite um CPF válido (11 números) ou CNPJ válido (14 números).', 'error');
       return;
     }
 
@@ -269,7 +360,10 @@ export const SubscriptionGate: React.FC = () => {
                     type="text" 
                     placeholder="000.000.000-00 ou 00.000.000/0000-00"
                     value={cpfCnpj}
-                    onChange={(e) => setCpfCnpj(e.target.value)}
+                    onChange={(e) => {
+                      const digitsOnly = e.target.value.replace(/\D/g, '');
+                      setCpfCnpj(formatCpfCnpj(digitsOnly));
+                    }}
                     required
                     maxLength={18}
                     className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none"
@@ -357,15 +451,29 @@ export const SubscriptionGate: React.FC = () => {
 
               {/* Copia e Cola */}
               <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-between gap-3 text-left">
-                <div className="max-w-[240px] overflow-hidden">
+                <div className="max-w-[200px] overflow-hidden">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
                   <p className="text-[11px] font-mono font-bold text-slate-700 truncate mt-0.5">{copiaCola || 'PIX_KEY'}</p>
                 </div>
                 <button 
                   onClick={handleCopyCode}
-                  className="p-3 bg-white border border-slate-200 hover:bg-slate-100/50 rounded-xl transition-all cursor-pointer text-slate-700 active:scale-95 shrink-0"
+                  className={`px-3 py-2.5 rounded-xl border font-bold text-xs transition-all active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                    copied 
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                      : 'bg-white border-slate-200 hover:bg-slate-100/50 text-slate-700'
+                  }`}
                 >
-                  {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
+                  {copied ? (
+                    <>
+                      <Check size={14} className="text-emerald-500" />
+                      <span>Copiado!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} />
+                      <span>Copiar</span>
+                    </>
+                  )}
                 </button>
               </div>
 
