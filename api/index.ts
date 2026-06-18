@@ -87,6 +87,19 @@ app.post('/api/asaas/create-pix', async (req, res) => {
       console.log(`Novo cliente cadastrado com sucesso. ID: ${customerId}`);
     }
 
+    // Salva o ID do cliente Asaas no Supabase para uso futuro (como histórico de faturas)
+    if (supabaseClient && customerId) {
+      const { error: updateCustError } = await supabaseClient
+        .from('profiles')
+        .update({ asaas_customer_id: customerId })
+        .eq('id', userId);
+      if (updateCustError) {
+        console.error('Erro ao salvar asaas_customer_id no perfil:', updateCustError);
+      } else {
+        console.log(`asaas_customer_id registrado com sucesso no Supabase para ${userId}`);
+      }
+    }
+
     // 2. Criar Cobrança para PIX
     console.log(`Criando cobrança PIX para o cliente ${customerId}...`);
     // Data de vencimento: amanhã
@@ -198,6 +211,105 @@ app.get('/api/asaas/check-payment/:paymentId', async (req, res) => {
       success: false, 
       error: error.message,
       message: error.message 
+    });
+  }
+});
+
+// Listar histórico de pagamentos do cliente Asaas ou usuário ID do Supabase
+app.get('/api/asaas/payments/:customerId', async (req, res) => {
+  try {
+    let { customerId } = req.params;
+    const apiKey = process.env.ASAAS_API_KEY;
+
+    if (!apiKey || apiKey.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: 'Chave do Asaas ausente no servidor.',
+        message: 'Chave do Asaas ausente no servidor.'
+      });
+    }
+
+    if (!customerId || customerId === 'undefined' || customerId.trim() === '') {
+      return res.json({ success: true, payments: [] });
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'access_token': apiKey
+    };
+
+    // Se não for um ID do Asaas (que começa com cus_), vamos obter do Supabase ou buscar no Asaas
+    if (!customerId.startsWith('cus_')) {
+      let resolvedCustomerId = '';
+      if (supabaseClient) {
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('asaas_customer_id, email')
+          .eq('id', customerId)
+          .maybeSingle();
+        
+        if (profile?.asaas_customer_id) {
+          resolvedCustomerId = profile.asaas_customer_id;
+        } else if (profile?.email) {
+          // Busca no Asaas pelo e-mail
+          const searchUrl = `https://sandbox.asaas.com/api/v3/customers?email=${encodeURIComponent(profile.email)}`;
+          const searchResponse = await fetch(searchUrl, { method: 'GET', headers });
+          if (searchResponse.ok) {
+            const searchData = await searchResponse.json();
+            if (searchData.data && searchData.data.length > 0) {
+              resolvedCustomerId = searchData.data[0].id;
+              
+              // Salva de volta no banco para agilizar próximas vezes
+              await supabaseClient
+                .from('profiles')
+                .update({ asaas_customer_id: resolvedCustomerId })
+                .eq('id', customerId);
+            }
+          }
+        }
+      }
+      customerId = resolvedCustomerId;
+    }
+
+    if (!customerId) {
+      return res.json({ success: true, payments: [] });
+    }
+
+    const response = await fetch(`https://sandbox.asaas.com/api/v3/payments?customer=${customerId}`, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Impossível listar pagamentos na API do Asaas (${response.status}): ${errText}`);
+    }
+
+    const data = await response.json();
+    
+    // Simplificar lista de cobranças para o frontend
+    const payments = (data.data || []).map((p: any) => ({
+      id: p.id,
+      dateCreated: p.dateCreated,
+      dueDate: p.dueDate,
+      paymentDate: p.paymentDate,
+      value: p.value,
+      billingType: p.billingType,
+      status: p.status, // CONFIRMED, RECEIVED, OVERDUE, PENDING, etc.
+      invoiceUrl: p.invoiceUrl,
+      bankSlipUrl: p.bankSlipUrl,
+      transactionReceiptUrl: p.transactionReceiptUrl
+    }));
+
+    return res.json({
+      success: true,
+      payments
+    });
+  } catch (error: any) {
+    console.error('Erro ao listar pagamentos do Asaas:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });

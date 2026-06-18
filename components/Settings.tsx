@@ -1,10 +1,27 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Download, Upload, Trash2, AlertTriangle, Save, RefreshCw, X, Lock, Shield, Key } from 'lucide-react';
+import { 
+  Download, 
+  Upload, 
+  Trash2, 
+  AlertTriangle, 
+  Save, 
+  RefreshCw, 
+  X, 
+  Lock, 
+  Shield, 
+  Key, 
+  Receipt, 
+  CreditCard, 
+  ExternalLink, 
+  Calendar, 
+  Sparkles, 
+  AlertCircle 
+} from 'lucide-react';
 
 export const Settings: React.FC = () => {
-  const { products, sales, importData, resetSystem, updateAdminPassword, isDefaultPassword } = useStore();
+  const { products, sales, importData, resetSystem, updateAdminPassword, isDefaultPassword, profile, addToast } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [modalType, setModalType] = useState<'restore' | 'reset' | 'reset-initial' | null>(null);
@@ -15,6 +32,53 @@ export const Settings: React.FC = () => {
 
   const [pwdForm, setPwdForm] = useState({ current: '', new: '', confirm: '' });
   const [pwdMessage, setPwdMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+  // Estados do histórico de faturas
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      if (!profile?.id) return;
+      setLoadingPayments(true);
+      try {
+        const response = await fetch(`/api/asaas/payments/${profile.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setPayments(data.payments || []);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao obter cobranças:", err);
+      } finally {
+        setLoadingPayments(false);
+      }
+    };
+
+    fetchPayments();
+  }, [profile?.id]);
+
+  const getStatusBadge = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case 'RECEIVED':
+      case 'CONFIRMED':
+        return <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-150 text-[10px] font-black uppercase rounded-full tracking-wide">PAGO</span>;
+      case 'PENDING':
+        return <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-150 text-[10px] font-black uppercase rounded-full tracking-wide">AGUARDANDO PAGAMENTO</span>;
+      case 'OVERDUE':
+        return <span className="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-150 text-[10px] font-black uppercase rounded-full tracking-wide">VENCIDO</span>;
+      default:
+        return <span className="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-150 text-[10px] font-black uppercase rounded-full tracking-wide">{status || 'PENDENTE'}</span>;
+    }
+  };
+
+  const getPaymentMethodLabel = (type: string) => {
+    if (type?.toUpperCase() === 'PIX') return 'Pix Imediato';
+    if (type?.toUpperCase() === 'CREDIT_CARD') return 'Cartão de Crédito';
+    if (type?.toUpperCase() === 'BOLETO') return 'Boleto Bancário';
+    return type || 'Pix';
+  };
 
   const handleExportBackup = () => {
     const data = { timestamp: Date.now(), version: 1, products, sales };
@@ -93,6 +157,163 @@ export const Settings: React.FC = () => {
       </header>
 
       <div className="grid gap-8">
+        {/* Minha Assinatura & Histórico de Faturas */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100">
+                <Receipt size={28} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-800">Minha Assinatura & Histórico</h3>
+                <p className="text-sm text-slate-500">Acompanhe seu status e acesse comprovantes de faturas integradas pelo Asaas.</p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={async () => {
+                if (!profile?.id) return;
+                setLoadingPayments(true);
+                try {
+                  const r = await fetch(`/api/asaas/payments/${profile.id}`);
+                  if (r.ok) {
+                    const d = await r.json();
+                    if (d.success) setPayments(d.payments || []);
+                  }
+                  addToast('Histórico de faturas atualizado!', 'success');
+                } catch {
+                  addToast('Erro ao atualizar faturas', 'error');
+                } finally {
+                  setLoadingPayments(false);
+                }
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 transition-colors"
+            >
+              <RefreshCw size={14} className={loadingPayments ? 'animate-spin' : ''} />
+              Atualizar Lista
+            </button>
+          </div>
+
+          {/* Status Geral */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8 pt-2">
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
+              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                <CreditCard size={20} />
+              </div>
+              <div>
+                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Status do Acesso</span>
+                <span className="text-sm font-black text-slate-800 flex items-center gap-1.5 mt-0.5">
+                  {profile?.subscriptionStatus === 'active' || profile?.subscription_status === 'active' ? (
+                    <span className="text-emerald-600 flex items-center gap-1"><Sparkles size={14} /> Ativo</span>
+                  ) : profile?.subscriptionStatus === 'trial' || profile?.subscription_status === 'trial' ? (
+                    <span className="text-indigo-600">Período de Testes</span>
+                  ) : (
+                    <span className="text-rose-600">Expirado / Inativo</span>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
+              <div className="p-3 bg-sky-50 text-sky-600 rounded-xl">
+                <Calendar size={20} />
+              </div>
+              <div>
+                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Validade / Expiração</span>
+                <span className="text-sm font-black text-slate-800 mt-0.5 block">
+                  {profile?.subscription_expiry ? (
+                    new Date(profile.subscription_expiry).toLocaleDateString('pt-BR')
+                  ) : profile?.trialEndDate ? (
+                    new Date(profile.trialEndDate).toLocaleDateString('pt-BR')
+                  ) : (
+                    'N/D'
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
+              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Mapeamento Asaas</span>
+                <span className="text-xs font-black text-slate-800 mt-0.5 block truncate max-w-[180px]">
+                  {profile?.asaasCustomerId || profile?.asaas_customer_id || 'Não vinculado ao gateway'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela ou Lista de Cobranças */}
+          {loadingPayments ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-3">
+              <RefreshCw size={24} className="text-indigo-600 animate-spin" />
+              <p className="text-xs font-bold text-slate-400">Buscando faturas no Asaas Sandbox...</p>
+            </div>
+          ) : payments.length === 0 ? (
+            <div className="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center">
+              <Receipt size={36} className="text-slate-300 mx-auto mb-3" />
+              <h4 className="text-sm font-black text-slate-700">Nenhuma fatura encontrada</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Sua assinatura corporativa ou histórico de lançamentos do Asaas será exibido aqui assim que forem gerados.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-2xl border border-slate-200/80">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                    <th className="py-4 px-5">ID Cobrança</th>
+                    <th className="py-4 px-5">Emissão</th>
+                    <th className="py-4 px-5">Vencimento</th>
+                    <th className="py-4 px-5">Valor</th>
+                    <th className="py-4 px-5">Método de Pgto</th>
+                    <th className="py-4 px-5">Status</th>
+                    <th className="py-4 px-5 text-right">Comprovante</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-150">
+                  {payments.map((p) => (
+                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4 px-5 text-xs font-black text-slate-600">
+                        {p.id}
+                      </td>
+                      <td className="py-4 px-5 text-xs font-bold text-slate-600">
+                        {p.dateCreated ? new Date(p.dateCreated).toLocaleDateString('pt-BR') : '-'}
+                      </td>
+                      <td className="py-4 px-5 text-xs font-semibold text-slate-500">
+                        {p.dueDate ? new Date(p.dueDate).toLocaleDateString('pt-BR') : '-'}
+                      </td>
+                      <td className="py-4 px-5 text-xs font-black text-slate-900">
+                        R$ {Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="py-4 px-5 text-xs font-semibold text-slate-500">
+                        {getPaymentMethodLabel(p.billingType)}
+                      </td>
+                      <td className="py-4 px-5">
+                        {getStatusBadge(p.status)}
+                      </td>
+                      <td className="py-4 px-5 text-right">
+                        {p.invoiceUrl || p.transactionReceiptUrl || p.bankSlipUrl ? (
+                          <a 
+                            href={p.transactionReceiptUrl || p.invoiceUrl || p.bankSlipUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-black tracking-tight transition-colors"
+                          >
+                            Visualizar <ExternalLink size={11} />
+                          </a>
+                        ) : (
+                          <span className="text-[11px] font-extrabold text-slate-300">Nenhum</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
         <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100">
            <div className="flex items-start gap-4 mb-8">
             <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
