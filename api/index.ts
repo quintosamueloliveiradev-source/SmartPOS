@@ -1,7 +1,17 @@
 import express from 'express';
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
 app.use(express.json());
+
+// Instanciar cliente do Supabase para processamento seguro no backend
+const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+
+const supabaseClient = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
+}) : null;
+
 
 // Rota de Health Check
 app.get('/api/health', (req, res) => {
@@ -199,9 +209,40 @@ app.post('/api/asaas/webhook', async (req, res) => {
     console.log('Webhook do Asaas recebido:', JSON.stringify(event));
 
     if (event && (event.event === 'PAYMENT_CONFIRMED' || event.event === 'PAYMENT_RECEIVED')) {
-      const userId = event.payment.externalReference;
+      const paymentData = event.payment;
+      if (!paymentData) {
+        console.warn('paymentData ausente no corpo do webhook.');
+        return res.status(400).json({ success: false, error: 'paymentData ausente.' });
+      }
+
+      const userId = paymentData.externalReference;
       if (userId) {
         console.log(`Reconciliando pagamento do usuário ${userId}. Atualizando no banco...`);
+        if (supabaseClient) {
+          const expiryDate = new Date();
+          expiryDate.setDate(expiryDate.getDate() + 30);
+          const ISOExpiry = expiryDate.toISOString();
+
+          const { data, error } = await supabaseClient
+            .from('profiles')
+            .update({ 
+              subscription_status: 'active',
+              subscription_expiry: ISOExpiry,
+              expires_at: ISOExpiry
+            })
+            .eq('id', userId);
+
+          if (error) {
+            console.error(`Erro ao atualizar perfil do usuário ${userId} por webhook:`, error);
+            throw error;
+          }
+
+          console.log(`Sucesso na ativação do usuário: ${userId}.`);
+        } else {
+          console.warn('supabaseClient não pôde ser inicializado no backend. Chaves do Supabase ausentes.');
+        }
+      } else {
+        console.warn('externalReference (userId) não encontrado no evento de pagamento do Asaas.');
       }
     }
     return res.status(200).json({ received: true });

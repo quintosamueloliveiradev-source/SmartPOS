@@ -11,6 +11,9 @@ import {
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
 
+// Controle visual para Produção - quando true, esconde botões/mensagens de simulação/debug
+const isProduction = true;
+
 // Helper for dynamic formatting: CPF / CNPJ 
 const formatCpfCnpj = (value: string) => {
   const digits = value.replace(/\D/g, '').slice(0, 14);
@@ -332,22 +335,26 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     )}
                   </button>
 
-                  <button 
-                    type="button"
-                    onClick={handleSimulatePaymentApproval}
-                    className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    Ativar Modo de Demonstração (Simulado)
-                  </button>
+                  {!isProduction && (
+                    <button 
+                      type="button"
+                      onClick={handleSimulatePaymentApproval}
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Ativar Modo de Demonstração (Simulado)
+                    </button>
+                  )}
                 </div>
               </form>
 
-              <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
-                <div className="text-amber-600 mt-0.5 shrink-0"><Star size={14} fill="currentColor" /></div>
-                <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-                  <strong>Gateway Asaas Ativo:</strong> Se sua API Key estiver configurada, o PIX será gerado na Sandbox real com atualização por Polling.
-                </p>
-              </div>
+              {!isProduction && (
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
+                  <div className="text-amber-600 mt-0.5 shrink-0"><Star size={14} fill="currentColor" /></div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    <strong>Gateway Asaas Ativo:</strong> Se sua API Key estiver configurada, o PIX será gerado na Sandbox real com atualização por Polling.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -374,7 +381,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                       Buscando QR Code...
                     </div>
                   )}
-                  {isSimulated && (
+                  {isSimulated && !isProduction && (
                     <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1 py-0.5 rounded shadow-sm">
                       MOCK ACTIVE
                     </div>
@@ -416,13 +423,15 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               </div>
 
               <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                <button 
-                  onClick={handleSimulatePaymentApproval}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-sm cursor-pointer flex items-center justify-center gap-1"
-                >
-                  <CheckCircle size={12} />
-                  Simular Confirmação
-                </button>
+                {!isProduction && (
+                  <button 
+                    onClick={handleSimulatePaymentApproval}
+                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-sm cursor-pointer flex items-center justify-center gap-1 mb-1.5"
+                  >
+                    <CheckCircle size={12} />
+                    Simular Confirmação
+                  </button>
+                )}
                 <button 
                   onClick={() => {
                     setPollingActive(false);

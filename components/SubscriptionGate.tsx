@@ -18,6 +18,9 @@ import {
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
 
+// Controle visual para Produção - quando true, esconde botões/mensagens de simulação/debug
+const isProduction = true;
+
 // Função de máscara dinâmica para CPF / CNPJ
 const formatCpfCnpj = (value: string) => {
   const digits = value.replace(/\D/g, '').slice(0, 14);
@@ -325,13 +328,15 @@ export const SubscriptionGate: React.FC = () => {
               <LogOut size={14} />
               Desconectar minha conta
             </button>
-            <button 
-              onClick={() => setShowIntegrationsGuide(!showIntegrationsGuide)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              <Code size={14} />
-              {showIntegrationsGuide ? 'Ocultar Código da API' : 'Ver Código da API / Webhook'}
-            </button>
+            {!isProduction && (
+              <button 
+                onClick={() => setShowIntegrationsGuide(!showIntegrationsGuide)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                <Code size={14} />
+                {showIntegrationsGuide ? 'Ocultar Código da API' : 'Ver Código da API / Webhook'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -392,22 +397,26 @@ export const SubscriptionGate: React.FC = () => {
                     )}
                   </button>
 
-                  <button 
-                    type="button"
-                    onClick={handleSimulatePaymentApproval}
-                    className="w-full py-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-500 rounded-2xl font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    Simular Ativação de Teste
-                  </button>
+                  {!isProduction && (
+                    <button 
+                      type="button"
+                      onClick={handleSimulatePaymentApproval}
+                      className="w-full py-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-500 rounded-2xl font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Simular Ativação de Teste
+                    </button>
+                  )}
                 </div>
               </form>
 
-              <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 flex gap-3">
-                <div className="text-yellow-600 mt-0.5 shrink-0"><Star size={16} fill="currentColor" /></div>
-                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                  <strong>Sandbox Integration:</strong> O sistema está pronto! Insira o CPF, clique no botão e o app chamará o gateway para exibir o Pix oficial em tempo de execução.
-                </p>
-              </div>
+              {!isProduction && (
+                <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 flex gap-3">
+                  <div className="text-yellow-600 mt-0.5 shrink-0"><Star size={16} fill="currentColor" /></div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                    <strong>Sandbox Integration:</strong> O sistema está pronto! Insira o CPF, clique no botão e o app chamará o gateway para exibir o Pix oficial em tempo de execução.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -436,7 +445,7 @@ export const SubscriptionGate: React.FC = () => {
                     </div>
                   )}
                   
-                  {isSimulated && (
+                  {isSimulated && !isProduction && (
                     <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
                       MOCK ACTIVE
                     </div>
@@ -478,13 +487,15 @@ export const SubscriptionGate: React.FC = () => {
               </div>
 
               <div className="space-y-2 pt-2 border-t border-slate-100">
-                <button 
-                  onClick={handleSimulatePaymentApproval}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/15 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <CheckCircle size={14} />
-                  Simular Confirmação no Gateway
-                </button>
+                {!isProduction && (
+                  <button 
+                    onClick={handleSimulatePaymentApproval}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/15 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <CheckCircle size={14} />
+                    Simular Confirmação no Gateway
+                  </button>
+                )}
                 <button 
                   onClick={() => {
                     setPollingActive(false);
