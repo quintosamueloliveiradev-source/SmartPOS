@@ -1,5 +1,20 @@
-import React, { useState } from 'react';
-import { CreditCard, ShieldAlert, CheckCircle, Smartphone, ExternalLink, Code, Terminal, Clock, Star, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  CreditCard, 
+  ShieldAlert, 
+  CheckCircle, 
+  Smartphone, 
+  ExternalLink, 
+  Code, 
+  Terminal, 
+  Clock, 
+  Star, 
+  Zap, 
+  Copy, 
+  Check, 
+  RefreshCw, 
+  LogOut 
+} from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
 
@@ -7,9 +22,135 @@ export const SubscriptionGate: React.FC = () => {
   const { profile, addToast, signOut } = useStore();
   const [showIntegrationsGuide, setShowIntegrationsGuide] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
+  
+  // Estados para o fluxo do Pix Asaas Realtime
+  const [paymentStep, setPaymentStep] = useState<'initial' | 'pix_details' | 'success'>('initial');
+  const [cpfCnpj, setCpfCnpj] = useState('');
+  const [paymentId, setPaymentId] = useState('');
+  const [qrCodeBase64, setQrCodeBase64] = useState('');
+  const [copiaCola, setCopiaCola] = useState('');
+  const [isSimulated, setIsSimulated] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [pollingActive, setPollingActive] = useState(false);
+  const [pollingErrorCount, setPollingErrorCount] = useState(0);
 
-  // Simulação de pagamento imediato para fins de testes do MVP
-  const simulatePayment = async () => {
+  // Polling para checar status do pagamento junto ao servidor
+  useEffect(() => {
+    let intervalId: any;
+
+    if (pollingActive && paymentId) {
+      intervalId = setInterval(async () => {
+        try {
+          const response = await fetch(`/api/asaas/check-payment/${paymentId}`);
+          if (!response.ok) {
+            throw new Error('Falha ao comunicar com o validador de faturas.');
+          }
+          
+          const data = await response.json();
+          if (data.success && (data.status === 'CONFIRMED' || data.status === 'RECEIVED')) {
+            setPollingActive(false);
+            clearInterval(intervalId);
+            
+            // Ativa 30 dias de acesso completo no Supabase
+            const { error } = await supabase
+              .from('profiles')
+              .update({ 
+                subscription_status: 'active',
+                subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+              })
+              .eq('id', profile!.id);
+
+            if (error) throw error;
+            
+            addToast('Pagamento confirmado com sucesso pelo Asaas!', 'success');
+            setPaymentStep('success');
+            
+            // Recarrega a página após 3 segundos para recarregar o contexto com acesso liberado
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          }
+        } catch (err) {
+          console.error('Erro ao verificar pagamento:', err);
+          setPollingErrorCount(prev => prev + 1);
+          // Se houverem muitos erros seguidos de polling, desativa para preservar recusos
+          if (pollingErrorCount > 15) {
+            setPollingActive(false);
+            addToast('Poller inativo devido a erros de conexão consecutivos.', 'error');
+          }
+        }
+      }, 4000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [pollingActive, paymentId, profile, addToast, pollingErrorCount]);
+
+  // Iniciar fluxo do checkout gerando o Pix no Asaas
+  const handleGeneratePix = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    
+    // Validação básica do CPF ou CNPJ
+    const rawCpfCnpj = cpfCnpj.replace(/\D/g, '');
+    if (rawCpfCnpj.length !== 11 && rawCpfCnpj.length !== 14) {
+      addToast('Por favor, digite um CPF (11 números) ou CNPJ (14 números) válido.', 'error');
+      return;
+    }
+
+    setLoadingPayment(true);
+    try {
+      addToast('Conectando ao gateway Asaas Sandbox...', 'info');
+      
+      const response = await fetch('/api/asaas/create-pix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: profile.store_name || 'Assinante SmartPOS',
+          email: profile.email,
+          cpfCnpj: rawCpfCnpj,
+          userId: profile.id
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Erro inesperado ao gerar fatura no Asaas.');
+      }
+
+      setPaymentId(data.paymentId);
+      setQrCodeBase64(data.encodedImage);
+      setCopiaCola(data.payload);
+      setIsSimulated(!!data.simulated);
+      setPaymentStep('pix_details');
+      setPollingActive(true);
+      
+      if (data.simulated) {
+        addToast('Como sua ASAAS_API_KEY no .env não está configurada, geramos um Pix simulado!', 'success');
+      } else {
+        addToast('Cobrança Pix emitida no Asaas Sandbox com sucesso!', 'success');
+      }
+
+    } catch (err: any) {
+      addToast(err.message || 'Falha ao integrar com o gateway Asaas.', 'error');
+    } finally {
+      setLoadingPayment(false);
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (!copiaCola) return;
+    navigator.clipboard.writeText(copiaCola);
+    setCopied(true);
+    addToast('Chave copia e cola copiada para a área de transferência!', 'success');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Simular aprovação instantânea se for simulado
+  const handleSimulatePaymentApproval = async () => {
     if (!profile) return;
     setLoadingPayment(true);
     try {
@@ -22,10 +163,13 @@ export const SubscriptionGate: React.FC = () => {
         .eq('id', profile.id);
 
       if (error) throw error;
-      addToast('Sucesso! Assinatura ativada por 30 dias (Modo Simulado).', 'success');
-      window.location.reload();
+      addToast('Incrível! Assinatura liberada instantaneamente no modo simulado.', 'success');
+      setPaymentStep('success');
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (err) {
-      addToast('Erro ao processar pagamento simulado', 'error');
+      addToast('Erro ao simular liberação', 'error');
     } finally {
       setLoadingPayment(false);
     }
@@ -56,7 +200,7 @@ export const SubscriptionGate: React.FC = () => {
               <ul className="space-y-3.5">
                 {[
                   { title: 'Controle de Estoque Inteligente', desc: 'Alertas de falta e cálculo automático de custos e margem de lucro.' },
-                  { title: 'Ponto de Venda (PDV) Rápido', desc: 'Fluxo ágil de vendas, carrinho persistente e suporte a leitor de código de barras.' },
+                  { title: 'Ponto de Venda (PDV) Rápido', desc: 'Fluxo ágil de vendas, carrinho pré-computado e suporte a leitor de código de barras.' },
                   { title: 'Histórico Completo & Estornos', desc: 'Gere cupons térmicos (58mm) e relatórios formatados em PDF A4.' },
                   { title: 'Painel Financeiro Detalhado', desc: 'Estatísticas de receita e margem de lucro com gráficos refinados.' }
                 ].map((feature, i) => (
@@ -77,66 +221,186 @@ export const SubscriptionGate: React.FC = () => {
           <div className="mt-12 pt-6 border-t border-slate-800 flex items-center justify-between">
             <button 
               onClick={signOut}
-              className="text-xs font-bold text-slate-400 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
             >
-              ← Desconectar minha conta
+              <LogOut size={14} />
+              Desconectar minha conta
             </button>
             <button 
               onClick={() => setShowIntegrationsGuide(!showIntegrationsGuide)}
               className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
             >
               <Code size={14} />
-              {showIntegrationsGuide ? 'Ocultar Guia da API' : 'Ver Guia da API / Webhook'}
+              {showIntegrationsGuide ? 'Ocultar Código da API' : 'Ver Código da API / Webhook'}
             </button>
           </div>
         </div>
 
-        {/* Direita: Checkout */}
-        <div className="p-8 md:p-12 w-full md:w-[380px] bg-white text-slate-950 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100">
-          <div className="text-center mb-8">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Plano Profissional Completo</span>
-            <div className="flex items-baseline justify-center gap-1 mt-2">
-              <span className="text-sm font-bold text-slate-400">R$</span>
-              <span className="text-5xl font-black text-slate-900 tracking-tight">14,90</span>
-              <span className="text-sm font-bold text-slate-400">/mês</span>
-            </div>
-            <p className="text-xs text-slate-500 mt-2">Sem fidelidade, cancele a qualquer momento</p>
-          </div>
-
-          <div className="space-y-4">
-            <button 
-              onClick={simulatePayment}
-              disabled={loadingPayment}
-              className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
-            >
-              <CreditCard size={18} className="group-hover:translate-x-0.5 transition-transform" />
-              {loadingPayment ? 'Ativando...' : 'Assinar Agora (Simulado)'}
-            </button>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200/80"></div>
+        {/* Direita: Fluxo de Checkout Pix Asaas */}
+        <div className="p-8 md:p-12 w-full md:w-[410px] bg-white text-slate-950 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100">
+          
+          {paymentStep === 'initial' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 block">Assinatura Mensal</span>
+                <div className="flex items-baseline justify-center gap-1 mt-2">
+                  <span className="text-sm font-bold text-slate-400">R$</span>
+                  <span className="text-5xl font-black text-slate-900 tracking-tight">14,90</span>
+                  <span className="text-sm font-bold text-slate-400">/mês</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">Plano completo. Cancele e pause quando desejar.</p>
               </div>
-              <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-wider">
-                <span className="bg-white px-3 text-slate-400">Ou use o PIX</span>
+
+              {/* Formulário de Identificação Requerido pelo Asaas */}
+              <form onSubmit={handleGeneratePix} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                    CPF ou CNPJ do Pagador *
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                    value={cpfCnpj}
+                    onChange={(e) => setCpfCnpj(e.target.value)}
+                    required
+                    maxLength={18}
+                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none"
+                  />
+                  <p className="text-[10px] text-slate-400 leading-tight">
+                    * Requerido pela regulamentação do Banco Central para emissão de chaves Pix registradas.
+                  </p>
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <button 
+                    type="submit"
+                    disabled={loadingPayment}
+                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {loadingPayment ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" />
+                        Trabalhando...
+                      </>
+                    ) : (
+                      <>
+                        <Smartphone size={16} />
+                        Pagar com PIX Imediato 
+                      </>
+                    )}
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={handleSimulatePaymentApproval}
+                    className="w-full py-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-500 rounded-2xl font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    Simular Ativação de Teste
+                  </button>
+                </div>
+              </form>
+
+              <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 flex gap-3">
+                <div className="text-yellow-600 mt-0.5 shrink-0"><Star size={16} fill="currentColor" /></div>
+                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                  <strong>Sandbox Integration:</strong> O sistema está pronto! Insira o CPF, clique no botão e o app chamará o gateway para exibir o Pix oficial em tempo de execução.
+                </p>
               </div>
             </div>
+          )}
 
-            <button 
-              onClick={simulatePayment}
-              className="w-full py-3.5 border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Smartphone size={16} className="text-emerald-600" />
-              Pagar com PIX Imediato (R$ 14,90)
-            </button>
-          </div>
+          {paymentStep === 'pix_details' && (
+            <div className="space-y-6 animate-fade-in text-center">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                  Aguardando Pagamento Pix
+                </span>
+                <p className="text-sm font-bold text-slate-700 mt-3">Escaneie o QR Code ou Use o Copia e Cola:</p>
+              </div>
 
-          <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 mt-8 flex gap-3">
-            <div className="text-yellow-600 mt-0.5 shrink-0"><Star size={16} fill="currentColor" /></div>
-            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-              <strong>Modo de Demonstração:</strong> Atualmente o sistema roda de forma integrada ao Supabase do cliente. Clique nos botões acima para simular o recebimento de pagamento real e prosseguir para usar o painel do PDV imediatamente.
-            </p>
-          </div>
+              {/* Renderização Dinâmica do QR Code obtido do Asaas */}
+              <div className="flex flex-col items-center justify-center">
+                <div className="relative p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl shadow-sm mb-4">
+                  {qrCodeBase64 ? (
+                    <img 
+                      src={`data:image/png;base64,${qrCodeBase64}`} 
+                      alt="Asaas QR Code Pix" 
+                      className="w-44 h-44 object-contain rounded-lg"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-44 h-44 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-xs">
+                      Buscando QR Code...
+                    </div>
+                  )}
+                  
+                  {isSimulated && (
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                      MOCK ACTIVE
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-4 justify-center">
+                  <RefreshCw size={12} className="animate-spin text-emerald-600" />
+                  <span>Sincronizado com Asaas Sandbox...</span>
+                </div>
+              </div>
+
+              {/* Copia e Cola */}
+              <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-between gap-3 text-left">
+                <div className="max-w-[240px] overflow-hidden">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
+                  <p className="text-[11px] font-mono font-bold text-slate-700 truncate mt-0.5">{copiaCola || 'PIX_KEY'}</p>
+                </div>
+                <button 
+                  onClick={handleCopyCode}
+                  className="p-3 bg-white border border-slate-200 hover:bg-slate-100/50 rounded-xl transition-all cursor-pointer text-slate-700 active:scale-95 shrink-0"
+                >
+                  {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
+                </button>
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-slate-100">
+                <button 
+                  onClick={handleSimulatePaymentApproval}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/15 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle size={14} />
+                  Simular Confirmação no Gateway
+                </button>
+                <button 
+                  onClick={() => {
+                    setPollingActive(false);
+                    setPaymentStep('initial');
+                  }}
+                  className="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs"
+                >
+                  ← Voltar e alterar dados
+                </button>
+              </div>
+            </div>
+          )}
+
+          {paymentStep === 'success' && (
+            <div className="text-center py-8 space-y-6 animate-fade-in flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-emerald-50 text-emerald-500 border-2 border-emerald-200 rounded-3xl flex items-center justify-center animate-bounce mb-2">
+                <CheckCircle size={36} />
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Pagamento Confirmado!</h3>
+                <p className="text-slate-500 text-xs mt-2 max-w-[260px] mx-auto leading-relaxed">
+                  Perfeito! O Asaas processou sua transação de R$ 14,90. Sua assinatura SmartPOS foi ativada por mais 30 dias com sucesso.
+                </p>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 uppercase font-black tracking-widest animate-pulse">
+                <RefreshCw size={12} className="animate-spin" />
+                Carregando PDV...
+              </div>
+            </div>
+          )}
 
           <p className="mt-8 text-[10px] text-slate-400 text-center leading-relaxed font-bold uppercase tracking-wide">
             SmartPOS © 2026 • GESTÃO INTELIGENTE MVP
@@ -168,18 +432,32 @@ export const SubscriptionGate: React.FC = () => {
 
             <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar font-sans text-sm text-slate-300">
               
-              {/* Seção Stripe */}
+              {/* Seção Como Configurar .env */}
               <div className="space-y-2 border-l-2 border-indigo-500 pl-4">
                 <h4 className="font-bold text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Opção A: Gateway Stripe
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Onde configurar seu Token?
                 </h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Para criar um checkout seguro na Stripe e tratar o webhook de retorno de forma automática:
+                  Para utilizar a API real do Asaas, abra o arquivo <code className="bg-slate-900 px-1 py-0.5 rounded font-mono text-emerald-400">.env</code> na raiz do projeto e declare a chave do Token Sandbox obtido direto no painel do parceiro do Asaas:
                 </p>
+                <pre className="bg-slate-900 text-[11px] p-4 rounded-xl font-mono text-slate-200 overflow-x-auto border border-slate-800">
+{`# smartpos/.env
+ASAAS_API_KEY=$your_sandbox_access_token_copied_from_asaas`}
+                </pre>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Ao reiniciar o servidor, o sistema fará a comunicação REST direta com <code className="text-indigo-400">https://sandbox.asaas.com/api/v3</code> para emitir faturas reais no nome do cliente da conta, gerando o QR Code dinamicamente com base nos dados informados!
+                </p>
+              </div>
+
+              {/* Seção Stripe */}
+              <div className="space-y-2 border-l-2 border-slate-500 pl-4">
+                <h4 className="font-bold text-slate-200 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-slate-500"></span> Exemplo de Configuração Stripe
+                </h4>
                 <pre className="bg-slate-900 text-[11px] p-4 rounded-xl font-mono text-slate-200 overflow-x-auto border border-slate-800 leading-relaxed">
 {`// 1. Criar Checkout Session (Backend / Supabase Edge Function)
 import Stripe from 'stripe';
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 async function handleCheckout(userId, userEmail) {
   const session = await stripe.checkout.sessions.create({
@@ -196,85 +474,39 @@ async function handleCheckout(userId, userEmail) {
     mode: 'subscription',
     client_reference_id: userId,
     customer_email: userEmail,
-    success_url: 'https://seusite.com/dashboard?payment=success',
-    cancel_url: 'https://seusite.com/dashboard?payment=fail',
+    success_url: 'https://smartpos.com/dashboard?payment=success',
+    cancel_url: 'https://smartpos.com/dashboard?payment=fail',
   });
-  return session.url; // Redirecionar cliente para esta URL!
+  return session.url;
 }`}
-                </pre>
-              </div>
-
-              {/* Seção Asaas */}
-              <div className="space-y-2 border-l-2 border-emerald-500 pl-4">
-                <h4 className="font-bold text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Opção B: Gateway ASAAS (Ideal para PIX e Cartão no Brasil)
-                </h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Criando a cobrança na API do Asaas diretamente:
-                </p>
-                <pre className="bg-slate-900 text-[11px] p-4 rounded-xl font-mono text-slate-200 overflow-x-auto border border-slate-800 leading-relaxed">
-{`// 2. Criando Assinatura no Asaas (POST /v3/subscriptions)
-const rawResponse = await fetch('https://api.asaas.com/v3/subscriptions', {
-  method: 'POST',
-  headers: {
-    'access_token': '$YOUR_ASAAS_API_KEY',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    customer: 'cus_xxxxxx', // ID do cliente criado previamente
-    billingType: 'UNDEFINED', // Permite Cartão ou PIX
-    value: 14.90,
-    nextDueDate: '2026-07-18',
-    cycle: 'MONTHLY',
-    description: 'Assinatura SmartPOS'
-  })
-});`}
                 </pre>
               </div>
 
               {/* Seção Webhook Handler */}
               <div className="space-y-2 border-l-2 border-amber-500 pl-4">
                 <h4 className="font-bold text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-500"></span> Manipulando Webhook de Entrada
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span> Webhook Pronto de Retorno no Servidor
                 </h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Endpoint para receber o webhook do gateway e atualizar o status do usuário no banco:
+                  Nós já deixamos o endpoint express pronto! Você pode usar a rota <code className="bg-slate-900 px-1.5 py-0.5 rounded font-mono text-indigo-400">POST /api/asaas/webhook</code> no seu painel para aprovações em tempo real rodando em produção:
                 </p>
                 <pre className="bg-slate-900 text-[11px] p-4 rounded-xl font-mono text-slate-200 overflow-x-auto border border-slate-800 leading-relaxed">
-{`// 3. Exemplo de Webhook (Supabase Edge Function ou Endpoint Express)
-app.post('/api/webhooks/payment', async (req, res) => {
+{`// Código rodando no nosso server.ts para webhook do Asaas:
+app.post('/api/asaas/webhook', async (req, res) => {
   const event = req.body;
-  
-  // No caso da Stripe: 'checkout.session.completed' ou 'invoice.paid'
-  // No caso do Asaas: 'PAYMENT_RECEIVED' ou 'PAYMENT_CONFIRMED'
-  if (event.type === 'invoice.paid' || event.event === 'PAYMENT_CONFIRMED') {
-    const customerId = event.data.object.customer || event.payment.customerId;
-    const email = event.data.object.customer_email || event.payment.customerEmail;
+  if (event && (event.event === 'PAYMENT_CONFIRMED' || event.event === 'PAYMENT_RECEIVED')) {
+    const userId = event.payment.externalReference; // Recupera userID vindo do Asaas
     
-    // Buscar usuário associado ao e-mail ou customerId
-    const { data: profile } = await supabase
+    // Atualizar no banco Supabase
+    const { error } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (profile) {
-      // Registrar 30 dias de acesso
-      await supabase
-        .from('profiles')
-        .update({
-          subscription_status: 'active',
-          // Armazenar o id do gateway no perfil
-          stripe_customer_id: customerId, 
-          // Prorroga 30 dias da data de hoje
-          subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        })
-        .eq('id', profile.id);
-        
-      console.log('Assinatura ativada para o usuário:', profile.id);
-    }
+      .update({
+        subscription_status: 'active',
+        subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      })
+      .eq('id', userId);
   }
-  return res.status(200).send({ received: true });
+  return res.status(200).json({ received: true });
 });`}
                 </pre>
               </div>
@@ -283,7 +515,7 @@ app.post('/api/webhooks/payment', async (req, res) => {
 
             <div className="mt-6 pt-4 border-t border-slate-800 text-center">
               <p className="text-[11px] text-slate-400">
-                Você pode criar uma Supabase Edge Function rodando <code className="bg-slate-900 px-1.5 py-0.5 rounded font-mono text-indigo-400">deno</code> para automatizar essa lógica com segurança absoluta!
+                O SmartPOS está preparado para rodar em larga escala integrando com múltiplos gateways de pagamento com segurança absoluta!
               </p>
             </div>
           </div>
