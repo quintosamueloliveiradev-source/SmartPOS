@@ -85,98 +85,126 @@ export const Inventory: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-sm">
-        <div className="p-5 bg-slate-50 flex flex-col md:flex-row gap-4 border-b-2 border-slate-200">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={20} />
-            <input 
-              type="text" 
-              placeholder="Pesquisar por nome do produto..." 
-              className="w-full pl-12 pr-4 py-3 bg-white border-2 border-slate-300 rounded-xl text-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all font-bold text-slate-900 placeholder:text-slate-500 shadow-sm" 
-              value={searchTerm} 
-              onChange={e => setSearchTerm(e.target.value)} 
-            />
-          </div>
-          <div className="relative">
-             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" size={18} />
-             <select 
-              className="pl-12 pr-10 py-3 bg-white border-2 border-slate-300 rounded-xl text-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all font-black text-slate-800 appearance-none cursor-pointer min-w-[200px]" 
-              value={selectedCategory} 
-              onChange={e => setSelectedCategory(e.target.value)}
+        {products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center bg-white min-h-[400px]">
+            <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-3xl flex items-center justify-center mb-5 border-2 border-slate-200/60 shadow-sm">
+              <Box size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Nenhum produto cadastrado no estoque</h3>
+            <p className="text-slate-500 text-sm max-w-md mb-8 leading-relaxed">
+              Você ainda não cadastrou produtos. Comece adicionando um novo produto neste painel para controlar seu estoque e realizar vendas no PDV.
+            </p>
+            <button 
+              onClick={() => { setFormData({ name: '', category: '', price: 0, costPrice: 0, stock: 0, description: '', imageUrl: '', barcode: '' }); setIsEditing(false); setIsModalOpen(true); }}
+              className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 text-sm"
             >
-              <option value="all">Todas as Categorias</option>
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+              <Plus size={18} /> Cadastrar Meu Primeiro Produto
+            </button>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="p-5 bg-slate-50 flex flex-col md:flex-row gap-4 border-b-2 border-slate-200">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={20} />
+                <input 
+                  type="text" 
+                  placeholder="Pesquisar por nome do produto..." 
+                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-slate-300 rounded-xl text-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all font-bold text-slate-900 placeholder:text-slate-500 shadow-sm" 
+                  value={searchTerm} 
+                  onChange={e => setSearchTerm(e.target.value)} 
+                />
+              </div>
+              <div className="relative">
+                 <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" size={18} />
+                 <select 
+                  className="pl-12 pr-10 py-3 bg-white border-2 border-slate-300 rounded-xl text-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all font-black text-slate-800 appearance-none cursor-pointer min-w-[200px]" 
+                  value={selectedCategory} 
+                  onChange={e => setSelectedCategory(e.target.value)}
+                >
+                  <option value="all">Todas as Categorias</option>
+                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+              </div>
+            </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-200 text-slate-800 font-black border-b border-slate-300 uppercase tracking-widest">
-              <tr>
-                <th className="p-5 text-[11px]">Produto</th>
-                <th className="p-5 text-[11px]">Preço Venda</th>
-                <th className="p-5 text-[11px]">Preço Custo</th>
-                <th className="p-5 text-[11px]">Margem</th>
-                <th className="p-5 text-[11px]">Estoque</th>
-                <th className="p-5 text-right text-[11px]">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {filteredProducts.map(p => {
-                const margin = p.price - p.costPrice;
-                const marginPercent = p.price > 0 ? ((margin / p.price) * 100).toFixed(0) : '0';
-                return (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-5">
-                      <div className="flex items-center gap-4">
-                        <img src={p.imageUrl} className="w-12 h-12 rounded-xl object-cover border border-slate-200" />
-                        <div>
-                          <p className="font-black text-slate-900 text-base">{p.name}</p>
-                          <div className="flex items-center gap-2">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{p.category}</p>
-                            {p.barcode && (
-                              <span className="text-[9px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-200 flex items-center gap-1">
-                                <Barcode size={10} /> {p.barcode}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-5 font-black text-emerald-600 text-base">R$ {p.price.toFixed(2)}</td>
-                    <td className="p-5 text-slate-500 font-medium">R$ {p.costPrice.toFixed(2)}</td>
-                    <td className="p-5">
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${Number(marginPercent) > 30 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {marginPercent}% Lucro
-                      </span>
-                    </td>
-                    <td className="p-5">
-                      <div className="flex items-center gap-2">
-                        <Archive size={14} className={p.stock < 5 ? 'text-red-500' : 'text-slate-400'} />
-                        <span className={`font-black text-base ${p.stock < 5 ? 'text-red-500' : 'text-slate-700'}`}>{p.stock} <span className="text-xs font-medium text-slate-400">un</span></span>
-                      </div>
-                    </td>
-                    <td className="p-5 text-right space-x-3">
-                      <button 
-                        onClick={() => { setFormData(p); setIsEditing(true); setIsModalOpen(true); }} 
-                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                      >
-                        <Edit2 size={18}/>
-                      </button>
-                      <button 
-                        onClick={() => setDeleteTarget({id: p.id, name: p.name})} 
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                      >
-                        <Trash2 size={18}/>
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-200 text-slate-800 font-black border-b border-slate-300 uppercase tracking-widest">
+                  <tr>
+                    <th className="p-5 text-[11px]">Produto</th>
+                    <th className="p-5 text-[11px]">Preço Venda</th>
+                    <th className="p-5 text-[11px]">Preço Custo</th>
+                    <th className="p-5 text-[11px]">Margem</th>
+                    <th className="p-5 text-[11px]">Estoque</th>
+                    <th className="p-5 text-right text-[11px]">Ações</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {filteredProducts.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-slate-500 font-bold">
+                        Nenhum produto correspondente aos filtros de busca encontrado.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredProducts.map(p => {
+                      const margin = p.price - p.costPrice;
+                      const marginPercent = p.price > 0 ? ((margin / p.price) * 100).toFixed(0) : '0';
+                      return (
+                        <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-5">
+                            <div className="flex items-center gap-4">
+                              <img src={p.imageUrl} className="w-12 h-12 rounded-xl object-cover border border-slate-200" />
+                              <div>
+                                <p className="font-black text-slate-900 text-base">{p.name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{p.category}</p>
+                                  {p.barcode && (
+                                    <span className="text-[9px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-200 flex items-center gap-1">
+                                      <Barcode size={10} /> {p.barcode}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-5 font-black text-emerald-600 text-base">R$ {p.price.toFixed(2)}</td>
+                          <td className="p-5 text-slate-500 font-medium">R$ {p.costPrice.toFixed(2)}</td>
+                          <td className="p-5">
+                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${Number(marginPercent) > 30 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                              {marginPercent}% Lucro
+                            </span>
+                          </td>
+                          <td className="p-5">
+                            <div className="flex items-center gap-2">
+                              <Archive size={14} className={p.stock < 5 ? 'text-red-500' : 'text-slate-400'} />
+                              <span className={`font-black text-base ${p.stock < 5 ? 'text-red-500' : 'text-slate-700'}`}>{p.stock} <span className="text-xs font-medium text-slate-400">un</span></span>
+                            </div>
+                          </td>
+                          <td className="p-5 text-right space-x-3">
+                            <button 
+                              onClick={() => { setFormData(p); setIsEditing(true); setIsModalOpen(true); }} 
+                              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                            >
+                              <Edit2 size={18}/>
+                            </button>
+                            <button 
+                              onClick={() => setDeleteTarget({id: p.id, name: p.name})} 
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            >
+                              <Trash2 size={18}/>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Modal de Confirmação de Exclusão Customizado */}

@@ -99,17 +99,25 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Vendas Recentes</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
-                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                <Bar dataKey="valor" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {activeSales.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={salesData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
+                  <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                  <Bar dataKey="valor" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-64 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 p-6 text-center">
+              <TrendingUp size={40} className="text-slate-300 mb-2" />
+              <p className="font-bold text-slate-700 text-sm">Sem dados de faturamento</p>
+              <p className="text-slate-400 text-xs max-w-xs mt-1">Realize vendas no módulo PDV para gerar gráficos e estatísticas de vendas em tempo real.</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -117,19 +125,27 @@ export const Dashboard: React.FC = () => {
             <Trophy size={20} className="text-yellow-600" />
             <h3 className="text-lg font-black text-slate-900 uppercase tracking-widest text-[11px]">Mais Vendidos</h3>
           </div>
-          <div className="space-y-4">
-            {topProducts.map((p, i) => (
-              <div key={p.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
-                <span className="text-xs font-black text-slate-400 w-4">{i + 1}</span>
-                <img src={p.imageUrl} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-black text-slate-800 truncate">{p.name}</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{p.soldCount} unidades</p>
+          {topProducts.length > 0 ? (
+            <div className="space-y-4">
+              {topProducts.map((p, i) => (
+                <div key={p.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
+                  <span className="text-xs font-black text-slate-400 w-4">{i + 1}</span>
+                  <img src={p.imageUrl} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-black text-slate-800 truncate">{p.name}</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{p.soldCount} unidades</p>
+                  </div>
+                  <p className="text-sm font-black text-emerald-600">R$ {p.price.toFixed(2)}</p>
                 </div>
-                <p className="text-sm font-black text-emerald-600">R$ {p.price.toFixed(2)}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 flex flex-col items-center justify-center text-slate-400 text-center">
+              <Trophy size={32} className="text-slate-200 mb-2" />
+              <p className="font-bold text-slate-700 text-sm">Nenhum ranking disponível</p>
+              <p className="text-slate-400 text-xs max-w-[200px] mt-1">Os produtos mais vendidos serão calculados aqui automaticamente.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

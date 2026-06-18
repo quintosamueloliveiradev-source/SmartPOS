@@ -96,7 +96,17 @@ export const POS: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          {!isSearching ? (
+          {products.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-slate-500 max-w-sm mx-auto text-center p-8">
+              <div className="p-8 bg-slate-100 rounded-[2rem] mb-6 border-2 border-slate-200 text-slate-400">
+                <ShoppingBasket size={64} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Nenhum produto cadastrado</h3>
+              <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                Você precisa cadastrar pelo menos um produto no estoque antes de realizar vendas no PDV.
+              </p>
+            </div>
+          ) : !isSearching ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-400">
               <div className="p-8 bg-slate-100 rounded-full mb-6 border-2 border-slate-200">
                 <Search size={64} className="text-slate-300" />

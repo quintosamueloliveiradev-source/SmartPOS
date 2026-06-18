@@ -172,7 +172,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             imageUrl: p.image_url
           })));
         } else {
-          setProducts(INITIAL_PRODUCTS);
+          setProducts([]);
         }
 
         // 3. Buscar Vendas do Usuário
@@ -211,8 +211,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               acc.totalProfit += s.profit;
             }
             return acc;
-          }, { revenue: 0, salesCount: salesData.length, totalProfit: 0 });
+          }, { revenue: 0, salesCount: 0, totalProfit: 0 });
           setAllTimeStats(stats);
+        } else {
+          setSales([]);
+          setAllTimeStats({ revenue: 0, salesCount: 0, totalProfit: 0 });
         }
 
       } catch (err: any) {
@@ -453,6 +456,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const cancelSale = async (saleId: string, password: string) => {
+    if (!user) return { success: false, message: 'Usuário não autenticado.' };
     if (password !== adminPassword) {
       addToast('Senha administrativa incorreta', 'error');
       return { success: false, message: 'Senha incorreta.' };
@@ -468,18 +472,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { error } = await supabase
         .from('sales')
         .update({ status: 'canceled' })
-        .eq('id', saleId);
+        .eq('id', saleId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      // Devolver estoque
+      // Devolver estoque com segurança de usuário
       for (const item of saleToCancel.items) {
         const product = products.find(p => p.id === item.id);
         if (product) {
           await supabase
             .from('products')
             .update({ stock: product.stock + item.quantity })
-            .eq('id', item.id);
+            .eq('id', item.id)
+            .eq('user_id', user.id);
         }
       }
 
@@ -565,10 +571,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const resetSystem = async (password: string) => {
     if (password !== adminPassword) return false;
+    if (!user) return false;
     try {
-      await supabase.from('sale_items').delete().neq('id', 0);
-      await supabase.from('sales').delete().neq('id', '0');
-      await supabase.from('products').delete().neq('id', '0');
+      await supabase.from('sale_items').delete().eq('user_id', user.id);
+      await supabase.from('sales').delete().eq('user_id', user.id);
+      await supabase.from('products').delete().eq('user_id', user.id);
       
       setProducts([]);
       setSales([]);
@@ -589,10 +596,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       addToast, removeToast, addProduct, updateProduct, deleteProduct,
       addToCart, removeFromCart, updateCartQuantity, clearCart,
       completeSale, cancelSale, clearSalesHistory: async (pw) => { 
+        if (!user) return false;
         if (pw === adminPassword) { 
-          await supabase.from('sale_items').delete().neq('id', 0);
-          await supabase.from('sales').delete().neq('id', '0');
+          await supabase.from('sale_items').delete().eq('user_id', user.id);
+          await supabase.from('sales').delete().eq('user_id', user.id);
           setSales([]); 
+          setAllTimeStats(prev => ({ ...prev, revenue: 0, salesCount: 0, totalProfit: 0 }));
           return true; 
         } 
         return false; 
@@ -600,17 +609,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       signOut, checkSubscription,
       importData: async (data: any, password: string) => {
         if (password !== adminPassword) return false;
+        if (!user) return false;
         try {
           setLoading(true);
-          // 1. Limpar
-          await supabase.from('sale_items').delete().neq('id', 0);
-          await supabase.from('sales').delete().neq('id', '0');
-          await supabase.from('products').delete().neq('id', '0');
+          // 1. Limpar apenas dados do usuário autenticado!
+          await supabase.from('sale_items').delete().eq('user_id', user.id);
+          await supabase.from('sales').delete().eq('user_id', user.id);
+          await supabase.from('products').delete().eq('user_id', user.id);
 
           // 2. Importar Produtos
           if (data.products && data.products.length > 0) {
             const productsToInsert = data.products.map((p: any) => ({
               id: p.id,
+              user_id: user.id,
               name: p.name,
               category: p.category,
               price: p.price,
@@ -628,6 +639,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             for (const s of data.sales) {
               await supabase.from('sales').insert({
                 id: s.id,
+                user_id: user.id,
                 subtotal: s.subtotal,
                 total: s.total,
                 discount: s.discount,
@@ -642,6 +654,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               if (s.items && s.items.length > 0) {
                 const itemsToInsert = s.items.map((item: any) => ({
                   sale_id: s.id,
+                  user_id: user.id,
                   product_id: item.id,
                   name: item.name,
                   quantity: item.quantity,

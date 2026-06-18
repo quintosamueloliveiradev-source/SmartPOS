@@ -155,80 +155,94 @@ export const SalesHistory: React.FC = () => {
         )}
       </div>
 
-      <div className="space-y-4">
-        {filteredSales.map(sale => {
-          const isCanceled = sale.status === 'canceled';
-          return (
-            <div key={sale.id} className={`bg-white border-2 ${isCanceled ? 'border-red-100 bg-red-50/20 grayscale opacity-60' : 'border-slate-100'} rounded-2xl p-5 shadow-sm flex flex-col lg:flex-row gap-6 items-start lg:items-center relative transition-all hover:shadow-md`}>
-              <div className="flex items-center gap-4 min-w-[180px]">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${isCanceled ? 'bg-red-50 border-red-200 text-red-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}><Clock size={24} /></div>
-                <div>
-                  <p className="font-black text-slate-900 leading-tight">#{sale.id}</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">{new Date(sale.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(sale.timestamp).toLocaleDateString()}</p>
+      {sales.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white border border-dashed border-slate-300 rounded-3xl min-h-[350px]">
+          <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mb-4 border-2 border-slate-200">
+            <Clock size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Nenhuma venda registrada</h3>
+          <p className="text-slate-500 text-sm max-w-sm">Suas vendas finalizadas no PDV aparecerão aqui com o histórico detalhado e relatórios financeiros.</p>
+        </div>
+      ) : filteredSales.length === 0 ? (
+        <div className="p-8 text-center bg-white border border-slate-100 rounded-3xl text-slate-500 font-bold">
+          Nenhuma venda encontrada correspondente aos filtros de busca ou período.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredSales.map(sale => {
+            const isCanceled = sale.status === 'canceled';
+            return (
+              <div key={sale.id} className={`bg-white border-2 ${isCanceled ? 'border-red-100 bg-red-50/20 grayscale opacity-60' : 'border-slate-100'} rounded-2xl p-5 shadow-sm flex flex-col lg:flex-row gap-6 items-start lg:items-center relative transition-all hover:shadow-md`}>
+                <div className="flex items-center gap-4 min-w-[180px]">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${isCanceled ? 'bg-red-50 border-red-200 text-red-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}><Clock size={24} /></div>
+                  <div>
+                    <p className="font-black text-slate-900 leading-tight">#{sale.id}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{new Date(sale.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(sale.timestamp).toLocaleDateString()}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex-1 space-y-2">
-                <div className="flex flex-wrap gap-2">
-                  {sale.items.map((item, idx) => (
-                    <span key={idx} className="inline-flex items-center px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-600">
-                      {item.quantity}x {item.name}
-                    </span>
-                  ))}
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {sale.items.map((item, idx) => (
+                      <span key={idx} className="inline-flex items-center px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-600">
+                        {item.quantity}x {item.name}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {sale.customerName && <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider"><User size={12} className="text-indigo-400" /> Cliente: {sale.customerName}</div>}
+                    {sale.surcharge > 0 && <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-500 uppercase tracking-wider"><PlusCircle size={12} /> Taxa Cartão: R$ {sale.surcharge.toFixed(2)}</div>}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-4">
-                  {sale.customerName && <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider"><User size={12} className="text-indigo-400" /> Cliente: {sale.customerName}</div>}
-                  {sale.surcharge > 0 && <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-500 uppercase tracking-wider"><PlusCircle size={12} /> Taxa Cartão: R$ {sale.surcharge.toFixed(2)}</div>}
-                </div>
-              </div>
 
-              <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-end border-t border-slate-100 lg:border-none pt-4 lg:pt-0">
-                <div className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-2">
-                   {getPaymentIcon(sale.paymentMethod)}
-                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{sale.paymentMethod}</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-slate-400 font-black uppercase mb-0.5">Total Recebido</p>
-                  <p className={`text-xl font-black ${isCanceled ? 'text-red-400 line-through' : 'text-emerald-600'}`}>R$ {sale.total.toFixed(2)}</p>
-                </div>
-                
-                <div className="flex gap-2">
-                  {!isCanceled && (
-                    <>
-                      <button 
-                        onClick={() => printReceipt(sale, 'thermal')} 
-                        className="p-3 text-emerald-600 hover:bg-emerald-50 border border-emerald-100 rounded-2xl transition-all shadow-sm group relative"
-                        title="Imprimir Cupom 58mm"
-                      >
-                        <Ticket size={20} />
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Térmica 58mm</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => printReceipt(sale, 'a4')} 
-                        className="p-3 text-indigo-600 hover:bg-indigo-50 border border-indigo-100 rounded-2xl transition-all shadow-sm group relative"
-                        title="Imprimir A4"
-                      >
-                        <FileText size={20} />
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Relatório A4</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => setSaleToCancel(sale.id)} 
-                        className="p-3 text-amber-500 hover:bg-amber-50 border border-amber-100 rounded-2xl transition-all shadow-sm group relative"
-                        title="Estornar Venda"
-                      >
-                        <RotateCcw size={20} />
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Estornar</span>
-                      </button>
-                    </>
-                  )}
+                <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-end border-t border-slate-100 lg:border-none pt-4 lg:pt-0">
+                  <div className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-2">
+                     {getPaymentIcon(sale.paymentMethod)}
+                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{sale.paymentMethod}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-400 font-black uppercase mb-0.5">Total Recebido</p>
+                    <p className={`text-xl font-black ${isCanceled ? 'text-red-400 line-through' : 'text-emerald-600'}`}>R$ {sale.total.toFixed(2)}</p>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    {!isCanceled && (
+                      <>
+                        <button 
+                          onClick={() => printReceipt(sale, 'thermal')} 
+                          className="p-3 text-emerald-600 hover:bg-emerald-50 border border-emerald-100 rounded-2xl transition-all shadow-sm group relative"
+                          title="Imprimir Cupom 58mm"
+                        >
+                          <Ticket size={20} />
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Térmica 58mm</span>
+                        </button>
+                        
+                        <button 
+                          onClick={() => printReceipt(sale, 'a4')} 
+                          className="p-3 text-indigo-600 hover:bg-indigo-50 border border-indigo-100 rounded-2xl transition-all shadow-sm group relative"
+                          title="Imprimir A4"
+                        >
+                          <FileText size={20} />
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Relatório A4</span>
+                        </button>
+                        
+                        <button 
+                          onClick={() => setSaleToCancel(sale.id)} 
+                          className="p-3 text-amber-500 hover:bg-amber-50 border border-amber-100 rounded-2xl transition-all shadow-sm group relative"
+                          title="Estornar Venda"
+                        >
+                          <RotateCcw size={20} />
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Estornar</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {saleToCancel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
