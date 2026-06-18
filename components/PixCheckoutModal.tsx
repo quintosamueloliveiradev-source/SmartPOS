@@ -116,7 +116,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
     let intervalId: any;
 
     if (pollingActive && paymentId && isOpen) {
-      intervalId = setInterval(async () => {
+       intervalId = setInterval(async () => {
         try {
           const response = await fetch(`/api/asaas/check-payment/${paymentId}`);
           if (!response.ok) {
@@ -136,7 +136,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               .update({ 
                 subscription_status: 'active',
                 subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-              })
+               })
               .eq('id', profile!.id);
 
             if (error) throw error;
@@ -192,7 +192,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
       
       const response = await fetch('/api/asaas/create-pix', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: profile.store_name || 'Assinante SmartPOS',
           email: profile.email,
@@ -264,39 +264,39 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-150 overflow-hidden relative">
+    <div className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#e5eeff] overflow-hidden relative">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="px-6 py-4.5 border-b border-[#e5eeff] flex items-center justify-between bg-[#f8f9ff]">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <p className="text-sm font-bold text-slate-800">Assinatura SmartPOS Mensal</p>
+            <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+            <p className="text-sm font-bold text-[#0b1c30]">Assinatura SmartPOS Mensal</p>
           </div>
           <button 
             onClick={onClose} 
-            className="p-1.5 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer text-slate-500 hover:text-slate-700"
+            className="p-1.5 hover:bg-[#e5eeff] rounded-full transition-colors cursor-pointer text-slate-400 hover:text-slate-600"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 bg-white">
           {paymentStep === 'initial' && (
             <div className="space-y-5">
-              <div className="text-center bg-slate-50 border border-slate-100 p-4 rounded-2xl">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Assinatura Mensal</span>
+              <div className="text-center bg-[#f8f9ff] border border-[#e5eeff] p-5 rounded-xl">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">Assinatura Mensal</span>
                 <div className="flex items-baseline justify-center gap-1 mt-1">
                   <span className="text-sm font-bold text-slate-400">R$</span>
-                  <span className="text-4xl font-black text-slate-900 tracking-tight">14,90</span>
+                  <span className="text-4xl font-extrabold text-[#0b1c30] tracking-tight">14,90</span>
                   <span className="text-sm font-bold text-slate-400">/mês</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">Acesso completo sem anúncios ou taxas extras.</p>
+                <p className="text-[11px] text-slate-500 mt-1 font-medium">Acesso completo sem anúncios ou taxas extras.</p>
               </div>
 
               <form onSubmit={handleGeneratePix} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block">
                     CPF ou CNPJ do Pagador *
                   </label>
                   <input 
@@ -309,7 +309,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     }}
                     required
                     maxLength={18}
-                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none"
+                    className="w-full px-4 py-2.5 bg-white border border-[#e5eeff] focus:border-[#3525cd] rounded-lg text-sm font-semibold transition-all outline-none text-[#0b1c30] placeholder:text-slate-400"
                   />
                   <p className="text-[10px] text-slate-400 leading-tight">
                     * Requerido pela regulamentação do Banco Central para emissão de Pix nominal.
@@ -320,16 +320,16 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                   <button 
                     type="submit"
                     disabled={loadingPayment}
-                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3 bg-[#3525cd] hover:bg-[#4f46e5] text-white rounded-lg font-bold text-sm shadow-md shadow-indigo-600/10 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {loadingPayment ? (
                       <>
-                        <RefreshCw size={16} className="animate-spin" />
+                        <RefreshCw size={14} className="animate-spin" />
                         Gerando Pix...
                       </>
                     ) : (
                       <>
-                        <Smartphone size={16} />
+                        <Smartphone size={14} />
                         Pagar com PIX Imediato 
                       </>
                     )}
@@ -339,7 +339,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     <button 
                       type="button"
                       onClick={handleSimulatePaymentApproval}
-                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-bold text-xs transition-colors cursor-pointer"
+                      className="w-full py-2 bg-[#f8f9ff] hover:bg-[#e5eeff] text-slate-600 border border-[#e5eeff] rounded-lg font-bold text-xs transition-colors cursor-pointer"
                     >
                       Ativar Modo de Demonstração (Simulado)
                     </button>
@@ -348,7 +348,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               </form>
 
               {!isProduction && (
-                <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
+                <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 flex gap-2">
                   <div className="text-amber-600 mt-0.5 shrink-0"><Star size={14} fill="currentColor" /></div>
                   <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
                     <strong>Gateway Asaas Ativo:</strong> Se sua API Key estiver configurada, o PIX será gerado na Sandbox real com atualização por Polling.
@@ -361,14 +361,14 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
           {paymentStep === 'pix_details' && (
             <div className="space-y-5 text-center animate-fade-in">
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#3525cd] bg-[#f8f9ff] px-2.5 py-1 rounded-full border border-[#e5eeff]">
                   Aguardando Confirmação Pix
                 </span>
-                <p className="text-xs font-bold text-slate-700 mt-2">Escaneie o QR Code abaixo no seu aplicativo bancário:</p>
+                <p className="text-xs font-semibold text-slate-600 mt-3">Escaneie o QR Code abaixo no seu aplicativo bancário:</p>
               </div>
 
               <div className="flex flex-col items-center justify-center">
-                <div className="relative p-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm mb-3">
+                <div className="relative p-3 bg-[#f8f9ff] border border-[#e5eeff] rounded-xl mb-3">
                   {qrCodeBase64 ? (
                     <img 
                       src={`data:image/png;base64,${qrCodeBase64}`} 
@@ -377,56 +377,56 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-40 h-40 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-xs">
+                    <div className="w-40 h-40 flex items-center justify-center bg-slate-50 rounded-lg animate-pulse text-slate-400 text-xs font-medium">
                       Buscando QR Code...
                     </div>
                   )}
                   {isSimulated && !isProduction && (
-                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1 py-0.5 rounded shadow-sm">
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1 py-0.5 rounded shadow-xs">
                       MOCK ACTIVE
                     </div>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-1 text-xs text-slate-500 justify-center">
-                  <RefreshCw size={11} className="animate-spin text-emerald-600" />
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 justify-center font-medium">
+                  <RefreshCw size={12} className="animate-spin text-secondary" />
                   <span>Sincronizando com Asaas em tempo real...</span>
                 </div>
               </div>
 
               {/* Copy / Paste */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-center justify-between gap-2 text-left">
+              <div className="bg-[#f8f9ff] border border-[#e5eeff] rounded-lg p-2.5 flex items-center justify-between gap-2 text-left">
                 <div className="max-w-[200px] overflow-hidden">
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
-                  <p className="text-[10px] font-mono font-bold text-slate-600 truncate mt-0.5">{copiaCola || 'PIX_PAYLOAD'}</p>
+                  <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
+                  <p className="text-[10px] font-mono font-bold text-[#0b1c30] truncate mt-0.5">{copiaCola || 'PIX_PAYLOAD'}</p>
                 </div>
                 <button 
                   onClick={handleCopyCode}
-                  className={`px-2.5 py-2 rounded-lg border font-bold text-[10px] transition-all active:scale-95 shrink-0 flex items-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] transition-all active:scale-95 shrink-0 flex items-center gap-1 cursor-pointer ${
                     copied 
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
-                      : 'bg-white border-slate-200 text-slate-600'
+                      ? 'bg-emerald-50 border-emerald-200 text-[#006c49]' 
+                      : 'bg-white border-[#e5eeff] text-slate-650 hover:bg-[#f8f9ff]'
                   }`}
                 >
                   {copied ? (
                     <>
-                      <Check size={12} className="text-emerald-500" />
+                      <Check size={11} className="text-[#006c49]" />
                       <span>Copiado!</span>
                     </>
                   ) : (
                     <>
-                      <Copy size={12} />
+                      <Copy size={11} />
                       <span>Copiar</span>
                     </>
                   )}
                 </button>
               </div>
 
-              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+              <div className="space-y-1.5 pt-3 border-t border-[#e5eeff]">
                 {!isProduction && (
                   <button 
                     onClick={handleSimulatePaymentApproval}
-                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-sm cursor-pointer flex items-center justify-center gap-1 mb-1.5"
+                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-xs cursor-pointer flex items-center justify-center gap-1 mb-1.5"
                   >
                     <CheckCircle size={12} />
                     Simular Confirmação
@@ -437,7 +437,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     setPollingActive(false);
                     setPaymentStep('initial');
                   }}
-                  className="w-full py-1 text-slate-500 hover:text-slate-700 text-[10px] font-bold"
+                  className="w-full py-1 text-slate-400 hover:text-slate-600 text-[10px] font-bold transition-colors"
                 >
                   ← Voltar e alterar documento
                 </button>
@@ -447,18 +447,18 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
 
           {paymentStep === 'success' && (
             <div className="text-center py-6 space-y-4 animate-fade-in flex flex-col items-center justify-center">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-500 border border-emerald-200 rounded-2xl flex items-center justify-center animate-bounce">
-                <CheckCircle size={28} />
+              <div className="w-12 h-12 bg-emerald-50 text-secondary border border-emerald-100 rounded-xl flex items-center justify-center animate-bounce">
+                <CheckCircle size={24} />
               </div>
 
               <div>
-                <h3 className="text-lg font-black text-slate-900 tracking-tight">Assinatura Ativada!</h3>
+                <h3 className="text-lg font-bold text-[#0b1c30] tracking-tight">Assinatura Ativada!</h3>
                 <p className="text-slate-500 text-[11px] mt-1.5 max-w-[240px] mx-auto leading-relaxed">
                   Perfeito! O Asaas processou sua transação com sucesso. Sua licença foi ativada por mais 30 dias.
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-1 text-[10px] text-slate-400 uppercase font-black tracking-widest animate-pulse pt-2">
+              <div className="inline-flex items-center gap-1.5 text-[10px] text-slate-400 uppercase font-bold tracking-widest animate-pulse pt-2">
                 <RefreshCw size={10} className="animate-spin" />
                 Recarregando sistema...
               </div>

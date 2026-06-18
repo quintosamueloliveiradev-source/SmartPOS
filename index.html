@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SmartPOS - Gestão & PDV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @keyframes slide-in {
@@ -26,9 +29,25 @@
         theme: {
           extend: {
             colors: {
-              primary: '#10b981', // Emerald 500
-              secondary: '#3b82f6', // Blue 500
-              dark: '#1e293b', // Slate 800
+              primary: {
+                DEFAULT: '#3525cd', // Deep Indigo
+                light: '#4f46e5',
+                dark: '#213145',
+              },
+              secondary: '#006c49', // Emerald Success
+              danger: '#ba1a1a', // Rose Danger
+              background: '#f8f9ff', // Light Gray Surface color
+              surface: '#ffffff', // Pure white cards
+              onSurface: '#0b1c30', // Text color
+              onSurfaceVariant: '#464555',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            borderRadius: {
+              'button': '8px', // Corner radius for buttons/inputs
+              'card': '12px', // Corner radius for cards/containers
             }
           }
         }
@@ -48,7 +67,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gray-50 text-slate-800 antialiased">
+  <body class="bg-[#f8f9ff] text-[#0b1c30] antialiased font-sans">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
