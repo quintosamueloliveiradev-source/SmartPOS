@@ -86,59 +86,61 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <header className="border-b border-slate-200 pb-6">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Visão Geral do Negócio</h2>
-        <p className="text-slate-600 font-bold">Métricas de faturamento, lucro e estoque em tempo real.</p>
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 lg:p-8 rounded-smart border border-neutral-border shadow-sm">
+        <div>
+          <h2 className="text-xl font-black text-neutral-text">Visão Geral do Negócio</h2>
+          <p className="text-neutral-muted text-sm mt-1">Métricas de faturamento, lucro e estoque em tempo real.</p>
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-          <div className="p-3 bg-emerald-100 text-emerald-600 rounded-full">
-            <DollarSign size={24} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex items-center gap-4 hover:border-brand/33 transition-all">
+          <div className="p-2.5 bg-emerald-50 text-brand rounded-smart border border-emerald-100">
+            <DollarSign size={18} />
           </div>
           <div>
-            <p className="text-xs text-slate-700 font-black uppercase tracking-wider">Faturamento</p>
-            <p className="text-2xl font-black text-slate-900 tracking-tight">R$ {allTimeStats.revenue.toFixed(2)}</p>
+            <p className="text-[10px] text-neutral-muted font-black uppercase tracking-wider">Faturamento</p>
+            <p className="text-lg font-bold text-neutral-text mt-0.5">R$ {allTimeStats.revenue.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-          <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
-            <TrendingUp size={24} />
+        <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex items-center gap-4 hover:border-brand/33 transition-all">
+          <div className="p-2.5 bg-emerald-50 text-brand rounded-smart border border-emerald-100">
+            <TrendingUp size={18} />
           </div>
           <div>
-            <p className="text-xs text-slate-700 font-black uppercase tracking-wider">Lucro Estimado</p>
-            <p className="text-2xl font-black text-emerald-600 tracking-tight">R$ {allTimeStats.totalProfit.toFixed(2)}</p>
+            <p className="text-[10px] text-neutral-muted font-black uppercase tracking-wider">Lucro Estimado</p>
+            <p className="text-lg font-bold text-brand mt-0.5">R$ {allTimeStats.totalProfit.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-          <div className="p-3 bg-indigo-100 text-indigo-600 rounded-full">
-            <PieChart size={24} />
+        <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex items-center gap-4 hover:border-indigo-100 transition-all">
+          <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-smart border border-indigo-100">
+            <PieChart size={18} />
           </div>
           <div>
-            <p className="text-xs text-slate-700 font-black uppercase tracking-wider">Valor em Estoque</p>
-            <p className="text-2xl font-black text-slate-900 tracking-tight">R$ {totalStockValue.toFixed(2)}</p>
+            <p className="text-[10px] text-neutral-muted font-black uppercase tracking-wider">Valor em Estoque</p>
+            <p className="text-lg font-bold text-neutral-text mt-0.5">R$ {totalStockValue.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative">
+        <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex items-center gap-4 relative hover:border-amber-100 transition-all">
           {products.filter(p => p.stock < 5).length > 0 && (
-            <span className="absolute top-4 right-4 h-3 w-3 rounded-full bg-red-500 animate-pulse"></span>
+            <span className="absolute top-4 right-4 h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
           )}
-          <div className="p-3 bg-amber-100 text-amber-600 rounded-full">
-            <AlertTriangle size={24} />
+          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-smart border border-amber-100">
+            <AlertTriangle size={18} />
           </div>
           <div>
-            <p className="text-xs text-slate-700 font-black uppercase tracking-wider">Alertas de Reposição</p>
-            <p className="text-2xl font-black text-slate-900 tracking-tight">{products.filter(p => p.stock < 5).length}</p>
+            <p className="text-[10px] text-neutral-muted font-black uppercase tracking-wider">Alertas de Reposição</p>
+            <p className="text-lg font-bold text-neutral-text mt-0.5">{products.filter(p => p.stock < 5).length}</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Vendas Recentes</h3>
+        <div className="lg:col-span-2 bg-white p-6 rounded-smart border border-neutral-border shadow-sm">
+          <h3 className="text-xs font-black text-neutral-text uppercase tracking-wider mb-6">Vendas Recentes</h3>
           {activeSales.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -146,7 +148,7 @@ export const Dashboard: React.FC = () => {
                   <defs>
                     <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#34d399" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#34d399" stopOpacity={0.25} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.4} />
@@ -166,45 +168,45 @@ export const Dashboard: React.FC = () => {
                   <Bar 
                     dataKey="valor" 
                     fill="url(#barGradient)" 
-                    radius={[6, 6, 0, 0]} 
-                    barSize={28}
+                    radius={[4, 4, 0, 0]} 
+                    barSize={24}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-64 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 p-6 text-center">
-              <TrendingUp size={40} className="text-slate-300 mb-2" />
-              <p className="font-bold text-slate-700 text-sm">Sem dados de faturamento</p>
-              <p className="text-slate-400 text-xs max-w-xs mt-1">Realize vendas no módulo PDV para gerar gráficos e estatísticas de vendas em tempo real.</p>
+            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-neutral-border rounded-smart text-neutral-muted p-6 text-center">
+              <TrendingUp size={32} className="text-neutral-muted/50 mb-2" />
+              <p className="font-bold text-neutral-text text-sm">Sem dados de faturamento</p>
+              <p className="text-neutral-muted text-xs max-w-xs mt-1">Realize vendas no módulo PDV para gerar gráficos e estatísticas de vendas em tempo real.</p>
             </div>
           )}
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm">
           <div className="flex items-center gap-2 mb-6">
-            <Trophy size={20} className="text-yellow-600" />
-            <h3 className="text-lg font-black text-slate-900 uppercase tracking-widest text-[11px]">Mais Vendidos</h3>
+            <Trophy size={16} className="text-amber-500" />
+            <h3 className="text-xs font-black text-neutral-text uppercase tracking-wider">Produtos Mais Vendidos</h3>
           </div>
           {topProducts.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {topProducts.map((p, i) => (
-                <div key={p.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
-                  <span className="text-xs font-black text-slate-400 w-4">{i + 1}</span>
-                  <img src={p.imageUrl} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                <div key={p.id} className="flex items-center gap-3 p-2 hover:bg-slate-50/80 rounded-smart border border-transparent hover:border-neutral-border/50 transition-all">
+                  <span className="text-xs font-bold text-neutral-muted w-4">{i + 1}</span>
+                  <img src={p.imageUrl} referrerPolicy="no-referrer" className="w-10 h-10 rounded-smart object-cover border border-neutral-border" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-black text-slate-800 truncate">{p.name}</p>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{p.soldCount} unidades</p>
+                    <p className="text-sm font-bold text-neutral-text truncate">{p.name}</p>
+                    <p className="text-[10px] text-neutral-muted font-bold uppercase tracking-wider mt-0.5">{p.soldCount} unidades</p>
                   </div>
-                  <p className="text-sm font-black text-emerald-600">R$ {p.price.toFixed(2)}</p>
+                  <p className="text-sm font-bold text-brand">R$ {p.price.toFixed(2)}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-12 flex flex-col items-center justify-center text-slate-400 text-center">
-              <Trophy size={32} className="text-slate-200 mb-2" />
-              <p className="font-bold text-slate-700 text-sm">Nenhum ranking disponível</p>
-              <p className="text-slate-400 text-xs max-w-[200px] mt-1">Os produtos mais vendidos serão calculados aqui automaticamente.</p>
+            <div className="py-12 flex flex-col items-center justify-center text-neutral-muted text-center">
+              <Trophy size={28} className="text-neutral-muted/40 mb-2" />
+              <p className="font-bold text-neutral-text text-sm">Nenhum ranking disponível</p>
+              <p className="text-neutral-muted text-xs max-w-[200px] mt-1">Os produtos mais vendidos serão calculados aqui automaticamente.</p>
             </div>
           )}
         </div>

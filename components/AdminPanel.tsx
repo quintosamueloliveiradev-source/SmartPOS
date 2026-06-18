@@ -268,84 +268,82 @@ export const AdminPanel: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 pb-20 animate-fade-in">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 lg:p-8 rounded-smart border border-neutral-border shadow-sm">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 leading-tight">Painel do Administrador</h1>
-          <p className="text-slate-600 font-bold">Gestão de assinaturas e usuários da plataforma</p>
+          <h2 className="text-xl font-black text-neutral-text">Painel do Administrador</h2>
+          <p className="text-neutral-muted text-sm mt-1">Gestão de assinaturas corporativas, usuários e faturamentos SaaS.</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
+            className={`px-3.5 py-1.5 rounded-smart text-xs font-bold transition-all cursor-pointer ${activeTab === 'users' ? 'bg-brand text-white shadow-sm border border-brand/20' : 'bg-[#f8fafc] text-neutral-text border border-neutral-border hover:bg-slate-100'}`}
           >
             Usuários
           </button>
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
+            className={`px-3.5 py-1.5 rounded-smart text-xs font-bold transition-all cursor-pointer ${activeTab === 'settings' ? 'bg-brand text-white shadow-sm border border-brand/20' : 'bg-[#f8fafc] text-neutral-text border border-neutral-border hover:bg-slate-100'}`}
           >
             Configurações SaaS
           </button>
           <button 
             onClick={fetchUsers}
-            className="px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-200 flex items-center gap-2 transition-all"
+            className="px-3.5 py-1.5 bg-brand hover:bg-[#059669] text-white rounded-smart flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer shadow-sm"
           >
-            <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
-            <span className="hidden md:inline">Atualizar Dados</span>
+            <RefreshCcw size={12} className={loading ? 'animate-spin' : ''} />
+            Recarregar Dados
           </button>
         </div>
-      </div>
+      </header>
 
       {activeTab === 'users' ? (
         <>
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Total de Usuários', value: stats.totalUsers, icon: Users, color: 'from-blue-500 to-indigo-600', bg: 'bg-blue-50', text: 'text-blue-600' },
-              { label: 'Assinaturas Ativas', value: stats.activeSubscriptions, icon: CreditCard, color: 'from-emerald-400 to-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-600' },
-              { label: 'MRR (Mensal)', value: `R$ ${stats.monthlyRevenue.toFixed(2)}`, icon: ArrowUpRight, color: 'from-violet-500 to-purple-600', bg: 'bg-violet-50', text: 'text-violet-600' },
-              { label: 'Novos Hoje', value: stats.trialsToday, icon: ShieldCheck, color: 'from-amber-400 to-orange-500', bg: 'bg-amber-50', text: 'text-amber-600' }
+              { label: 'Total de Usuários', value: stats.totalUsers, icon: Users, bg: 'bg-indigo-50 text-indigo-600 border border-indigo-100' },
+              { label: 'Assinaturas Ativas', value: stats.activeSubscriptions, icon: CreditCard, bg: 'bg-emerald-50 text-brand border border-emerald-100' },
+              { label: 'MRR (Mensal)', value: `R$ ${stats.monthlyRevenue.toFixed(2)}`, icon: ArrowUpRight, bg: 'bg-purple-50 text-purple-650 border border-purple-100' },
+              { label: 'Novos Hoje', value: stats.trialsToday, icon: ShieldCheck, bg: 'bg-amber-50 text-amber-650 border border-amber-100' }
             ].map((item, i) => (
-              <div key={i} className="group relative bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${item.color} opacity-[0.03] -mr-8 -mt-8 rounded-full group-hover:scale-110 transition-transform duration-500`} />
-                
+              <div key={i} className="group relative bg-white p-6 rounded-smart border border-neutral-border shadow-sm hover:border-brand/30 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 ${item.bg} ${item.text} rounded-2xl group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon size={24} />
+                  <div className={`p-2.5 rounded-smart ${item.bg}`}>
+                    <item.icon size={18} />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-neutral-muted uppercase tracking-wider">Status</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse mt-1" />
                   </div>
                 </div>
                 
                 <div>
-                  <p className="text-sm font-semibold text-slate-500 mb-1">{item.label}</p>
-                  <p className="text-3xl font-black text-slate-900 tracking-tight">{item.value}</p>
+                  <p className="text-xs font-bold text-neutral-muted mb-0.5">{item.label}</p>
+                  <p className="text-xl font-black text-neutral-text tracking-tight">{item.value}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="lg:col-span-2 bg-white p-6 rounded-smart border border-neutral-border shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <TrendingUp className="text-primary" size={20} />
+                  <h3 className="text-sm font-black text-neutral-text flex items-center gap-2 uppercase tracking-wider">
+                    <TrendingUp className="text-brand" size={16} />
                     Evolução da Plataforma
                   </h3>
-                  <p className="text-xs text-slate-500">Cadastros vs Faturamento (Últimos 30 dias)</p>
+                  <p className="text-xs text-neutral-muted mt-0.5">Cadastros de Clientes vs Faturamento Equivalente (30 dias)</p>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-medium">
+                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-wider">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                    <span className="text-slate-600">Cadastros</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-brand"></div>
+                    <span className="text-neutral-text">Cadastros</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-violet-500"></div>
-                    <span className="text-slate-600">MRR (R$)</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                    <span className="text-neutral-text">MRR (R$)</span>
                   </div>
                 </div>
               </div>
@@ -354,55 +352,55 @@ export const AdminPanel: React.FC = () => {
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorCadastros" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15}/>
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                     <XAxis 
                       dataKey="name" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }}
                       interval={4}
                     />
                     <YAxis 
                       yAxisId="left"
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }}
                     />
                     <YAxis 
                       yAxisId="right"
                       orientation="right"
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }}
                     />
                     <Tooltip 
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           return (
-                            <div className="bg-white p-3 rounded-xl shadow-xl border border-slate-100">
-                              <p className="text-xs font-bold text-slate-500 mb-2 uppercase">{label}</p>
-                              <div className="space-y-1">
+                            <div className="bg-white p-3 rounded-smart shadow-lg border border-neutral-border">
+                              <p className="text-[10px] font-black text-neutral-muted mb-2 uppercase tracking-wider">{label}</p>
+                              <div className="space-y-1.5">
                                 <div className="flex items-center justify-between gap-4">
-                                  <span className="text-xs text-slate-600 flex items-center gap-1">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                  <span className="text-xs text-neutral-text flex items-center gap-1.5 font-bold">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-brand"></div>
                                     Novos Usuários
                                   </span>
-                                  <span className="font-bold text-slate-900">{payload[0].value}</span>
+                                  <span className="font-extrabold text-neutral-text">{payload[0].value}</span>
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
-                                  <span className="text-xs text-slate-600 flex items-center gap-1">
-                                    <div className="w-2 h-2 rounded-full bg-violet-500"></div>
-                                    Faturamento Total
+                                  <span className="text-xs text-neutral-text flex items-center gap-1.5 font-bold font-mono">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                                    Faturamento Equivalente
                                   </span>
-                                  <span className="font-bold text-violet-600">R$ {Number(payload[1].value).toFixed(2)}</span>
+                                  <span className="font-black text-indigo-700">R$ {Number(payload[1].value).toFixed(2)}</span>
                                 </div>
                               </div>
                             </div>
@@ -416,7 +414,7 @@ export const AdminPanel: React.FC = () => {
                       type="monotone" 
                       dataKey="cadastros" 
                       stroke="#10b981" 
-                      strokeWidth={3}
+                      strokeWidth={2}
                       fillOpacity={1} 
                       fill="url(#colorCadastros)" 
                       animationDuration={1500}
@@ -425,8 +423,8 @@ export const AdminPanel: React.FC = () => {
                       yAxisId="right"
                       type="monotone" 
                       dataKey="mrr" 
-                      stroke="#8b5cf6" 
-                      strokeWidth={3}
+                      stroke="#6366f1" 
+                      strokeWidth={2}
                       fillOpacity={1} 
                       fill="url(#colorMRR)" 
                       animationDuration={1500}
@@ -436,134 +434,124 @@ export const AdminPanel: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <Filter className="text-violet-500" size={20} />
-                Filtros Rápidos
-              </h3>
-              <div className="space-y-2">
-                {[
-                  { id: 'all', label: 'Todos os Usuários', icon: Users, count: stats.totalUsers },
-                  { id: 'pro', label: 'Assinantes ATIVOS', icon: CreditCard, count: stats.activeSubscriptions },
-                  { id: 'inactive', label: 'Inativos / Cancelados', icon: XCircle, count: users.filter(u => u.subscription_status === 'inactive').length },
-                  { id: 'expiring', label: 'Vencendo em 48h', icon: Clock, count: users.filter(u => {
-                    if (!u.subscription_expiry) return false;
-                    const expiry = new Date(u.subscription_expiry);
-                    const diffHrs = (expiry.getTime() - new Date().getTime()) / (1000 * 60 * 60);
-                    return diffHrs > 0 && diffHrs <= 48;
-                  }).length },
-                ].map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setFilterType(f.id as any)}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${filterType === f.id ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-100 hover:border-slate-200'}`}
-                  >
-                    <div className="flex items-center gap-3 text-sm font-medium">
-                      <f.icon size={18} className={filterType === f.id ? 'text-white' : 'text-slate-400'} />
-                      {f.label}
-                    </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${filterType === f.id ? 'bg-white/20' : 'bg-slate-100 text-slate-600'}`}>
-                      {f.count}
-                    </span>
-                  </button>
-                ))}
+            <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="text-sm font-black text-neutral-text mb-5 flex items-center gap-2 uppercase tracking-wider">
+                  <Filter className="text-brand" size={16} />
+                  Filtros Disponíveis
+                </h3>
+                <div className="space-y-2">
+                  {[
+                    { id: 'all', label: 'Todos os Usuários', icon: Users, count: stats.totalUsers },
+                    { id: 'pro', label: 'Assinantes ATIVOS', icon: CreditCard, count: stats.activeSubscriptions },
+                    { id: 'inactive', label: 'Inativos / Cancelados', icon: XCircle, count: users.filter(u => u.subscription_status === 'inactive').length },
+                    { id: 'expiring', label: 'Vencendo em 48h', icon: Clock, count: users.filter(u => {
+                      if (!u.subscription_expiry) return false;
+                      const expiry = new Date(u.subscription_expiry);
+                      const diffHrs = (expiry.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+                      return diffHrs > 0 && diffHrs <= 48;
+                    }).length },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setFilterType(f.id as any)}
+                      className={`w-full flex items-center justify-between p-3 rounded-smart border transition-all text-left cursor-pointer ${filterType === f.id ? 'bg-brand text-white border-brand shadow-sm font-bold' : 'bg-[#f8fafc] text-neutral-text border-neutral-border hover:bg-slate-100 font-semibold mb-0.5'}`}
+                    >
+                      <div className="flex items-center gap-2.5 text-xs">
+                        <f.icon size={14} className={filterType === f.id ? 'text-white' : 'text-neutral-muted'} />
+                        {f.label}
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-smart font-black ${filterType === f.id ? 'bg-white/20' : 'bg-white border border-neutral-border text-neutral-text'}`}>
+                        {f.count}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="mt-8 p-4 bg-violet-50 rounded-xl border border-violet-100">
-                <p className="text-xs text-violet-700 font-medium mb-1">Previsão de Faturamento</p>
-                <p className="text-xl font-bold text-violet-900">R$ {stats.monthlyRevenue.toFixed(2)} /mês</p>
+              <div className="mt-6 p-4 bg-emerald-50 rounded-smart border border-emerald-150">
+                <p className="text-[10px] text-brand font-black uppercase tracking-wider mb-0.5">Previsão Faturamento SaaS</p>
+                <p className="text-lg font-black text-neutral-text">R$ {stats.monthlyRevenue.toFixed(2)} <span className="text-xs font-bold text-neutral-muted">/ mês</span></p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white rounded-smart border border-neutral-border shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-neutral-border flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-muted" size={16} />
                 <input 
                   type="text"
-                  placeholder="Buscar por e-mail ou loja..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-medium text-slate-900 placeholder:text-slate-500"
+                  placeholder="Buscar por e-mail ou nome da loja..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-neutral-border rounded-smart text-sm font-semibold text-neutral-text focus:border-brand focus:ring-4 focus:ring-brand/10 focus:outline-none transition-all placeholder:text-slate-400"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="text-sm font-bold text-slate-600">
-                Exibindo <span className="text-slate-900">{filteredUsers.length}</span> usuários
+              <div className="text-xs font-bold text-neutral-muted uppercase tracking-wider">
+                Exibindo <span className="text-neutral-text font-black">{filteredUsers.length}</span> usuários cadastrados
               </div>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-slate-100 border-b border-slate-200">
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Usuário / Loja</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Último Acesso</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Última Venda</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Validade</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider text-right">Ações</th>
+                  <tr className="bg-[#f8fafc] border-b border-neutral-border">
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider">Usuário / Loja</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider">Último Acesso</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider">Última Venda</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider">Validade</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-neutral-muted uppercase tracking-wider text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-border">
                   {loading ? (
                     Array(5).fill(0).map((_, i) => (
                       <tr key={i} className="animate-pulse">
-                        <td colSpan={6} className="px-6 py-10 text-center text-slate-400">Carregando...</td>
+                        <td colSpan={6} className="px-6 py-10 text-center text-neutral-muted text-xs font-semibold">Carregando usuários...</td>
                       </tr>
                     ))
                   ) : filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-10 text-center text-slate-400">Nenhum usuário encontrado</td>
+                      <td colSpan={6} className="px-6 py-10 text-center text-neutral-muted text-xs font-semibold">Nenhum registro de usuário correspondente encontrado</td>
                     </tr>
                   ) : filteredUsers.map((userProfile) => (
-                    <tr key={userProfile.id} className="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
-                      <td className="px-6 py-5 text-sm">
+                    <tr key={userProfile.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 text-sm">
                         <div className="flex flex-col">
-                          <span className="font-black text-slate-900 text-base">{userProfile.email}</span>
-                          <span className="text-xs text-slate-600 font-bold uppercase tracking-tight">{userProfile.store_name || 'Carrinho não configurado'}</span>
+                          <span className="font-bold text-neutral-text text-sm">{userProfile.email}</span>
+                          <span className="text-[10px] text-neutral-muted font-black uppercase tracking-wider mt-0.5">{userProfile.store_name || 'Loja sem nome definido'}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider
-                          ${userProfile.subscription_status === 'active' ? 'bg-emerald-100 text-emerald-800' : 
-                            userProfile.subscription_status === 'trial' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}
-                          border ${userProfile.subscription_status === 'active' ? 'border-emerald-200' : 
-                            userProfile.subscription_status === 'trial' ? 'border-blue-200' : 'border-red-200'}
+                      <td className="px-6 py-4 text-sm">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-smart text-[10px] font-black uppercase tracking-wider border
+                          ${userProfile.subscription_status === 'active' ? 'bg-emerald-55 text-brand border-emerald-100' : 
+                            userProfile.subscription_status === 'trial' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-red-50 text-red-700 border-red-100'}
                         `}>
-                          {userProfile.subscription_status === 'active' ? <CheckCircle2 size={12} /> : 
-                           userProfile.subscription_status === 'trial' ? <Clock size={12} /> : <XCircle size={12} />}
                           {userProfile.subscription_status === 'active' ? 'Ativo' : 
-                           userProfile.subscription_status === 'trial' ? 'Teste' : 'Inativo'}
+                           userProfile.subscription_status === 'trial' ? 'Demonstração' : 'Inativo'}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <div className="flex items-center gap-2 text-slate-900 font-bold">
-                          <Activity size={16} className={userProfile.last_seen_at && (new Date().getTime() - new Date(userProfile.last_seen_at).getTime() < 300000) ? "text-emerald-600 animate-pulse" : "text-slate-400"} />
+                      <td className="px-6 py-4 text-xs font-semibold text-neutral-text">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`w-1.5 h-1.5 rounded-full ${userProfile.last_seen_at && (new Date().getTime() - new Date(userProfile.last_seen_at).getTime() < 300000) ? "bg-brand animate-pulse" : "bg-slate-350"}`} />
                           {formatLastSeen(userProfile.last_seen_at)}
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                         <div className="flex items-center gap-2 text-slate-900 font-bold">
-                          <TrendingUp size={16} className="text-indigo-500" />
-                          {userProfile.last_sale_at ? new Date(userProfile.last_sale_at).toLocaleDateString() : 'Sem vendas'}
-                        </div>
+                      <td className="px-6 py-4 text-xs font-semibold text-neutral-text">
+                        {userProfile.last_sale_at ? new Date(userProfile.last_sale_at).toLocaleDateString('pt-BR') : <span className="text-slate-300">Nenhuma</span>}
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <div className="flex items-center gap-2 text-slate-900 font-bold">
-                          <Calendar size={16} className="text-slate-400" />
-                          {userProfile.subscription_expiry ? new Date(userProfile.subscription_expiry).toLocaleDateString() : 'N/A'}
-                        </div>
+                      <td className="px-6 py-4 text-xs font-bold text-neutral-text">
+                        {userProfile.subscription_expiry ? new Date(userProfile.subscription_expiry).toLocaleDateString('pt-BR') : <span className="text-slate-300">Indeterminado</span>}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => setSelectedUser(userProfile)}
-                            className="p-2 text-primary hover:bg-emerald-50 rounded-xl transition-all hover:scale-110 active:scale-95"
-                            title="Gerenciar Usuário"
-                          >
-                            <MoreVertical size={20} />
-                          </button>
-                        </div>
+                        <button 
+                          onClick={() => setSelectedUser(userProfile)}
+                          className="inline-flex items-center justify-center p-1.5 bg-[#f8fafc] hover:bg-slate-100 rounded-smart border border-neutral-border text-neutral-muted hover:text-neutral-text transition-all cursor-pointer"
+                          title="Gerenciar Contrato"
+                        >
+                          <MoreVertical size={14} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -574,139 +562,139 @@ export const AdminPanel: React.FC = () => {
 
           {/* User Management Modal */}
           {selectedUser && (
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
               <div 
-                className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in slide-in-from-bottom-8 duration-500"
+                className="bg-white w-full max-w-xl rounded-smart shadow-xl overflow-hidden border border-neutral-border animate-scale-up"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="relative p-8 pb-0 flex items-start justify-between">
-                  <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
-                      <Users size={32} />
+                <div className="p-6 border-b border-neutral-border bg-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-brand text-white rounded-smart">
+                      <Users size={18} />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black text-slate-900 leading-tight">Gestão de Conta</h2>
-                      <p className="text-slate-500 font-medium">{selectedUser.email}</p>
+                      <h3 className="text-sm font-black text-neutral-text uppercase tracking-wider">Gestão de Conta</h3>
+                      <p className="text-[11px] text-neutral-muted font-bold mt-0.5">{selectedUser.email}</p>
                     </div>
                   </div>
                   <button 
                     onClick={() => setSelectedUser(null)}
-                    className="p-3 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"
+                    className="p-1.5 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400 hover:text-neutral-text cursor-pointer"
                   >
-                    <X size={24} />
+                    <X size={18} />
                   </button>
                 </div>
 
-                <div className="p-8">
+                <div className="p-6 space-y-6">
                   {/* Quick Info Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase
-                        ${selectedUser.subscription_status === 'active' ? 'bg-emerald-100 text-emerald-700' : 
-                          selectedUser.subscription_status === 'trial' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="p-3.5 bg-[#f8fafc] rounded-smart border border-neutral-border text-center">
+                      <p className="text-[9px] font-black text-neutral-muted uppercase tracking-widest mb-1 leading-none">Status</p>
+                      <span className={`inline-flex px-2 py-0.5 rounded-smart text-[9px] font-black uppercase
+                        ${selectedUser.subscription_status === 'active' ? 'bg-emerald-50 text-brand border border-emerald-100' : 
+                          selectedUser.subscription_status === 'trial' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-red-50 text-red-700 border border-red-100'}
                       `}>
                         {selectedUser.subscription_status}
                       </span>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Cargo</p>
-                      <p className="text-sm font-black text-slate-900 uppercase">{selectedUser.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
+                    <div className="p-3.5 bg-[#f8fafc] rounded-smart border border-neutral-border text-center">
+                      <p className="text-[9px] font-black text-neutral-muted uppercase tracking-widest mb-1 leading-none">Cargo</p>
+                      <p className="text-xs font-black text-neutral-text uppercase leading-tight mt-1">{selectedUser.role === 'admin' ? 'Admin' : 'Cliente'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Loja</p>
-                      <p className="text-sm font-black text-slate-900 truncate">{selectedUser.store_name || 'N/A'}</p>
+                    <div className="p-3.5 bg-[#f8fafc] rounded-smart border border-neutral-border text-center">
+                      <p className="text-[9px] font-black text-neutral-muted uppercase tracking-widest mb-1 leading-none">Loja</p>
+                      <p className="text-xs font-black text-neutral-text truncate leading-tight mt-1">{selectedUser.store_name || 'N/A'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Validade</p>
-                      <p className="text-sm font-black text-slate-900">
+                    <div className="p-3.5 bg-[#f8fafc] rounded-smart border border-neutral-border text-center">
+                      <p className="text-[9px] font-black text-neutral-muted uppercase tracking-widest mb-1 leading-none">Expiração</p>
+                      <p className="text-xs font-black text-neutral-text leading-tight mt-1">
                         {selectedUser.subscription_expiry ? new Date(selectedUser.subscription_expiry).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                   </div>
 
                   {/* Actions Section */}
-                  <div className="space-y-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Ações Estratégicas</p>
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black text-neutral-muted uppercase tracking-wider">Ações Administrativas</p>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         onClick={() => { toggleSubscription(selectedUser.id, selectedUser.subscription_status); }}
-                        className={`flex items-center gap-4 p-4 rounded-[1.5rem] border-2 transition-all group ${
+                        className={`flex items-center gap-3 p-3.5 rounded-smart border transition-all text-left cursor-pointer group ${
                           selectedUser.subscription_status === 'active' 
-                          ? 'border-red-50 hover:bg-red-50 bg-white' 
-                          : 'border-emerald-50 hover:bg-emerald-50 bg-white'
+                          ? 'border-red-150 bg-red-50/30 hover:bg-red-50' 
+                          : 'border-emerald-150 bg-emerald-50/30 hover:bg-emerald-50'
                         }`}
                       >
-                        <div className={`p-3 rounded-2xl ${
-                          selectedUser.subscription_status === 'active' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'
+                        <div className={`p-2 rounded-smart ${
+                          selectedUser.subscription_status === 'active' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-brand'
                         }`}>
-                          <CreditCard size={20} />
+                          <CreditCard size={14} />
                         </div>
-                        <div className="text-left">
-                          <p className="font-bold text-slate-900">
+                        <div>
+                          <p className="text-xs font-bold text-neutral-text">
                             {selectedUser.subscription_status === 'active' ? 'Suspender Assinatura' : 'Ativar Assinatura PRO'}
                           </p>
-                          <p className="text-xs text-slate-500">Mudar status financeiro</p>
+                          <p className="text-[10px] text-neutral-muted font-medium mt-0.5">Alternar status financeiro</p>
                         </div>
                       </button>
 
                       <button
                         onClick={() => { extendTrial(selectedUser.id); }}
-                        className="flex items-center gap-4 p-4 rounded-[1.5rem] border-2 border-blue-50 bg-white hover:bg-blue-50 transition-all group"
+                        className="flex items-center gap-3 p-3.5 rounded-smart border border-blue-150 bg-blue-50/30 hover:bg-blue-50 transition-all text-left cursor-pointer group"
                       >
-                        <div className="p-3 bg-blue-100 text-blue-600 rounded-2xl">
-                          <Plus size={20} />
+                        <div className="p-2 bg-blue-100 text-blue-700 rounded-smart">
+                          <Plus size={14} />
                         </div>
-                        <div className="text-left">
-                          <p className="font-bold text-slate-900">Extender Teste</p>
-                          <p className="text-xs text-slate-500">Adicionar +7 dias bônus</p>
+                        <div>
+                          <p className="text-xs font-bold text-neutral-text">Estender Teste</p>
+                          <p className="text-[10px] text-neutral-muted font-medium mt-0.5">Adicionar +7 dias bônus</p>
                         </div>
                       </button>
 
                       <button
                         onClick={() => { changeRole(selectedUser.id, selectedUser.role); }}
-                        className="flex items-center gap-4 p-4 rounded-[1.5rem] border-2 border-violet-50 bg-white hover:bg-violet-50 transition-all group"
+                        className="flex items-center gap-3 p-3.5 rounded-smart border border-purple-150 bg-purple-50/30 hover:bg-purple-50 transition-all text-left cursor-pointer group"
                       >
-                        <div className="p-3 bg-violet-100 text-violet-600 rounded-2xl">
-                          <UserCog size={20} />
+                        <div className="p-2 bg-purple-100 text-purple-700 rounded-smart">
+                          <UserCog size={14} />
                         </div>
-                        <div className="text-left">
-                          <p className="font-bold text-slate-900">Alterar Cargo</p>
-                          <p className="text-xs text-slate-500">Alternar Administrador</p>
+                        <div>
+                          <p className="text-xs font-bold text-neutral-text">Alterar Cargo</p>
+                          <p className="text-[10px] text-neutral-muted font-medium mt-0.5">Alternar Administrador</p>
                         </div>
                       </button>
 
                       <button
                         onClick={() => { copyToClipboard(selectedUser.email); }}
-                        className="flex items-center gap-4 p-4 rounded-[1.5rem] border-2 border-slate-50 bg-white hover:bg-slate-50 transition-all group"
+                        className="flex items-center gap-3 p-3.5 rounded-smart border border-neutral-border bg-white hover:bg-slate-50 transition-all text-left cursor-pointer group"
                       >
-                        <div className="p-3 bg-slate-100 text-slate-600 rounded-2xl">
-                          <Copy size={20} />
+                        <div className="p-2 bg-slate-100 text-neutral-muted rounded-smart">
+                          <Copy size={14} />
                         </div>
-                        <div className="text-left">
-                          <p className="font-bold text-slate-900">Copiar Contato</p>
-                          <p className="text-xs text-slate-500">E-mail para suporte</p>
+                        <div>
+                          <p className="text-xs font-bold text-neutral-text">Copiar Contato</p>
+                          <p className="text-[10px] text-neutral-muted font-medium mt-0.5">E-mail para suporte</p>
                         </div>
                       </button>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-100">
+                    <div className="pt-4 border-t border-neutral-border">
                       <button
-                        onClick={() => { if(confirm('Esta ação removerá todos os dados deste usuário. Continuar?')) { deleteUser(selectedUser.id); } }}
-                        className="w-full flex items-center justify-between p-5 rounded-[1.5rem] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300"
+                        onClick={() => { if(confirm('Esta ação removerá todos os dados deste usuário permanentemente. Continuar?')) { deleteUser(selectedUser.id); } }}
+                        className="w-full flex items-center justify-between p-4 rounded-smart bg-red-50 hover:bg-red-600 text-red-700 hover:text-white border border-red-200 hover:border-red-600 transition-all group cursor-pointer"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-white/20 rounded-2xl">
-                            <Trash2 size={24} />
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-white/50 group-hover:bg-red-700 group-hover:text-white rounded-smart text-red-750">
+                            <Trash2 size={16} />
                           </div>
                           <div className="text-left">
-                            <p className="font-black">Remover Conta do Sistema</p>
-                            <p className="text-xs opacity-80">Ação imediata e permanente</p>
+                            <p className="text-xs font-black">Remover Conta do Sistema</p>
+                            <p className="text-[10px] opacity-80 mt-0.5">Exclusão imediata, definitiva e irreversível.</p>
                           </div>
                         </div>
-                        <ArrowUpRight size={24} />
+                        <ArrowUpRight size={18} />
                       </button>
                     </div>
                   </div>
@@ -716,86 +704,94 @@ export const AdminPanel: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-100/50 hover:shadow-2xl transition-all duration-300 group">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <CreditCard size={28} />
-            </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">Preço da Assinatura</h3>
-            <p className="text-sm text-slate-500 mb-6">Defina o valor base para o cálculo do seu MRR e cobranças.</p>
-            
-            <div className="space-y-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <span className="text-slate-400 font-bold text-lg">R$</span>
-                </div>
-                <input 
-                  type="number" 
-                  step="0.01"
-                  className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-emerald-500 focus:bg-white outline-none text-2xl font-black transition-all"
-                  value={pricing.price}
-                  onChange={(e) => setPricing({ ...pricing, price: Number(e.target.value) })}
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 bg-emerald-50 text-brand rounded-smart flex items-center justify-center mb-4">
+                <CreditCard size={20} />
               </div>
+              <h3 className="text-sm font-black text-neutral-text uppercase tracking-wider mb-1">Preço da Assinatura</h3>
+              <p className="text-xs text-neutral-muted mb-6">Defina o valor base cobrado na geração automática de faturas do Pix.</p>
+              
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <span className="text-slate-400 font-bold text-sm">R$</span>
+                  </div>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    className="w-full pl-9 pr-4 py-2.5 bg-[#f8fafc] border border-neutral-border rounded-smart text-base font-black text-neutral-text focus:border-brand focus:ring-4 focus:ring-brand/10 focus:outline-none transition-all"
+                    value={pricing.price}
+                    onChange={(e) => setPricing({ ...pricing, price: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="pt-4">
               <button 
                 onClick={updateSettings}
-                className="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:-translate-y-1 active:translate-y-0 transition-all"
+                className="w-full py-2.5 bg-brand hover:bg-[#059669] text-white rounded-smart font-black text-xs uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] cursor-pointer"
               >
                 Atualizar Preço
               </button>
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-100/50 hover:shadow-2xl transition-all duration-300 group">
-            <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <Activity size={28} />
+          <div className="bg-white p-6 rounded-smart border border-neutral-border shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-smart flex items-center justify-center mb-4">
+                <Activity size={20} />
+              </div>
+              <h3 className="text-sm font-black text-neutral-text uppercase tracking-wider mb-1">Aviso Global</h3>
+              <p className="text-xs text-neutral-muted mb-6">Transmita comunicados para todos os administradores logados em tempo real.</p>
+              
+              <div className="space-y-4">
+                <textarea 
+                  className="w-full p-3 bg-[#f8fafc] border border-neutral-border rounded-smart focus:border-amber-500 focus:bg-white focus:outline-none h-24 text-xs font-semibold text-neutral-text transition-all leading-relaxed placeholder:text-slate-350"
+                  placeholder="Ex: Instabilidade no provedor identificada. Nova atualização às 23:00..."
+                  value={pricing.announcement}
+                  onChange={(e) => setPricing({ ...pricing, announcement: e.target.value })}
+                />
+              </div>
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">Aviso Global</h3>
-            <p className="text-sm text-slate-500 mb-6">Envie mensagens em tempo real para todos os logados.</p>
-            
-            <div className="space-y-6">
-              <textarea 
-                className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-amber-500 focus:bg-white outline-none h-32 text-sm font-medium transition-all"
-                placeholder="Ex: Manutenção agendada para 23:59..."
-                value={pricing.announcement}
-                onChange={(e) => setPricing({ ...pricing, announcement: e.target.value })}
-              />
+            <div className="pt-4">
               <button 
                 onClick={updateSettings}
-                className="w-full py-4 bg-amber-500 text-white rounded-2xl font-bold shadow-lg shadow-amber-200 hover:bg-amber-600 hover:-translate-y-1 active:translate-y-0 transition-all"
+                className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-smart font-black text-xs uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] cursor-pointer"
               >
-                Publicar Agora
+                Publicar Aviso Global
               </button>
             </div>
           </div>
 
-          <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-2xl group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full -mr-32 -mt-32" />
+          <div className="bg-slate-900 p-6 rounded-smart text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-brand/10 blur-[60px] rounded-full -mr-24 -mt-24 pointer-events-none" />
             
             <div className="relative z-10">
-              <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center mb-6">
-                <ShieldCheck size={28} />
+              <div className="w-10 h-10 bg-white/10 text-white rounded-smart flex items-center justify-center mb-4">
+                <ShieldCheck size={20} />
               </div>
-              <h3 className="text-xl font-black mb-2 text-white">Resumo Operacional</h3>
-              <p className="text-sm text-slate-400 mb-8">Saúde geral do seu negócio SaaS.</p>
+              <h3 className="text-sm font-black mb-1 uppercase tracking-wider text-slate-100">Resumo Operacional</h3>
+              <p className="text-xs text-slate-400 mb-6">Mapeamento dinâmico de performance financeira.</p>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Taxa Churn</p>
-                  <p className="text-xl font-black">{(users.filter(u => u.subscription_status === 'inactive').length / users.length * 100 || 0).toFixed(1)}%</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-white/5 rounded-smart border border-white/10">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Taxa Churn</p>
+                  <p className="text-base font-black">{(users.filter(u => u.subscription_status === 'inactive').length / users.length * 100 || 0).toFixed(1)}%</p>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Ticket Médio</p>
-                  <p className="text-xl font-black">R$ {pricing.price.toFixed(0)}</p>
+                <div className="p-3 bg-white/5 rounded-smart border border-white/10">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Ticket Médio</p>
+                  <p className="text-base font-black">R$ {pricing.price.toFixed(0)}</p>
                 </div>
-                <div className="col-span-2 p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 flex items-center justify-between">
-                   <div>
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Novos Leads</p>
-                    <p className="text-2xl font-black text-emerald-400">{users.filter(u => u.subscription_status === 'trial').length}</p>
-                   </div>
-                   <div className="text-emerald-400">
-                    <TrendingUp size={24} />
-                   </div>
+                <div className="col-span-2 p-3 bg-emerald-500/10 rounded-smart border border-emerald-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-[9px] font-black text-brand uppercase tracking-widest mb-0.5">Novos Testes (Trial)</p>
+                    <p className="text-xl font-black text-brand">{users.filter(u => u.subscription_status === 'trial').length}</p>
+                  </div>
+                  <div className="text-brand">
+                    <TrendingUp size={16} />
+                  </div>
                 </div>
               </div>
             </div>
