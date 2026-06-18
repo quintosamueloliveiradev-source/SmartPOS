@@ -43,7 +43,9 @@ export const SubscriptionGate: React.FC = () => {
         try {
           const response = await fetch(`/api/asaas/check-payment/${paymentId}`);
           if (!response.ok) {
-            throw new Error('Falha ao comunicar com o validador de faturas.');
+            const errorText = await response.text();
+            console.error('Erro de validação retornado pelo backend:', errorText);
+            throw new Error(`Falha ao comunicar com o validador de faturas (${response.status}).`);
           }
           
           const data = await response.json();
@@ -116,8 +118,14 @@ export const SubscriptionGate: React.FC = () => {
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Dados brutos do erro retornados pelo backend:', errorText);
+        throw new Error(`Erro no servidor (${response.status}): ${errorText.substring(0, 150)}`);
+      }
+
       const data = await response.json();
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.message || 'Erro inesperado ao gerar fatura no Asaas.');
       }
 

@@ -1,13 +1,10 @@
 import express from 'express';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 
 // Carregar variáveis de ambiente adicionais se necessário
 const PORT = 3000;
-
-async function startServer() {
-  const app = express();
-  app.use(express.json());
+const app = express();
+app.use(express.json());
 
   // Rota de Health Check
   app.get('/api/health', (req, res) => {
@@ -215,24 +212,31 @@ async function startServer() {
     return res.status(200).json({ received: true });
   });
 
-  // Configuração do Vite Middleware em desenvolvimento ou arquivos estáticos em Produção
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+// Exporta para uso serverless (Vercel)
+export default app;
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT} with Full-Stack support.`);
-  });
+if (!process.env.VERCEL) {
+  const startServer = async () => {
+    // Configuração do Vite Middleware em desenvolvimento ou arquivos estáticos em Produção
+    if (process.env.NODE_ENV !== 'production') {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+    }
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on port ${PORT} with Full-Stack support.`);
+    });
+  };
+
+  startServer();
 }
-
-startServer();
