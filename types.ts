@@ -35,10 +35,15 @@ export interface Profile {
   id: string;
   email: string;
   role: 'admin' | 'customer';
-  subscription_status: 'active' | 'inactive' | 'trial';
+  subscription_status: 'active' | 'inactive' | 'trial' | 'canceled' | 'expired';
   subscription_expiry: string | null;
   store_name?: string;
   last_seen_at?: string;
   last_sale_at?: string;
   created_at: string;
+  // Atributos de controle de monetização adicionados
+  subscriptionStatus?: 'trial' | 'active' | 'canceled' | 'expired';
+  trialEndDate?: string;
+  stripeCustomerId?: string;
+  asaasCustomerId?: string;
 }

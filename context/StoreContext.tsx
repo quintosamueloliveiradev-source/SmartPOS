@@ -149,10 +149,40 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
 
         if (currentProfile) {
-          setProfile(currentProfile);
+          // Normalizar e preencher as propriedades de controle de monetização camelCase
+          let status = (currentProfile.subscription_status || 'trial') as 'trial' | 'active' | 'canceled' | 'expired';
+          const trialEndDateStr = currentProfile.subscription_expiry || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+          
+          // Se for "trial" e a data atual for MAIOR que o término, muda para expired
+          if (status === 'trial') {
+            const trialEnd = new Date(trialEndDateStr);
+            if (new Date() > trialEnd) {
+              console.log('Período de testes (Trial) expirado! Atualizando status para "expired" no banco...');
+              status = 'expired';
+              
+              // Atualizar no banco de dados de maneira assíncrona
+              supabase.from('profiles')
+                .update({ subscription_status: 'expired' })
+                .eq('id', user.id)
+                .then(({ error }) => {
+                  if (error) console.error('Erro ao atualizar status de assinatura expirada:', error);
+                });
+            }
+          }
+
+          const augmentedProfile: Profile = {
+            ...currentProfile,
+            subscription_status: status,
+            subscriptionStatus: status,
+            trialEndDate: trialEndDateStr,
+            stripeCustomerId: currentProfile.stripe_customer_id || undefined,
+            asaasCustomerId: currentProfile.asaas_customer_id || undefined
+          };
+
+          setProfile(augmentedProfile);
           // Atualizar última atividade de forma silenciosa
           supabase.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', user.id).then();
-          console.log('Perfil carregado com sucesso:', currentProfile.role);
+          console.log('Perfil carregado com sucesso:', augmentedProfile.role, augmentedProfile.subscriptionStatus);
         } else {
           throw new Error('Falha catastrófica ao carregar perfil');
         }
@@ -236,13 +266,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const checkSubscription = () => {
     if (!profile) return false;
+    // Administrador tem acesso irrestrito
     if (profile.role === 'admin') return true;
-    if (profile.subscription_status === 'active') return true;
-    if (profile.subscription_status === 'trial') {
-      const trialEnd = new Date(profile.created_at);
-      trialEnd.setDate(trialEnd.getDate() + 7); // 7 dias de teste
+
+    const status = profile.subscriptionStatus || profile.subscription_status;
+    const expiry = profile.trialEndDate || profile.subscription_expiry;
+
+    // Se o status for 'active', permite acesso total.
+    if (status === 'active') return true;
+
+    // Se o status for 'trial' e data atual menor que trialEndDate, permite acesso total.
+    if (status === 'trial') {
+      if (!expiry) return true; // Se não tem data, assume que está em teste
+      const trialEnd = new Date(expiry);
       return new Date() < trialEnd;
     }
+
+    // Se o status for 'expired' ou 'canceled', bloqueia o acesso.
     return false;
   };
 
