@@ -10,8 +10,9 @@ import { AdminPanel } from './components/AdminPanel';
 import { Login } from './components/Login';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { ViewState } from './types';
-import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone, AlertTriangle, Sparkles } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { PixCheckoutModal } from './components/PixCheckoutModal';
 
 const GlobalBanner = () => {
   const [announcement, setAnnouncement] = useState('');
@@ -79,6 +80,7 @@ const MainContent: React.FC = () => {
     const saved = sessionStorage.getItem('pos_current_view');
     return (saved as ViewState) || 'dashboard';
   });
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   useEffect(() => {
     sessionStorage.setItem('pos_current_view', currentView);
@@ -90,6 +92,19 @@ const MainContent: React.FC = () => {
       setCurrentView('admin');
     }
   }, [profile?.role, user?.email, currentView]);
+
+  const getTrialDaysRemaining = () => {
+    if (!profile) return null;
+    const status = profile.subscriptionStatus || profile.subscription_status;
+    const expiry = profile.trialEndDate || profile.subscription_expiry;
+    if (status !== 'trial') return null;
+    if (!expiry) return null;
+    
+    const expiryDate = new Date(expiry);
+    const diffTime = expiryDate.getTime() - Date.now();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
   if (loading) {
     return (
@@ -109,6 +124,9 @@ const MainContent: React.FC = () => {
   if (!user) return <Login />;
   
   if (!checkSubscription()) return <SubscriptionGate />;
+
+  const daysRemaining = getTrialDaysRemaining();
+  const showTrialBanner = daysRemaining !== null && daysRemaining <= 3 && daysRemaining >= 0;
 
   const renderView = () => {
     switch (currentView) {
@@ -132,14 +150,43 @@ const MainContent: React.FC = () => {
         <Sidebar currentView={currentView} setView={setCurrentView} />
         
         <main className="flex-1 ml-20 lg:ml-64 p-4 lg:p-8 transition-all duration-300 flex flex-col">
+          {/* Warning Pre-Expiry Trial Banner */}
+          {showTrialBanner && (
+            <div className="mb-6 bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-orange-500/30 animate-fade-in animate-pulse-subtle">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
+                  <AlertTriangle size={20} className="animate-bounce" />
+                </div>
+                <div>
+                  <p className="text-sm font-black tracking-tight leading-snug">
+                    Sua demonstração gratuita do SmartPOS expira em {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}.
+                  </p>
+                  <p className="text-xs text-white/85 mt-0.5 font-semibold">
+                    Evite bloqueios indesejados e ative sua assinatura mensal por apenas R$ 14,90!
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsCheckoutOpen(true)}
+                className="px-5 py-2.5 bg-white hover:bg-amber-50 text-orange-700 hover:text-orange-800 rounded-2xl text-xs font-black transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              >
+                <Sparkles size={14} className="text-orange-500" />
+                <span>Ativar Agora</span>
+              </button>
+            </div>
+          )}
+
           <div className="max-w-7xl mx-auto w-full flex-1">
             {renderView()}
           </div>
+          
           <footer className="w-full text-center pt-8 pb-4 text-sm text-slate-500 mt-auto">
             2026 – © Todos os direitos reservados
           </footer>
         </main>
       </div>
+
+      <PixCheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
     </div>
   );
 };
