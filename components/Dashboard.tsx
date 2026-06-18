@@ -39,10 +39,50 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  const salesData = activeSales.slice(0, 7).reverse().map(sale => ({
-    name: new Date(sale.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    valor: sale.total
-  }));
+  const salesData = useMemo(() => {
+    // Agrupa e soma as vendas dos últimos 7 dias corridos
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return d;
+    }).reverse();
+
+    return days.map(day => {
+      const dayStart = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getTime();
+      const dayEnd = dayStart + 24 * 60 * 60 * 1000;
+
+      const dailyTotal = activeSales
+        .filter(sale => sale.timestamp >= dayStart && sale.timestamp < dayEnd)
+        .reduce((sum, sale) => sum + sale.total, 0);
+
+      const dayOfWeek = day.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+      const dayAndMonth = day.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const label = `${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} (${dayAndMonth})`;
+
+      return {
+        name: label,
+        valor: parseFloat(dailyTotal.toFixed(2))
+      };
+    });
+  }, [activeSales]);
+
+  // Componente de Tooltip Moderno Customizado
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl border border-slate-800 shadow-xl font-sans text-xs flex flex-col gap-1">
+          <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">{label}</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[10px] text-emerald-400 font-bold">Faturamento:</span>
+            <span className="font-extrabold text-white text-sm">
+              R$ {payload[0].value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -102,12 +142,33 @@ export const Dashboard: React.FC = () => {
           {activeSales.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
-                  <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                  <Bar dataKey="valor" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} />
+                <BarChart data={salesData} margin={{ top: 10, right: 5, left: -15, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                      <stop offset="100%" stopColor="#34d399" stopOpacity={0.35} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} 
+                    dy={8}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} 
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={false} />
+                  <Bar 
+                    dataKey="valor" 
+                    fill="url(#barGradient)" 
+                    radius={[6, 6, 0, 0]} 
+                    barSize={28}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
