@@ -374,9 +374,9 @@ export const Login: React.FC = () => {
           className="flex items-center gap-3 mb-16"
         >
           <div className="bg-emerald-500 rounded-xl p-2.5 shadow-md shadow-emerald-500/20">
-            <LogIn className="text-white" size={24} />
+            <Store className="text-white" size={24} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei SaaS</span>
+          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei</span>
         </motion.div>
 
         <div className="max-w-xl">
@@ -468,7 +468,7 @@ export const Login: React.FC = () => {
           >
             {/* Sidebar */}
             <div className="w-[72px] bg-[#0f3d2e] shrink-0 flex flex-col items-center py-6 gap-6 rounded-l-[1.25rem] border-r border-[#155440]">
-              <div className="bg-emerald-500 rounded-xl p-2 text-white shadow-lg shadow-emerald-500/20"><LogIn size={20} /></div>
+              <div className="bg-emerald-500 rounded-xl p-2 text-white shadow-lg shadow-emerald-500/20"><Store size={20} /></div>
               <div className="w-6 h-px bg-white/20 mb-2"></div>
               <div className="bg-emerald-500 rounded-xl p-2 text-white shadow-lg shadow-emerald-500/20"><LayoutDashboard size={20} /></div>
               <div className="p-2 text-white/50 hover:text-white/80 transition-colors"><ShoppingCart size={20} /></div>
@@ -549,7 +549,7 @@ export const Login: React.FC = () => {
         {/* Only show logo on mobile, hidden on desktop since it's on the left */}
         <div className="lg:hidden flex items-center gap-2 mb-10 w-full max-w-md">
           <div className="bg-emerald-500 rounded-xl p-2 w-10 h-10 flex items-center justify-center shadow-md">
-            <LogIn className="text-white" size={20} />
+            <Store className="text-white" size={20} />
           </div>
           <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei</span>
         </div>
@@ -563,12 +563,12 @@ export const Login: React.FC = () => {
           {/* Logo inside card (optional, mimicking the design image) */}
           <div className="flex justify-center mb-6">
             <div className="bg-emerald-500 rounded-[1.25rem] p-4 shadow-lg shadow-emerald-500/20">
-              <LogIn className="text-white" size={32} />
+              <Store className="text-white" size={32} />
             </div>
           </div>
           
           <div className="text-center mb-8">
-             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3">Vendeei SaaS</h2>
+             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3">Vendeei</h2>
              <p className="text-slate-500 font-medium">Acesse sua conta para continuar</p>
           </div>
 
@@ -749,7 +749,7 @@ export const Login: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-12 text-slate-400 text-[13px] font-medium tracking-wide"
         >
-          © 2024 Vendeei SaaS. Todos os direitos reservados.
+          © 2024 Vendeei. Todos os direitos reservados.
         </motion.div>
 
       </div>
