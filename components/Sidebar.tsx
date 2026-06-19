@@ -31,10 +31,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         <div className="bg-primary p-2 rounded-lg">
           <Store size={24} className="text-white" />
         </div>
-        <div className="hidden lg:block overflow-hidden">
-          <h1 className="text-xl font-bold truncate">Vendeei</h1>
-          <p className="text-[10px] text-emerald-400 truncate uppercase tracking-widest font-black">{profile?.role === 'admin' ? 'Super Admin' : 'Pro'}</p>
-          <p className="text-[11px] text-white truncate mt-1 font-bold" title={user?.email}>{user?.email}</p>
+        <div className="hidden lg:block overflow-hidden flex-1 self-center">
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-lg font-black tracking-tight text-white leading-tight">Vendeei</h1>
+            <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black uppercase tracking-wider leading-none">
+              {profile?.role === 'admin' ? 'Admin' : 'Pro'}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 truncate mt-0.5 font-semibold" title={user?.email}>{user?.email}</p>
         </div>
       </div>
       
