@@ -8,6 +8,8 @@ export const Clientes: React.FC = () => {
   const { user, loading } = useStore();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
@@ -86,16 +88,23 @@ export const Clientes: React.FC = () => {
     }
   };
 
-  const handleDeleteCustomer = async (id: string) => {
-    if (!confirm("Deseja mesmo excluir este cliente?")) return;
+  const handleDeleteCustomer = (customer: Customer) => {
+    setCustomerToDelete(customer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteCustomer = async () => {
+    if (!customerToDelete) return;
     
     try {
-      const { error } = await supabase.from('customers').delete().eq('id', id);
+      const { error } = await supabase.from('customers').delete().eq('id', customerToDelete.id);
       
       if (error) {
         alert("Erro do Supabase ao deletar: " + error.message);
       } else {
         fetchCustomers(); // Atualiza a lista
+        setIsDeleteModalOpen(false);
+        setCustomerToDelete(null);
       }
     } catch (error: any) {
       console.error('Erro ao deletar cliente:', error);
@@ -193,7 +202,7 @@ export const Clientes: React.FC = () => {
                         <button onClick={() => openEditModal(c)} className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
                           <Pencil size={16} />
                         </button>
-                        <button onClick={() => handleDeleteCustomer(c.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button onClick={() => handleDeleteCustomer(c)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -278,6 +287,34 @@ export const Clientes: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && customerToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 relative text-center">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Excluir Cliente?</h3>
+            <p className="text-sm text-slate-500 mb-6">
+              Você está prestes a remover o cliente <span className="font-bold text-slate-900">{customerToDelete.name}</span> definitivamente do sistema. Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmDeleteCustomer}
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700"
+              >
+                SIM, EXCLUIR CLIENTE
+              </button>
+            </div>
           </div>
         </div>
       )}
