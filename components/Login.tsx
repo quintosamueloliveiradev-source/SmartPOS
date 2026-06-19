@@ -376,7 +376,7 @@ export const Login: React.FC = () => {
           <div className="bg-emerald-500 rounded-xl p-2.5 shadow-md shadow-emerald-500/20">
             <Store className="text-white" size={24} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei</span>
+          <span className="font-extrabold text-xl tracking-tight text-slate-800 font-vendeei">Vendeei</span>
         </motion.div>
 
         <div className="max-w-xl">
@@ -384,7 +384,7 @@ export const Login: React.FC = () => {
             initial={{ opacity: 0, y: 30 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl xl:text-6xl font-black text-slate-800 leading-[1.1] mb-8 tracking-tight"
+            className="text-display-lg font-display-lg text-slate-800 mb-8"
           >
             Gestão inteligente<br />
             <span className="text-emerald-500">para o seu negócio</span>
@@ -394,7 +394,7 @@ export const Login: React.FC = () => {
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="text-slate-500 text-lg xl:text-xl font-medium mb-12 max-w-lg leading-relaxed"
+            className="text-slate-500 text-body-md font-body-md font-medium mb-12 max-w-lg leading-relaxed"
           >
             Sistema completo para gestão de PDV, estoque, vendas e relatórios. 
             Tudo o que você precisa em um só lugar.
@@ -411,8 +411,8 @@ export const Login: React.FC = () => {
                 <BarChart3 size={28} strokeWidth={2.5} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-800 text-lg mb-1">Relatórios Inteligentes</h3>
-                <p className="text-slate-500 font-medium leading-snug">Dados em tempo real para decisões <br className="hidden xl:block"/> mais assertivas</p>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Relatórios Inteligentes</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Dados em tempo real para decisões <br className="hidden xl:block"/> mais assertivas</p>
               </div>
             </div>
 
@@ -421,8 +421,8 @@ export const Login: React.FC = () => {
                 <Store size={28} strokeWidth={2.5} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-800 text-lg mb-1">Gestão Completa</h3>
-                <p className="text-slate-500 font-medium leading-snug">Controle de vendas, estoque, clientes <br className="hidden xl:block"/> e muito mais</p>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Gestão Completa</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Controle de vendas, estoque, clientes <br className="hidden xl:block"/> e muito mais</p>
               </div>
             </div>
 
@@ -431,8 +431,8 @@ export const Login: React.FC = () => {
                 <ShieldCheck size={28} strokeWidth={2.5} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-800 text-lg mb-1">Seguro e Confiável</h3>
-                <p className="text-slate-500 font-medium leading-snug">Seus dados protegidos com as melhores <br className="hidden xl:block"/> práticas de segurança</p>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Seguro e Confiável</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Seus dados protegidos com as melhores <br className="hidden xl:block"/> práticas de segurança</p>
               </div>
             </div>
             
@@ -551,7 +551,7 @@ export const Login: React.FC = () => {
           <div className="bg-emerald-500 rounded-xl p-2 w-10 h-10 flex items-center justify-center shadow-md">
             <Store className="text-white" size={20} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-slate-800">Vendeei</span>
+          <span className="font-extrabold text-xl tracking-tight text-slate-800 font-vendeei">Vendeei</span>
         </div>
 
         <motion.div 
@@ -568,7 +568,7 @@ export const Login: React.FC = () => {
           </div>
           
           <div className="text-center mb-8">
-             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3">Vendeei</h2>
+             <h2 className="text-[1.75rem] font-black text-slate-800 tracking-tight leading-none mb-3 font-vendeei">Vendeei</h2>
              <p className="text-slate-500 font-medium">Acesse sua conta para continuar</p>
           </div>
 

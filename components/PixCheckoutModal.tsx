@@ -270,7 +270,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <p className="text-sm font-bold text-slate-800">Assinatura Vendeei Mensal</p>
+            <p className="text-body-md font-body-md font-bold text-slate-800">Assinatura Vendeei Mensal</p>
           </div>
           <button 
             onClick={onClose} 
@@ -285,18 +285,18 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
           {paymentStep === 'initial' && (
             <div className="space-y-5">
               <div className="text-center bg-slate-50 border border-slate-100 p-4 rounded-2xl">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Assinatura Mensal</span>
+                <span className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide block">Assinatura Mensal</span>
                 <div className="flex items-baseline justify-center gap-1 mt-1">
                   <span className="text-sm font-bold text-slate-400">R$</span>
-                  <span className="text-4xl font-black text-slate-900 tracking-tight">14,90</span>
+                  <span className="text-display-lg font-display-lg font-bold font-debug-mono text-slate-900 tracking-tight">14,90</span>
                   <span className="text-sm font-bold text-slate-400">/mês</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">Acesso completo sem anúncios ou taxas extras.</p>
+                <p className="text-body-md font-body-md text-slate-500 mt-1">Acesso completo sem anúncios ou taxas extras.</p>
               </div>
 
               <form onSubmit={handleGeneratePix} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                  <label className="text-label-sm font-label-sm text-slate-700 uppercase tracking-wide block font-semibold">
                     CPF ou CNPJ do Pagador *
                   </label>
                   <input 
@@ -309,9 +309,9 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     }}
                     required
                     maxLength={18}
-                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none"
+                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-body-md font-body-md font-debug-mono font-semibold transition-all outline-none"
                   />
-                  <p className="text-[10px] text-slate-400 leading-tight">
+                  <p className="text-label-sm font-label-sm text-slate-400 leading-tight">
                     * Requerido pela regulamentação do Banco Central para emissão de Pix nominal.
                   </p>
                 </div>
@@ -320,7 +320,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                   <button 
                     type="submit"
                     disabled={loadingPayment}
-                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-title-md text-sm uppercase tracking-wider shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {loadingPayment ? (
                       <>
@@ -339,7 +339,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     <button 
                       type="button"
                       onClick={handleSimulatePaymentApproval}
-                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-bold text-xs transition-colors cursor-pointer"
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-title-md text-xs transition-colors cursor-pointer"
                     >
                       Ativar Modo de Demonstração (Simulado)
                     </button>
@@ -350,7 +350,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               {!isProduction && (
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
                   <div className="text-amber-600 mt-0.5 shrink-0"><Star size={14} fill="currentColor" /></div>
-                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                  <p className="text-label-sm font-label-sm text-slate-500 leading-relaxed font-medium">
                     <strong>Gateway Asaas Ativo:</strong> Se sua API Key estiver configurada, o PIX será gerado na Sandbox real com atualização por Polling.
                   </p>
                 </div>
@@ -361,10 +361,10 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
           {paymentStep === 'pix_details' && (
             <div className="space-y-5 text-center animate-fade-in">
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                <span className="text-label-sm font-label-sm bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 uppercase font-semibold text-indigo-500">
                   Aguardando Confirmação Pix
                 </span>
-                <p className="text-xs font-bold text-slate-700 mt-2">Escaneie o QR Code abaixo no seu aplicativo bancário:</p>
+                <p className="text-body-md font-body-md font-semibold text-slate-700 mt-2">Escaneie o QR Code abaixo no seu aplicativo bancário:</p>
               </div>
 
               <div className="flex flex-col items-center justify-center">
@@ -377,18 +377,18 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-40 h-40 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-xs">
+                    <div className="w-40 h-40 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-label-sm font-label-sm">
                       Buscando QR Code...
                     </div>
                   )}
                   {isSimulated && !isProduction && (
-                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1 py-0.5 rounded shadow-sm">
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-label-sm font-label-sm font-bold uppercase px-1 py-0.5 rounded shadow-sm">
                       MOCK ACTIVE
                     </div>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-1 text-xs text-slate-500 justify-center">
+                <div className="flex items-center gap-1 text-label-sm font-label-sm text-slate-500 justify-center">
                   <RefreshCw size={11} className="animate-spin text-emerald-600" />
                   <span>Sincronizando com Asaas em tempo real...</span>
                 </div>
@@ -397,12 +397,12 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               {/* Copy / Paste */}
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-center justify-between gap-2 text-left">
                 <div className="max-w-[200px] overflow-hidden">
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
-                  <p className="text-[10px] font-mono font-bold text-slate-600 truncate mt-0.5">{copiaCola || 'PIX_PAYLOAD'}</p>
+                  <p className="text-label-sm font-label-sm uppercase font-semibold text-slate-400">Pix Copia e Cola</p>
+                  <p className="text-debug-mono font-debug-mono text-slate-600 truncate mt-0.5">{copiaCola || 'PIX_PAYLOAD'}</p>
                 </div>
                 <button 
                   onClick={handleCopyCode}
-                  className={`px-2.5 py-2 rounded-lg border font-bold text-[10px] transition-all active:scale-95 shrink-0 flex items-center gap-1 cursor-pointer ${
+                  className={`px-2.5 py-2 rounded-lg border font-title-md text-xs transition-all active:scale-95 shrink-0 flex items-center gap-1 cursor-pointer ${
                     copied 
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
                       : 'bg-white border-slate-200 text-slate-600'
@@ -426,7 +426,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                 {!isProduction && (
                   <button 
                     onClick={handleSimulatePaymentApproval}
-                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-sm cursor-pointer flex items-center justify-center gap-1 mb-1.5"
+                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-sm cursor-pointer flex items-center justify-center gap-1 mb-1.5"
                   >
                     <CheckCircle size={12} />
                     Simular Confirmação
@@ -437,7 +437,7 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
                     setPollingActive(false);
                     setPaymentStep('initial');
                   }}
-                  className="w-full py-1 text-slate-500 hover:text-slate-700 text-[10px] font-bold"
+                  className="w-full py-1 text-slate-500 hover:text-slate-700 text-label-sm font-label-sm font-semibold"
                 >
                   ← Voltar e alterar documento
                 </button>
@@ -452,13 +452,13 @@ export const PixCheckoutModal: React.FC<PixCheckoutModalProps> = ({ isOpen, onCl
               </div>
 
               <div>
-                <h3 className="text-lg font-black text-slate-900 tracking-tight">Assinatura Ativada!</h3>
-                <p className="text-slate-500 text-[11px] mt-1.5 max-w-[240px] mx-auto leading-relaxed">
+                <h3 className="text-title-md font-title-md text-slate-900 tracking-tight">Assinatura Ativada!</h3>
+                <p className="text-body-md font-body-md text-slate-500 mt-1.5 max-w-[240px] mx-auto leading-relaxed">
                   Perfeito! O Asaas processou sua transação com sucesso. Sua licença foi ativada por mais 30 dias.
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-1 text-[10px] text-slate-400 uppercase font-black tracking-widest animate-pulse pt-2">
+              <div className="inline-flex items-center gap-1 text-label-sm font-label-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse pt-2">
                 <RefreshCw size={10} className="animate-spin" />
                 Recarregando sistema...
               </div>

@@ -152,8 +152,8 @@ export const Settings: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl pb-12">
       <header>
-        <h2 className="text-3xl font-black text-slate-900">Configurações do Sistema</h2>
-        <p className="text-slate-500 mt-1">Gerencie segurança, integridade de dados e backups.</p>
+        <h2 className="text-headline-lg font-headline-lg text-slate-900">Configurações do Sistema</h2>
+        <p className="text-body-md font-body-md text-slate-500 mt-1">Gerencie segurança, integridade de dados e backups.</p>
       </header>
 
       <div className="grid gap-8">
@@ -165,8 +165,8 @@ export const Settings: React.FC = () => {
                 <Receipt size={28} />
               </div>
               <div>
-                <h3 className="text-xl font-black text-slate-800">Minha Assinatura & Histórico</h3>
-                <p className="text-sm text-slate-500">Acompanhe seu status e acesse comprovantes de faturas integradas pelo Asaas.</p>
+                <h3 className="text-title-md font-title-md text-slate-800">Minha Assinatura & Histórico</h3>
+                <p className="text-body-md font-body-md text-slate-500">Acompanhe seu status e acesse comprovantes de faturas integradas pelo Asaas.</p>
               </div>
             </div>
             
@@ -180,14 +180,14 @@ export const Settings: React.FC = () => {
                     const d = await r.json();
                     if (d.success) setPayments(d.payments || []);
                   }
-                  addToast('Histórico de faturas atualizado!', 'success');
+                  addToast('Histórico de faturas updated!', 'success');
                 } catch {
                   addToast('Erro ao atualizar faturas', 'error');
                 } finally {
                   setLoadingPayments(false);
                 }
               }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-label-sm font-label-sm font-semibold text-slate-600 transition-colors"
             >
               <RefreshCw size={14} className={loadingPayments ? 'animate-spin' : ''} />
               Atualizar Lista
@@ -201,8 +201,8 @@ export const Settings: React.FC = () => {
                 <CreditCard size={20} />
               </div>
               <div>
-                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Status do Acesso</span>
-                <span className="text-sm font-black text-slate-800 flex items-center gap-1.5 mt-0.5">
+                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Status do Acesso</span>
+                <span className="text-body-md font-body-md font-bold text-slate-800 flex items-center gap-1.5 mt-0.5">
                   {profile?.subscriptionStatus === 'active' || profile?.subscription_status === 'active' ? (
                     <span className="text-emerald-600 flex items-center gap-1"><Sparkles size={14} /> Ativo</span>
                   ) : profile?.subscriptionStatus === 'trial' || profile?.subscription_status === 'trial' ? (
@@ -219,8 +219,8 @@ export const Settings: React.FC = () => {
                 <Calendar size={20} />
               </div>
               <div>
-                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Validade / Expiração</span>
-                <span className="text-sm font-black text-slate-800 mt-0.5 block">
+                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Validade / Expiração</span>
+                <span className="text-body-md font-body-md font-bold font-debug-mono text-slate-800 mt-0.5 block">
                   {profile?.subscription_expiry ? (
                     new Date(profile.subscription_expiry).toLocaleDateString('pt-BR')
                   ) : profile?.trialEndDate ? (
@@ -237,9 +237,9 @@ export const Settings: React.FC = () => {
                 <AlertCircle size={20} />
               </div>
               <div>
-                <span className="block text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Mapeamento Asaas</span>
-                <span className="text-xs font-black text-slate-800 mt-0.5 block truncate max-w-[180px]">
-                  {profile?.asaasCustomerId || profile?.asaas_customer_id || 'Não vinculado ao gateway'}
+                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Mapeamento Asaas</span>
+                <span className="text-body-md font-body-md font-bold font-debug-mono text-slate-800 mt-0.5 block truncate max-w-[180px]">
+                  {profile?.asaasCustomerId || profile?.asaas_customer_id || 'Não vinculado'}
                 </span>
               </div>
             </div>
@@ -249,19 +249,19 @@ export const Settings: React.FC = () => {
           {loadingPayments ? (
             <div className="py-12 flex flex-col items-center justify-center gap-3">
               <RefreshCw size={24} className="text-indigo-600 animate-spin" />
-              <p className="text-xs font-bold text-slate-400">Buscando faturas no Asaas Sandbox...</p>
+              <p className="text-label-sm font-label-sm text-slate-400">Buscando faturas no Asaas Sandbox...</p>
             </div>
           ) : payments.length === 0 ? (
             <div className="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center">
               <Receipt size={36} className="text-slate-300 mx-auto mb-3" />
-              <h4 className="text-sm font-black text-slate-700">Nenhuma fatura encontrada</h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Sua assinatura corporativa ou histórico de lançamentos do Asaas será exibido aqui assim que forem gerados.</p>
+              <h4 className="text-title-md font-title-md text-slate-700">Nenhuma fatura encontrada</h4>
+              <p className="text-body-md font-body-md text-slate-500 mt-1 max-w-sm mx-auto">Sua assinatura corporativa ou histórico de lançamentos do Asaas será exibido aqui assim que forem gerados.</p>
             </div>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-slate-200/80">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">
                     <th className="py-4 px-5">ID Cobrança</th>
                     <th className="py-4 px-5">Emissão</th>
                     <th className="py-4 px-5">Vencimento</th>
@@ -274,19 +274,19 @@ export const Settings: React.FC = () => {
                 <tbody className="divide-y divide-slate-150">
                   {payments.map((p) => (
                     <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-4 px-5 text-xs font-black text-slate-600">
+                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-600">
                         {p.id}
                       </td>
-                      <td className="py-4 px-5 text-xs font-bold text-slate-600">
+                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-600">
                         {p.dateCreated ? new Date(p.dateCreated).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td className="py-4 px-5 text-xs font-semibold text-slate-500">
+                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-semibold text-slate-500">
                         {p.dueDate ? new Date(p.dueDate).toLocaleDateString('pt-BR') : '-'}
                       </td>
-                      <td className="py-4 px-5 text-xs font-black text-slate-900">
+                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-900">
                         R$ {Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="py-4 px-5 text-xs font-semibold text-slate-500">
+                      <td className="py-4 px-5 text-label-sm font-label-sm font-semibold text-slate-500">
                         {getPaymentMethodLabel(p.billingType)}
                       </td>
                       <td className="py-4 px-5">
@@ -298,12 +298,12 @@ export const Settings: React.FC = () => {
                             href={p.transactionReceiptUrl || p.invoiceUrl || p.bankSlipUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-black tracking-tight transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-label-sm font-label-sm font-semibold tracking-tight transition-colors"
                           >
                             Visualizar <ExternalLink size={11} />
                           </a>
                         ) : (
-                          <span className="text-[11px] font-extrabold text-slate-300">Nenhum</span>
+                          <span className="text-label-sm font-label-sm font-semibold text-slate-300">Nenhum</span>
                         )}
                       </td>
                     </tr>
@@ -320,8 +320,8 @@ export const Settings: React.FC = () => {
               <Shield size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-800">Segurança de Acesso</h3>
-              <p className="text-sm text-slate-500">Proteja ações críticas alterando sua senha de administrador.</p>
+              <h3 className="text-title-md font-title-md text-slate-800">Segurança de Acesso</h3>
+              <p className="text-body-md font-body-md text-slate-500">Proteja ações críticas alterando sua senha de administrador.</p>
             </div>
           </div>
 
@@ -334,7 +334,7 @@ export const Settings: React.FC = () => {
             )}
             
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider flex items-center gap-2 font-semibold">
                 <Key size={14} className="text-indigo-500" /> Senha Atual do Administrador
               </label>
               <input 
@@ -342,37 +342,37 @@ export const Settings: React.FC = () => {
                 placeholder="••••••••"
                 value={pwdForm.current}
                 onChange={e => setPwdForm({...pwdForm, current: e.target.value})}
-                className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-lg font-black focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200"
+                className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Nova Senha</label>
+                <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider font-semibold">Nova Senha</label>
                 <input 
                   type="password" 
                   placeholder="Mín. 4 dígitos"
                   value={pwdForm.new}
                   onChange={e => setPwdForm({...pwdForm, new: e.target.value})}
-                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-lg font-black focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200"
+                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Confirmar Nova</label>
+                <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider font-semibold">Confirmar Nova</label>
                 <input 
                   type="password" 
                   placeholder="Repita a nova"
                   value={pwdForm.confirm}
                   onChange={e => setPwdForm({...pwdForm, confirm: e.target.value})}
-                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-lg font-black focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200"
+                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
                   required
                 />
               </div>
             </div>
 
-            <button type="submit" className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98]">
+            <button type="submit" className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98]">
               Confirmar Alteração de Senha
             </button>
           </form>
@@ -384,8 +384,8 @@ export const Settings: React.FC = () => {
               <Save size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-800">Manutenção de Dados</h3>
-              <p className="text-sm text-slate-500">Exporte ou restaure suas informações em arquivos locais.</p>
+              <h3 className="text-title-md font-title-md text-slate-800">Manutenção de Dados</h3>
+              <p className="text-body-md font-body-md text-slate-500">Exporte ou restaure suas informações em arquivos locais.</p>
             </div>
           </div>
 
@@ -393,16 +393,16 @@ export const Settings: React.FC = () => {
             <button onClick={handleExportBackup} className="flex-1 flex items-center justify-center gap-4 bg-slate-900 text-white px-8 py-6 rounded-3xl hover:bg-slate-800 transition-all shadow-xl active:scale-[0.98]">
               <Download size={24} className="text-blue-400" />
               <div className="text-left">
-                <span className="block font-black uppercase tracking-widest text-xs">Fazer Backup</span>
-                <span className="text-[10px] text-slate-500 font-bold">Gerar arquivo .JSON</span>
+                <span className="block font-title-md uppercase tracking-wider text-xs">Fazer Backup</span>
+                <span className="text-label-sm font-label-sm text-slate-500 font-bold block mt-0.5">Gerar arquivo .JSON</span>
               </div>
             </button>
 
             <button onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-4 bg-white border-2 border-slate-300 text-slate-700 px-8 py-6 rounded-3xl hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-[0.98] group">
               <Upload size={24} className="group-hover:text-emerald-500" />
               <div className="text-left">
-                <span className="block font-black uppercase tracking-widest text-xs">Importar Dados</span>
-                <span className="text-[10px] text-slate-400 font-bold">Substituir dados atuais</span>
+                <span className="block font-title-md uppercase tracking-wider text-xs">Importar Dados</span>
+                <span className="text-label-sm font-label-sm text-slate-400 font-bold block mt-0.5">Substituir dados atuais</span>
               </div>
             </button>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
@@ -418,11 +418,11 @@ export const Settings: React.FC = () => {
               <Trash2 size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-red-900">Área Crítica</h3>
-              <p className="text-sm text-red-700">Ações irreversiveis que limpam todo o histórico de operações.</p>
+              <h3 className="text-title-md font-red-900 font-semibold">Área Crítica</h3>
+              <p className="text-body-md font-body-md text-red-700">Ações irreversíveis que limpam todo o histórico de operações.</p>
             </div>
           </div>
-          <button onClick={() => setModalType(isDefaultPassword ? 'reset-initial' : 'reset')} className="relative z-10 w-full md:w-auto px-10 py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-[0.98] flex items-center justify-center gap-3">
+          <button onClick={() => setModalType(isDefaultPassword ? 'reset-initial' : 'reset')} className="relative z-10 w-full md:w-auto px-10 py-4 bg-red-600 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-[0.98] flex items-center justify-center gap-3">
             <RefreshCw size={18} /> Reset de Fábrica
           </button>
         </div>
@@ -432,7 +432,7 @@ export const Settings: React.FC = () => {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
           <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             <div className={`p-6 border-b border-slate-100 flex justify-between items-center ${isDanger ? 'bg-red-50 text-red-800' : 'bg-blue-50 text-blue-800'}`}>
-              <h3 className="text-lg font-black flex items-center gap-2 uppercase tracking-tight">
+              <h3 className="text-title-md font-title-md flex items-center gap-2 uppercase tracking-wide">
                 {isDanger ? <AlertTriangle size={20} /> : <Lock size={20} />}
                 {modalType === 'restore' ? 'Validar Restauração' : modalType === 'reset-initial' ? 'Primeiro Uso' : 'Confirmar Limpeza'}
               </h3>
@@ -440,7 +440,7 @@ export const Settings: React.FC = () => {
             </div>
             
             <form onSubmit={handleSubmitPassword} className="p-8 space-y-6">
-              <div className="p-4 bg-slate-50 rounded-2xl text-sm text-slate-600 border border-slate-100 font-medium leading-relaxed">
+              <div className="p-4 bg-slate-50 rounded-2xl text-body-md font-body-md text-slate-600 border border-slate-100 font-semibold leading-relaxed">
                 {modalType === 'reset' && "Esta ação apagará permanentemente todos os produtos e vendas. Confirme com sua senha administrativa."}
                 {modalType === 'restore' && "Todos os dados atuais serão removidos e substituídos pelos do arquivo. Confirme com sua senha."}
                 {modalType === 'reset-initial' && "Crie sua senha de administrador antes de realizar o primeiro reset total do sistema."}
@@ -448,25 +448,25 @@ export const Settings: React.FC = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{modalType === 'reset-initial' ? 'Nova Senha Admin' : 'Senha do Sistema'}</label>
+                  <label className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wider">{modalType === 'reset-initial' ? 'Nova Senha Admin' : 'Senha do Sistema'}</label>
                   <input 
                     autoFocus
                     type="password" 
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-xl font-black focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-200"
+                    className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
                     placeholder="••••••••"
                     required
                   />
                 </div>
                 {modalType === 'reset-initial' && (
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Repita a Senha</label>
+                    <label className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wider">Repita a Senha</label>
                     <input 
                       type="password" 
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
-                      className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-xl font-black focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-200"
+                      className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
                       placeholder="••••••••"
                       required
                     />
@@ -477,8 +477,8 @@ export const Settings: React.FC = () => {
               {error && <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100 flex items-center gap-2 animate-shake"><AlertTriangle size={14} />{error}</div>}
 
               <div className="flex gap-4 pt-2">
-                <button type="button" onClick={closeModal} className="flex-1 px-4 py-4 border-2 border-slate-200 text-slate-500 rounded-2xl hover:bg-slate-50 font-black text-xs uppercase tracking-widest transition-colors">Cancelar</button>
-                <button type="submit" className={`flex-1 px-4 py-4 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98] ${isDanger ? 'bg-red-600 hover:bg-red-700 shadow-red-200' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200'}`}>Confirmar</button>
+                <button type="button" onClick={closeModal} className="flex-1 px-4 py-4 border-2 border-slate-200 text-slate-500 rounded-2xl hover:bg-slate-50 font-title-md text-xs uppercase tracking-wider transition-colors">Cancelar</button>
+                <button type="submit" className={`flex-1 px-4 py-4 text-white rounded-2xl font-title-md text-xs uppercase tracking-wider shadow-lg transition-all active:scale-[0.98] ${isDanger ? 'bg-red-600 hover:bg-red-700 shadow-red-200' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200'}`}>Confirmar</button>
               </div>
             </form>
           </div>

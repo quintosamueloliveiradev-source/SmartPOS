@@ -114,7 +114,7 @@ const MainContent: React.FC = () => {
           <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
         </div>
         <div className="space-y-2">
-          <p className="text-2xl font-black text-slate-900 tracking-tight">Vendeei</p>
+          <p className="text-2xl font-black text-slate-900 tracking-tight font-vendeei">Vendeei</p>
           <p className="font-bold text-slate-600 uppercase tracking-widest text-[10px]">Preparando seu ambiente seguro</p>
         </div>
       </div>

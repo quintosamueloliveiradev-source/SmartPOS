@@ -33,12 +33,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         </div>
         <div className="hidden lg:block overflow-hidden flex-1 self-center">
           <div className="flex items-center gap-1.5">
-            <h1 className="text-lg font-black tracking-tight text-white leading-tight">Vendeei</h1>
-            <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black uppercase tracking-wider leading-none">
+            <h1 className="text-lg font-black tracking-tight text-white leading-tight font-vendeei">Vendeei</h1>
+            <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider leading-none">
               {profile?.role === 'admin' ? 'Admin' : 'Pro'}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 truncate mt-0.5 font-semibold" title={user?.email}>{user?.email}</p>
+          <p className="text-label-sm font-label-sm text-slate-400 truncate mt-0.5 font-semibold" title={user?.email}>{user?.email}</p>
         </div>
       </div>
       
@@ -50,11 +50,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
             className={`w-full flex items-center justify-center lg:justify-start gap-4 p-3 rounded-xl transition-all duration-200 ${
               currentView === item.id 
                 ? 'bg-primary text-white shadow-lg shadow-emerald-900/40 ring-1 ring-white/20' 
-                : 'text-slate-200 hover:bg-white/10 hover:text-white font-bold'
+                : 'text-slate-200 hover:bg-white/10 hover:text-white'
             }`}
           >
             {item.icon}
-            <span className="hidden lg:block font-black tracking-tight">{item.label}</span>
+            <span className="hidden lg:block font-title-md text-sm font-semibold tracking-wide">{item.label}</span>
           </button>
         ))}
       </nav>
@@ -62,13 +62,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
       <div className="p-4 space-y-4 border-t border-slate-700 mt-auto bg-slate-900/50">
         <button 
           onClick={signOut}
-          className="w-full flex items-center justify-center lg:justify-start gap-4 p-3 rounded-xl text-red-400 hover:bg-red-500/20 transition-colors font-black"
+          className="w-full flex items-center justify-center lg:justify-start gap-4 p-3 rounded-xl text-red-400 hover:bg-red-500/20 transition-colors font-title-md text-sm font-semibold tracking-wide"
         >
           <LogOut size={20} />
           <span className="hidden lg:block">Sair</span>
         </button>
-        <div className="text-center lg:text-left text-[10px] text-slate-300 font-mono font-bold">
-          <span className="hidden lg:block uppercase opacity-70">Build SaaS v2.0.1</span>
+        <div className="text-center lg:text-left text-debug-mono font-debug-mono text-slate-350 opacity-70">
+          <span className="hidden lg:block uppercase">Build SaaS v2.0.1</span>
         </div>
       </div>
     </div>

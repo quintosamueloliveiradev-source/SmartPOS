@@ -284,21 +284,21 @@ export const SubscriptionGate: React.FC = () => {
         {/* Esquerda: Informações & Recursos */}
         <div className="p-8 md:p-12 bg-slate-900 text-white flex-1 flex flex-col justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 rounded-full text-xs font-black uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 rounded-full text-label-sm font-label-sm font-semibold uppercase tracking-wider mb-6">
               <Clock size={12} />
               Período de Teste Encerrado
             </div>
 
-            <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 leading-tight">
+            <h2 className="text-headline-lg font-headline-lg tracking-tight mb-4 leading-tight">
               Seus 7 dias gratuitos <span className="text-emerald-400">chegaram ao fim</span>
             </h2>
             
-            <p className="text-slate-400 mb-8 text-sm lg:text-base leading-relaxed">
+            <p className="text-body-md font-body-md text-slate-400 mb-8 leading-relaxed">
               Obrigado por usar o Vendeei para gerenciar seu negócio! Seu período de demonstração gratuita expirou. Escolha um plano para ativar o acesso total.
             </p>
             
             <div className="space-y-4">
-              <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Recursos Inclusos na Assinatura:</p>
+              <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wider font-semibold">Recursos Inclusos na Assinatura:</p>
               <ul className="space-y-3.5">
                 {[
                   { title: 'Controle de Estoque Inteligente', desc: 'Alertas de falta e cálculo automático de custos e margem de lucro.' },
@@ -311,8 +311,8 @@ export const SubscriptionGate: React.FC = () => {
                       <CheckCircle size={14} />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white leading-tight">{feature.title}</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{feature.desc}</p>
+                      <p className="text-body-md font-body-md font-semibold text-white leading-tight">{feature.title}</p>
+                      <p className="text-label-sm font-label-sm text-slate-400 mt-0.5">{feature.desc}</p>
                     </div>
                   </li>
                 ))}
@@ -323,7 +323,7 @@ export const SubscriptionGate: React.FC = () => {
           <div className="mt-12 pt-6 border-t border-slate-800 flex items-center justify-between">
             <button 
               onClick={signOut}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 font-title-md text-xs font-semibold text-slate-400 hover:text-white transition-colors"
             >
               <LogOut size={14} />
               Desconectar minha conta
@@ -331,7 +331,7 @@ export const SubscriptionGate: React.FC = () => {
             {!isProduction && (
               <button 
                 onClick={() => setShowIntegrationsGuide(!showIntegrationsGuide)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="inline-flex items-center gap-1.5 font-title-md text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 <Code size={14} />
                 {showIntegrationsGuide ? 'Ocultar Código da API' : 'Ver Código da API / Webhook'}
@@ -346,19 +346,19 @@ export const SubscriptionGate: React.FC = () => {
           {paymentStep === 'initial' && (
             <div className="space-y-6">
               <div className="text-center">
-                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 block">Assinatura Mensal</span>
+                <span className="text-label-sm font-label-sm uppercase tracking-wide font-bold text-slate-400 block">Assinatura Mensal</span>
                 <div className="flex items-baseline justify-center gap-1 mt-2">
                   <span className="text-sm font-bold text-slate-400">R$</span>
-                  <span className="text-5xl font-black text-slate-900 tracking-tight">14,90</span>
+                  <span className="text-display-lg font-display-lg font-bold text-slate-900 font-debug-mono tracking-tight">14,90</span>
                   <span className="text-sm font-bold text-slate-400">/mês</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Plano completo. Cancele e pause quando desejar.</p>
+                <p className="text-body-md font-body-md text-slate-500 mt-2">Plano completo. Cancele e pause quando desejar.</p>
               </div>
 
               {/* Formulário de Identificação Requerido pelo Asaas */}
               <form onSubmit={handleGeneratePix} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                  <label className="text-label-sm font-label-sm text-slate-700 uppercase tracking-wide block font-semibold">
                     CPF ou CNPJ do Pagador *
                   </label>
                   <input 
@@ -371,9 +371,9 @@ export const SubscriptionGate: React.FC = () => {
                     }}
                     required
                     maxLength={18}
-                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-sm font-medium transition-all outline-none"
+                    className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-body-md font-body-md font-debug-mono font-semibold transition-all outline-none"
                   />
-                  <p className="text-[10px] text-slate-400 leading-tight">
+                  <p className="text-label-sm font-label-sm text-slate-400 leading-tight font-medium">
                     * Requerido pela regulamentação do Banco Central para emissão de chaves Pix registradas.
                   </p>
                 </div>
@@ -382,7 +382,7 @@ export const SubscriptionGate: React.FC = () => {
                   <button 
                     type="submit"
                     disabled={loadingPayment}
-                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-title-md text-sm uppercase tracking-wider shadow-xl shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {loadingPayment ? (
                       <>
@@ -401,7 +401,7 @@ export const SubscriptionGate: React.FC = () => {
                     <button 
                       type="button"
                       onClick={handleSimulatePaymentApproval}
-                      className="w-full py-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-500 rounded-2xl font-bold text-xs transition-colors cursor-pointer"
+                      className="w-full py-3 border-2 border-slate-200 hover:bg-slate-50 text-slate-500 rounded-2xl font-title-md text-xs transition-colors cursor-pointer"
                     >
                       Simular Ativação de Teste
                     </button>
@@ -412,7 +412,7 @@ export const SubscriptionGate: React.FC = () => {
               {!isProduction && (
                 <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 flex gap-3">
                   <div className="text-yellow-600 mt-0.5 shrink-0"><Star size={16} fill="currentColor" /></div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                  <p className="text-label-sm font-label-sm text-slate-500 leading-relaxed font-medium">
                     <strong>Sandbox Integration:</strong> O sistema está pronto! Insira o CPF, clique no botão e o app chamará o gateway para exibir o Pix oficial em tempo de execução.
                   </p>
                 </div>
@@ -423,10 +423,10 @@ export const SubscriptionGate: React.FC = () => {
           {paymentStep === 'pix_details' && (
             <div className="space-y-6 animate-fade-in text-center">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                <span className="text-label-sm font-label-sm bg-indigo-50 text-indigo-500 px-2.5 py-1 rounded-full border border-indigo-100 uppercase font-semibold">
                   Aguardando Pagamento Pix
                 </span>
-                <p className="text-sm font-bold text-slate-700 mt-3">Escaneie o QR Code ou Use o Copia e Cola:</p>
+                <p className="text-body-md font-body-md font-semibold text-slate-700 mt-3">Escaneie o QR Code ou Use o Copia e Cola:</p>
               </div>
 
               {/* Renderização Dinâmica do QR Code obtido do Asaas */}
@@ -440,19 +440,19 @@ export const SubscriptionGate: React.FC = () => {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-44 h-44 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-xs">
+                    <div className="w-44 h-44 flex items-center justify-center bg-slate-100 rounded-lg animate-pulse text-slate-400 text-label-sm font-label-sm">
                       Buscando QR Code...
                     </div>
                   )}
                   
                   {isSimulated && !isProduction && (
-                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white text-label-sm font-label-sm font-bold uppercase px-1.5 py-0.5 rounded shadow-sm">
                       MOCK ACTIVE
                     </div>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-4 justify-center">
+                <div className="flex items-center gap-1.5 text-label-sm font-label-sm text-slate-500 mb-4 justify-center">
                   <RefreshCw size={12} className="animate-spin text-emerald-600" />
                   <span>Sincronizado com Asaas Sandbox...</span>
                 </div>
@@ -461,12 +461,12 @@ export const SubscriptionGate: React.FC = () => {
               {/* Copia e Cola */}
               <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-between gap-3 text-left">
                 <div className="max-w-[200px] overflow-hidden">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Pix Copia e Cola</p>
-                  <p className="text-[11px] font-mono font-bold text-slate-700 truncate mt-0.5">{copiaCola || 'PIX_KEY'}</p>
+                  <p className="text-label-sm font-label-sm uppercase font-semibold text-slate-400">Pix Copia e Cola</p>
+                  <p className="text-debug-mono font-debug-mono text-slate-700 truncate mt-0.5">{copiaCola || 'PIX_KEY'}</p>
                 </div>
                 <button 
                   onClick={handleCopyCode}
-                  className={`px-3 py-2.5 rounded-xl border font-bold text-xs transition-all active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-2.5 rounded-xl border font-title-md text-xs transition-all active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer ${
                     copied 
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
                       : 'bg-white border-slate-200 hover:bg-slate-100/50 text-slate-700'
@@ -490,7 +490,7 @@ export const SubscriptionGate: React.FC = () => {
                 {!isProduction && (
                   <button 
                     onClick={handleSimulatePaymentApproval}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/15 cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-title-md text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/15 cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <CheckCircle size={14} />
                     Simular Confirmação no Gateway
@@ -501,7 +501,7 @@ export const SubscriptionGate: React.FC = () => {
                     setPollingActive(false);
                     setPaymentStep('initial');
                   }}
-                  className="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs"
+                  className="w-full py-2.5 text-slate-500 hover:text-slate-700 font-title-md text-xs font-semibold"
                 >
                   ← Voltar e alterar dados
                 </button>
@@ -516,21 +516,21 @@ export const SubscriptionGate: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Pagamento Confirmado!</h3>
-                <p className="text-slate-500 text-xs mt-2 max-w-[260px] mx-auto leading-relaxed">
+                <h3 className="text-headline-lg font-headline-lg text-slate-900 tracking-tight">Pagamento Confirmado!</h3>
+                <p className="text-body-md font-body-md text-slate-500 mt-2 max-w-[260px] mx-auto leading-relaxed">
                   Perfeito! O Asaas processou sua transação de R$ 14,90. Sua assinatura Vendeei foi ativada por mais 30 dias com sucesso.
                 </p>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 uppercase font-black tracking-widest animate-pulse">
+              <div className="inline-flex items-center gap-1.5 text-label-sm font-label-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">
                 <RefreshCw size={12} className="animate-spin" />
                 Carregando PDV...
               </div>
             </div>
           )}
 
-          <p className="mt-8 text-[10px] text-slate-400 text-center leading-relaxed font-bold uppercase tracking-wide">
-            Vendeei © 2026 • GESTÃO INTELIGENTE MVP
+          <p className="mt-8 text-label-sm font-label-sm text-slate-400 text-center uppercase tracking-wide font-semibold">
+            <span className="font-vendeei font-black">Vendeei</span> © 2026 • GESTÃO INTELIGENTE MVP
           </p>
         </div>
 

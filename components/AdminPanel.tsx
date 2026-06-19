@@ -271,25 +271,25 @@ export const AdminPanel: React.FC = () => {
     <div className="space-y-8 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 leading-tight">Painel do Administrador</h1>
-          <p className="text-slate-600 font-bold">Gestão de assinaturas e usuários da plataforma</p>
+          <h1 className="text-headline-lg font-headline-lg text-slate-900">Painel do Administrador</h1>
+          <p className="text-body-md font-body-md text-slate-500">Gestão de assinaturas e usuários da plataforma</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-title-md uppercase font-semibold tracking-wider transition-all ${activeTab === 'users' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
           >
             Usuários
           </button>
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-title-md uppercase font-semibold tracking-wider transition-all ${activeTab === 'settings' ? 'bg-primary text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'}`}
           >
             Configurações SaaS
           </button>
           <button 
             onClick={fetchUsers}
-            className="px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-200 flex items-center gap-2 transition-all"
+            className="px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-200 flex items-center gap-2 transition-all text-xs font-title-md uppercase font-bold tracking-wider"
           >
             <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
             <span className="hidden md:inline">Atualizar Dados</span>
@@ -315,14 +315,14 @@ export const AdminPanel: React.FC = () => {
                     <item.icon size={24} />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Status</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mt-1" />
                   </div>
                 </div>
                 
                 <div>
-                  <p className="text-sm font-semibold text-slate-500 mb-1">{item.label}</p>
-                  <p className="text-3xl font-black text-slate-900 tracking-tight">{item.value}</p>
+                  <p className="text-body-md font-body-md text-slate-500 mb-1">{item.label}</p>
+                  <p className="text-display-lg font-display-lg font-bold font-debug-mono text-slate-900 tracking-tight">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -332,13 +332,13 @@ export const AdminPanel: React.FC = () => {
             <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <h3 className="text-title-md font-title-md text-slate-900 flex items-center gap-2">
                     <TrendingUp className="text-primary" size={20} />
                     Evolução da Plataforma
                   </h3>
-                  <p className="text-xs text-slate-500">Cadastros vs Faturamento (Últimos 30 dias)</p>
+                  <p className="text-body-md font-body-md text-slate-500">Cadastros vs Faturamento (Últimos 30 dias)</p>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-medium">
+                <div className="flex items-center gap-4 text-label-sm font-label-sm">
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                     <span className="text-slate-600">Cadastros</span>
@@ -437,7 +437,7 @@ export const AdminPanel: React.FC = () => {
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <h3 className="text-title-md font-title-md text-slate-900 mb-6 flex items-center gap-2">
                 <Filter className="text-violet-500" size={20} />
                 Filtros Rápidos
               </h3>
@@ -458,19 +458,19 @@ export const AdminPanel: React.FC = () => {
                     onClick={() => setFilterType(f.id as any)}
                     className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${filterType === f.id ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-100 hover:border-slate-200'}`}
                   >
-                    <div className="flex items-center gap-3 text-sm font-medium">
+                    <div className="flex items-center gap-3 text-body-md font-body-md font-semibold">
                       <f.icon size={18} className={filterType === f.id ? 'text-white' : 'text-slate-400'} />
                       {f.label}
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${filterType === f.id ? 'bg-white/20' : 'bg-slate-100 text-slate-600'}`}>
+                    <span className={`text-label-sm font-label-sm px-2 py-0.5 rounded-full ${filterType === f.id ? 'bg-white/20' : 'bg-slate-100 text-slate-600'}`}>
                       {f.count}
                     </span>
                   </button>
                 ))}
               </div>
               <div className="mt-8 p-4 bg-violet-50 rounded-xl border border-violet-100">
-                <p className="text-xs text-violet-700 font-medium mb-1">Previsão de Faturamento</p>
-                <p className="text-xl font-bold text-violet-900">R$ {stats.monthlyRevenue.toFixed(2)} /mês</p>
+                <p className="text-label-sm font-label-sm text-violet-700 font-bold mb-1">Previsão de Faturamento</p>
+                <p className="text-title-md font-title-md font-debug-mono text-violet-900">R$ {stats.monthlyRevenue.toFixed(2)} /mês</p>
               </div>
             </div>
           </div>
@@ -496,12 +496,12 @@ export const AdminPanel: React.FC = () => {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-slate-100 border-b border-slate-200">
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Usuário / Loja</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Último Acesso</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Última Venda</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider">Validade</th>
-                    <th className="px-6 py-4 text-xs font-black text-slate-700 uppercase tracking-wider text-right">Ações</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide">Usuário / Loja</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide">Status</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide">Último Acesso</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide">Última Venda</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide">Validade</th>
+                    <th className="px-6 py-4 text-label-sm font-label-sm text-slate-700 uppercase tracking-wide text-right font-bold">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -517,14 +517,14 @@ export const AdminPanel: React.FC = () => {
                     </tr>
                   ) : filteredUsers.map((userProfile) => (
                     <tr key={userProfile.id} className="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
-                      <td className="px-6 py-5 text-sm">
+                      <td className="px-6 py-5">
                         <div className="flex flex-col">
-                          <span className="font-black text-slate-900 text-base">{userProfile.email}</span>
-                          <span className="text-xs text-slate-600 font-bold uppercase tracking-tight">{userProfile.store_name || 'Carrinho não configurado'}</span>
+                          <span className="font-bold text-slate-900 text-body-md font-body-md">{userProfile.email}</span>
+                          <span className="text-label-sm font-label-sm text-slate-500 font-semibold uppercase tracking-wide mt-0.5">{userProfile.store_name || 'Carrinho não configurado'}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider
+                      <td className="px-6 py-5">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-label-sm uppercase font-semibold
                           ${userProfile.subscription_status === 'active' ? 'bg-emerald-100 text-emerald-800' : 
                             userProfile.subscription_status === 'trial' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}
                           border ${userProfile.subscription_status === 'active' ? 'border-emerald-200' : 
@@ -536,20 +536,20 @@ export const AdminPanel: React.FC = () => {
                            userProfile.subscription_status === 'trial' ? 'Teste' : 'Inativo'}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <div className="flex items-center gap-2 text-slate-900 font-bold">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-slate-700 text-body-md font-body-md font-semibold">
                           <Activity size={16} className={userProfile.last_seen_at && (new Date().getTime() - new Date(userProfile.last_seen_at).getTime() < 300000) ? "text-emerald-600 animate-pulse" : "text-slate-400"} />
                           {formatLastSeen(userProfile.last_seen_at)}
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                         <div className="flex items-center gap-2 text-slate-900 font-bold">
+                      <td className="px-6 py-5">
+                         <div className="flex items-center gap-2 text-slate-700 text-body-md font-body-md font-semibold font-debug-mono">
                           <TrendingUp size={16} className="text-indigo-500" />
                           {userProfile.last_sale_at ? new Date(userProfile.last_sale_at).toLocaleDateString() : 'Sem vendas'}
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-sm">
-                        <div className="flex items-center gap-2 text-slate-900 font-bold">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-slate-700 text-body-md font-body-md font-semibold font-debug-mono">
                           <Calendar size={16} className="text-slate-400" />
                           {userProfile.subscription_expiry ? new Date(userProfile.subscription_expiry).toLocaleDateString() : 'N/A'}
                         </div>
@@ -558,7 +558,7 @@ export const AdminPanel: React.FC = () => {
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => setSelectedUser(userProfile)}
-                            className="p-2 text-primary hover:bg-emerald-50 rounded-xl transition-all hover:scale-110 active:scale-95"
+                            className="p-2 text-primary hover:bg-emerald-50 rounded-xl transition-all hover:scale-110 active:scale-95 animate-fade-in"
                             title="Gerenciar Usuário"
                           >
                             <MoreVertical size={20} />
@@ -579,15 +579,14 @@ export const AdminPanel: React.FC = () => {
                 className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in slide-in-from-bottom-8 duration-500"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Header */}
                 <div className="relative p-8 pb-0 flex items-start justify-between">
                   <div className="flex items-center gap-5">
                     <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                       <Users size={32} />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black text-slate-900 leading-tight">Gestão de Conta</h2>
-                      <p className="text-slate-500 font-medium">{selectedUser.email}</p>
+                      <h2 className="text-headline-lg font-headline-lg text-slate-900 leading-tight">Gestão de Conta</h2>
+                      <p className="text-body-md font-body-md text-slate-500 font-medium">{selectedUser.email}</p>
                     </div>
                   </div>
                   <button 
@@ -602,8 +601,8 @@ export const AdminPanel: React.FC = () => {
                   {/* Quick Info Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase
+                      <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Status</p>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm font-bold uppercase
                         ${selectedUser.subscription_status === 'active' ? 'bg-emerald-100 text-emerald-700' : 
                           selectedUser.subscription_status === 'trial' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}
                       `}>
@@ -611,16 +610,16 @@ export const AdminPanel: React.FC = () => {
                       </span>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Cargo</p>
-                      <p className="text-sm font-black text-slate-900 uppercase">{selectedUser.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
+                      <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Cargo</p>
+                      <p className="text-body-md font-body-md font-semibold text-slate-900 uppercase">{selectedUser.role === 'admin' ? 'Administrador' : 'Cliente'}</p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Loja</p>
-                      <p className="text-sm font-black text-slate-900 truncate">{selectedUser.store_name || 'N/A'}</p>
+                      <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Loja</p>
+                      <p className="text-body-md font-body-md font-semibold text-slate-900 truncate">{selectedUser.store_name || 'N/A'}</p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Validade</p>
-                      <p className="text-sm font-black text-slate-900">
+                      <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Validade</p>
+                      <p className="text-body-md font-body-md font-semibold text-slate-900 font-debug-mono">
                         {selectedUser.subscription_expiry ? new Date(selectedUser.subscription_expiry).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
@@ -628,7 +627,7 @@ export const AdminPanel: React.FC = () => {
 
                   {/* Actions Section */}
                   <div className="space-y-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Ações Estratégicas</p>
+                    <p className="text-label-sm font-label-sm font-bold text-slate-400 uppercase tracking-wide mb-2">Ações Estratégicas</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <button
@@ -645,10 +644,10 @@ export const AdminPanel: React.FC = () => {
                           <CreditCard size={20} />
                         </div>
                         <div className="text-left">
-                          <p className="font-bold text-slate-900">
+                          <p className="font-title-md font-semibold text-slate-900">
                             {selectedUser.subscription_status === 'active' ? 'Suspender Assinatura' : 'Ativar Assinatura PRO'}
                           </p>
-                          <p className="text-xs text-slate-500">Mudar status financeiro</p>
+                          <p className="text-label-sm font-label-sm text-slate-500">Mudar status financeiro</p>
                         </div>
                       </button>
 
@@ -660,8 +659,8 @@ export const AdminPanel: React.FC = () => {
                           <Plus size={20} />
                         </div>
                         <div className="text-left">
-                          <p className="font-bold text-slate-900">Extender Teste</p>
-                          <p className="text-xs text-slate-500">Adicionar +7 dias bônus</p>
+                          <p className="font-title-md font-semibold text-slate-900">Extender Teste</p>
+                          <p className="text-label-sm font-label-sm text-slate-500">Adicionar +7 dias bônus</p>
                         </div>
                       </button>
 
@@ -673,8 +672,8 @@ export const AdminPanel: React.FC = () => {
                           <UserCog size={20} />
                         </div>
                         <div className="text-left">
-                          <p className="font-bold text-slate-900">Alterar Cargo</p>
-                          <p className="text-xs text-slate-500">Alternar Administrador</p>
+                          <p className="font-title-md font-semibold text-slate-900">Alterar Cargo</p>
+                          <p className="text-label-sm font-label-sm text-slate-500">Alternar Administrador</p>
                         </div>
                       </button>
 
@@ -686,8 +685,8 @@ export const AdminPanel: React.FC = () => {
                           <Copy size={20} />
                         </div>
                         <div className="text-left">
-                          <p className="font-bold text-slate-900">Copiar Contato</p>
-                          <p className="text-xs text-slate-500">E-mail para suporte</p>
+                          <p className="font-title-md font-semibold text-slate-900">Copiar Contato</p>
+                          <p className="text-label-sm font-label-sm text-slate-500">E-mail para suporte</p>
                         </div>
                       </button>
                     </div>
@@ -702,8 +701,8 @@ export const AdminPanel: React.FC = () => {
                             <Trash2 size={24} />
                           </div>
                           <div className="text-left">
-                            <p className="font-black">Remover Conta do Sistema</p>
-                            <p className="text-xs opacity-80">Ação imediata e permanente</p>
+                            <p className="font-title-md font-semibold">Remover Conta do Sistema</p>
+                            <p className="text-label-sm font-label-sm opacity-80">Ação imediata e permanente</p>
                           </div>
                         </div>
                         <ArrowUpRight size={24} />
@@ -721,25 +720,25 @@ export const AdminPanel: React.FC = () => {
             <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <CreditCard size={28} />
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">Preço da Assinatura</h3>
-            <p className="text-sm text-slate-500 mb-6">Defina o valor base para o cálculo do seu MRR e cobranças.</p>
+            <h3 className="text-title-md font-title-md text-slate-900 mb-2">Preço da Assinatura</h3>
+            <p className="text-body-md font-body-md text-slate-500 mb-6">Defina o valor base para o cálculo do seu MRR e cobranças.</p>
             
             <div className="space-y-6">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <span className="text-slate-400 font-bold text-lg">R$</span>
+                  <span className="text-slate-400 font-bold text-lg font-debug-mono">R$</span>
                 </div>
                 <input 
                   type="number" 
                   step="0.01"
-                  className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-emerald-500 focus:bg-white outline-none text-2xl font-black transition-all"
+                  className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-emerald-500 focus:bg-white outline-none text-display-lg font-display-lg font-bold font-debug-mono transition-all"
                   value={pricing.price}
                   onChange={(e) => setPricing({ ...pricing, price: Number(e.target.value) })}
                 />
               </div>
               <button 
                 onClick={updateSettings}
-                className="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:-translate-y-1 active:translate-y-0 transition-all"
+                className="w-full py-4 bg-emerald-500 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:-translate-y-1 active:translate-y-0 transition-all font-semibold"
               >
                 Atualizar Preço
               </button>
@@ -750,19 +749,19 @@ export const AdminPanel: React.FC = () => {
             <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <Activity size={28} />
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">Aviso Global</h3>
-            <p className="text-sm text-slate-500 mb-6">Envie mensagens em tempo real para todos os logados.</p>
+            <h3 className="text-title-md font-title-md text-slate-900 mb-2">Aviso Global</h3>
+            <p className="text-body-md font-body-md text-slate-500 mb-6">Envie mensagens em tempo real para todos os logados.</p>
             
             <div className="space-y-6">
               <textarea 
-                className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-amber-500 focus:bg-white outline-none h-32 text-sm font-medium transition-all"
+                className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-amber-500 focus:bg-white outline-none h-32 text-body-md font-body-md transition-all"
                 placeholder="Ex: Manutenção agendada para 23:59..."
                 value={pricing.announcement}
                 onChange={(e) => setPricing({ ...pricing, announcement: e.target.value })}
               />
               <button 
                 onClick={updateSettings}
-                className="w-full py-4 bg-amber-500 text-white rounded-2xl font-bold shadow-lg shadow-amber-200 hover:bg-amber-600 hover:-translate-y-1 active:translate-y-0 transition-all"
+                className="w-full py-4 bg-amber-500 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs shadow-lg shadow-amber-200 hover:bg-amber-600 hover:-translate-y-1 active:translate-y-0 transition-all font-semibold"
               >
                 Publicar Agora
               </button>
@@ -776,24 +775,24 @@ export const AdminPanel: React.FC = () => {
               <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center mb-6">
                 <ShieldCheck size={28} />
               </div>
-              <h3 className="text-xl font-black mb-2 text-white">Resumo Operacional</h3>
-              <p className="text-sm text-slate-400 mb-8">Saúde geral do seu negócio SaaS.</p>
+              <h3 className="text-title-md font-title-md mb-2 text-white">Resumo Operacional</h3>
+              <p className="text-body-md font-body-md text-slate-400 mb-8">Saúde geral do seu negócio SaaS.</p>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Taxa Churn</p>
-                  <p className="text-xl font-black">{(users.filter(u => u.subscription_status === 'inactive').length / users.length * 100 || 0).toFixed(1)}%</p>
+                  <p className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wide mb-1">Taxa Churn</p>
+                  <p className="text-title-md font-title-md font-debug-mono">{(users.filter(u => u.subscription_status === 'inactive').length / users.length * 100 || 0).toFixed(1)}%</p>
                 </div>
                 <div className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Ticket Médio</p>
-                  <p className="text-xl font-black">R$ {pricing.price.toFixed(0)}</p>
+                  <p className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wide mb-1">Ticket Médio</p>
+                  <p className="text-title-md font-title-md font-debug-mono">R$ {pricing.price.toFixed(0)}</p>
                 </div>
                 <div className="col-span-2 p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 flex items-center justify-between">
                    <div>
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Novos Leads</p>
-                    <p className="text-2xl font-black text-emerald-400">{users.filter(u => u.subscription_status === 'trial').length}</p>
+                    <p className="text-label-sm font-label-sm text-emerald-400 uppercase tracking-wide mb-1">Novos Leads</p>
+                    <p className="text-title-md font-title-md text-emerald-300 font-debug-mono">{users.filter(u => u.subscription_status === 'trial').length}</p>
                    </div>
-                   <div className="text-emerald-400">
+                   <div className="text-emerald-450">
                     <TrendingUp size={24} />
                    </div>
                 </div>
