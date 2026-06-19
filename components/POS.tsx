@@ -1,21 +1,62 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Product } from '../types';
+import { Product, Customer } from '../types';
 import { Search, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, ShoppingBasket, User, Tag, Percent, Barcode, Printer, CheckCircle2, Ticket, FileText, X } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 import { Sale } from '../types';
 import { motion } from 'motion/react';
+import { supabase } from '../lib/supabase';
 
 export const POS: React.FC = () => {
-  const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast } = useStore();
+  const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast, user } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [customerName, setCustomerName] = useState('');
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [customerResults, setCustomerResults] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [discount, setDiscount] = useState<number>(0);
   const [cardTaxPercent, setCardTaxPercent] = useState<number>(0);
   const [receivedAmount, setReceivedAmount] = useState<number>(0);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    if (customerSearch.length < 2 || selectedCustomer) {
+      setCustomerResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const searchCustomers = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('user_id', user.id)
+        .or(`name.ilike.%${customerSearch}%,cpf.ilike.%${customerSearch}%,phone.ilike.%${customerSearch}%`)
+        .limit(5);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setCustomerResults(data.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        contact: c.phone,
+        cpf: c.cpf,
+        createdAt: c.created_at,
+        totalSpent: Number(c.total_spent)
+      })));
+      setShowDropdown(true);
+    };
+
+    const timer = setTimeout(searchCustomers, 300);
+    return () => clearTimeout(timer);
+  }, [customerSearch, selectedCustomer, user]);
 
   const isSearching = searchTerm.trim().length > 0;
   const filteredProducts = isSearching 
@@ -39,13 +80,15 @@ export const POS: React.FC = () => {
     // Neste caso, se o método for dinheiro, ignoramos a taxa informada
     const finalSurcharge = (method === 'credit' || method === 'debit') ? surchargeValue : 0;
     
-    const sale = await completeSale(method, discount, customerName, finalSurcharge);
+    const saleCustomerName = selectedCustomer ? selectedCustomer.name : customerSearch.toUpperCase().trim();
+    const sale = await completeSale(method, discount, selectedCustomer, finalSurcharge);
     if (sale) {
       setLastSale(sale);
       setShowSuccessModal(true);
     }
 
-    setCustomerName('');
+    setCustomerSearch('');
+    setSelectedCustomer(null);
     setDiscount(0);
     setCardTaxPercent(0);
     setSearchTerm('');
@@ -124,10 +167,42 @@ export const POS: React.FC = () => {
             <input 
               type="text" 
               placeholder="Cliente (Opcional)" 
-              className="w-full pl-8 pr-3 py-1.5 bg-white border-2 border-slate-400 rounded-xl text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none transition-all leading-relaxed shadow-md text-slate-900 placeholder:text-slate-500"
-              value={customerName}
-              onChange={e => setCustomerName(e.target.value)}
+              className="w-full pl-8 pr-8 py-1.5 bg-white border-2 border-slate-400 rounded-xl text-xs sm:text-sm font-bold uppercase focus:border-emerald-500 focus:outline-none transition-all leading-relaxed shadow-md text-slate-900 placeholder:text-slate-500"
+              value={selectedCustomer ? selectedCustomer.name : customerSearch}
+              onChange={e => {
+                setCustomerSearch(e.target.value);
+                setSelectedCustomer(null);
+              }}
             />
+            {selectedCustomer && (
+              <button 
+                onClick={() => {
+                  setSelectedCustomer(null);
+                  setCustomerSearch('');
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"
+              >
+                <X size={14} />
+              </button>
+            )}
+
+            {showDropdown && customerResults.length > 0 && (
+              <div className="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-xl mt-1 shadow-lg z-50 overflow-hidden">
+                {customerResults.map(customer => (
+                  <button
+                    key={customer.id}
+                    onClick={() => {
+                      setSelectedCustomer(customer);
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-emerald-50 text-sm border-b border-slate-50 last:border-b-0"
+                  >
+                    <p className="font-bold text-slate-900">{customer.name}</p>
+                    <p className="text-[10px] text-slate-500">{customer.cpf}</p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="bg-slate-900 rounded-xl overflow-hidden shadow-md ring-1 ring-white/10">

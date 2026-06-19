@@ -1,94 +1,114 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Plus, X, User, Phone, CreditCard } from 'lucide-react';
+import { Users, Search, Plus, X, User, Phone, CreditCard, Pencil, Trash2 } from 'lucide-react';
 import { Customer } from '../types';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../context/StoreContext';
 
 export const Clientes: React.FC = () => {
-  const { user } = useStore();
+  const { user, loading } = useStore();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [cpf, setCpf] = useState('');
 
-  useEffect(() => {
+  const fetchCustomers = async () => {
     if (!user) return;
+    const { data, error } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('name', { ascending: true });
 
-    const fetchCustomers = async () => {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('store_id', user.id)
-        .order('name', { ascending: true });
+    if (error) {
+      console.error('Erro ao buscar clientes:', error);
+      return;
+    }
 
-      if (error) {
-        console.error('Erro ao buscar clientes:', error);
-        return;
-      }
+    if (data) {
+      setCustomers(data.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        contact: c.phone,
+        cpf: c.cpf,
+        createdAt: new Date(c.created_at).toLocaleDateString('pt-BR'),
+        totalSpent: Number(c.total_spent)
+      })));
+    }
+  };
 
-      if (data) {
-        setCustomers(data.map((c: any) => ({
-          id: c.id,
-          name: c.name,
-          contact: c.phone,
-          cpf: c.cpf,
-          createdAt: new Date(c.created_at).toLocaleDateString('pt-BR'),
-          totalSpent: Number(c.total_spent)
-        })));
-      }
-    };
-
+  useEffect(() => {
     fetchCustomers();
   }, [user]);
 
-  const handleAddCustomer = async (e: React.FormEvent) => {
-    alert("1. Entrou na função handleAddCustomer!");
+  const handleSaveCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Tentando salvar cliente:', { name, contact, cpf, user });
     
-    if (!user) {
-      alert("Erro: user ou storeId estão nulos no estado do React!");
-      return;
-    }
-    alert("2. Passou pela checagem de usuário autenticado!");
+    if (loading || !user) return;
 
     try {
-      alert("3. Vai tentar enviar para o Supabase agora!");
-      const { data, error } = await supabase
-        .from('customers')
-        .insert([{
-          store_id: user.id,
-          name,
-          phone: contact,
-          cpf
-        }])
-        .select()
-        .single();
+      if (editingCustomerId) {
+        // Update
+        const { error } = await supabase
+          .from('customers')
+          .update({
+            name: name.toUpperCase().trim(),
+            phone: contact,
+            cpf
+          })
+          .eq('id', editingCustomerId);
+        
+        if (error) throw error;
+      } else {
+        // Insert
+        const { error } = await supabase
+          .from('customers')
+          .insert([{
+            user_id: user.id,
+            name: name.toUpperCase().trim(),
+            phone: contact,
+            cpf
+          }]);
 
-      if (error) {
-        throw error;
+        if (error) throw error;
       }
 
-      console.log('Cliente salvo com sucesso:', data);
-      if (data) {
-        setCustomers(prev => [...prev, {
-          id: data.id,
-          name: data.name,
-          contact: data.phone,
-          cpf: data.cpf,
-          createdAt: new Date(data.created_at).toLocaleDateString('pt-BR'),
-          totalSpent: Number(data.total_spent)
-        }]);
-        setIsModalOpen(false);
-        setName('');
-        setContact('');
-        setCpf('');
-      }
+      setIsModalOpen(false);
+      setEditingCustomerId(null);
+      setName('');
+      setContact('');
+      setCpf('');
+      fetchCustomers();
     } catch (error: any) {
       console.error('Erro ao salvar cliente:', error);
       alert("Erro ao salvar cliente: " + (error.message || JSON.stringify(error)));
     }
+  };
+
+  const handleDeleteCustomer = async (id: string) => {
+    if (!confirm("Deseja mesmo excluir este cliente?")) return;
+    
+    try {
+      const { error } = await supabase.from('customers').delete().eq('id', id);
+      
+      if (error) {
+        alert("Erro do Supabase ao deletar: " + error.message);
+      } else {
+        fetchCustomers(); // Atualiza a lista
+      }
+    } catch (error: any) {
+      console.error('Erro ao deletar cliente:', error);
+      alert("Erro ao deletar cliente: " + (error.message || JSON.stringify(error)));
+    }
+  };
+
+  const openEditModal = (customer: Customer) => {
+    setEditingCustomerId(customer.id);
+    setName(customer.name);
+    setContact(customer.contact);
+    setCpf(customer.cpf);
+    setIsModalOpen(true);
   };
 
   return (
@@ -99,7 +119,13 @@ export const Clientes: React.FC = () => {
           <p className="text-xs lg:text-sm text-slate-500 mt-0.5">Gerencie seus clientes e acompanhe histórico de compras.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingCustomerId(null);
+            setName('');
+            setContact('');
+            setCpf('');
+            setIsModalOpen(true);
+          }}
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm shadow-emerald-500/20 transition-all active:scale-95"
         >
           <Plus size={16} />
@@ -110,7 +136,7 @@ export const Clientes: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
           { label: 'Total de Clientes', value: customers.length.toString() },
-          { label: 'Clientes Ativos', value: customers.filter(c => c.totalSpent > 0).length.toString() },
+          { label: 'Clientes Ativos', value: customers.length.toString() },
           { label: 'Melhor Cliente', value: customers.length > 0 ? customers.reduce((max, c) => c.totalSpent > (max.totalSpent || 0) ? c : max, customers[0]).name : '-' },
         ].map((card, i) => (
           <div key={i} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
@@ -144,12 +170,13 @@ export const Clientes: React.FC = () => {
                 <th className="pb-3 font-semibold">CPF</th>
                 <th className="pb-3 font-semibold">Data de Cadastro</th>
                 <th className="pb-3 font-semibold">Total Gasto</th>
+                <th className="pb-3 font-semibold text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {customers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
                     Nenhum cliente cadastrado ainda.
                   </td>
                 </tr>
@@ -161,6 +188,16 @@ export const Clientes: React.FC = () => {
                     <td className="py-4">{c.cpf}</td>
                     <td className="py-4">{c.createdAt}</td>
                     <td className="py-4 font-mono font-medium text-emerald-600">R$ {c.totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                    <td className="py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => openEditModal(c)} className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
+                          <Pencil size={16} />
+                        </button>
+                        <button onClick={() => handleDeleteCustomer(c.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -178,8 +215,8 @@ export const Clientes: React.FC = () => {
             >
               <X size={20} />
             </button>
-            <h3 className="text-lg font-bold text-slate-900 mb-6">Novo Cliente</h3>
-            <form onSubmit={handleAddCustomer} className="space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 mb-6">{editingCustomerId ? 'Editar Cliente' : 'Novo Cliente'}</h3>
+            <form onSubmit={handleSaveCustomer} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-[11px] text-slate-600 uppercase tracking-wider flex items-center gap-1.5 font-semibold">
                   <User size={10} className="text-slate-400" /> Nome Completo
@@ -190,7 +227,7 @@ export const Clientes: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: João Silva Santos"
-                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-medium focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-400 text-sm"
+                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-medium uppercase focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-400 text-sm"
                   />
                   <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 </div>
@@ -234,8 +271,7 @@ export const Clientes: React.FC = () => {
                   Cancelar
                 </button>
                 <button 
-                  type="button"
-                  onClick={(e) => handleAddCustomer(e)}
+                  type="submit"
                   className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700"
                 >
                   Salvar Cliente

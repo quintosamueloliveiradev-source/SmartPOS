@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Product, Sale, CartItem, Profile } from '../types';
+import { Product, Sale, CartItem, Profile, Customer } from '../types';
 import { INITIAL_PRODUCTS } from '../constants';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
@@ -30,7 +30,7 @@ interface StoreContextType {
   removeFromCart: (productId: string) => void;
   updateCartQuantity: (productId: string, delta: number) => void;
   clearCart: () => void;
-  completeSale: (paymentMethod: Sale['paymentMethod'], discount: number, customerName: string, surcharge: number) => Promise<Sale | null>;
+  completeSale: (paymentMethod: Sale['paymentMethod'], discount: number, customer: Customer | null, surcharge: number) => Promise<Sale | null>;
   cancelSale: (saleId: string, password: string) => Promise<{ success: boolean; message: string }>;
   clearSalesHistory: (password: string) => Promise<boolean>;
   resetSystem: (password: string) => Promise<boolean>;
@@ -394,14 +394,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const clearCart = () => setCart([]);
 
-  const completeSale = async (paymentMethod: Sale['paymentMethod'], discount: number, customerName: string, surcharge: number) => {
+  const completeSale = async (paymentMethod: Sale['paymentMethod'], discount: number, customer: Customer | null, surcharge: number) => {
     if (!user) return null;
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const total = Math.max(0, subtotal - discount + surcharge);
     const costTotal = cart.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0);
     const profit = total - costTotal;
 
-    const nextSequentialId = allTimeStats.salesCount + 1;
     const formattedId = Date.now().toString();
 
     const newSale: Sale = {
@@ -412,7 +411,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       discount,
       surcharge,
       profit,
-      customerName: customerName.trim() || undefined,
+      customerName: customer ? customer.name : undefined,
       items: [...cart],
       paymentMethod,
       status: 'completed'
@@ -436,6 +435,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }]);
 
       if (saleError) throw saleError;
+      
+      // Atualizar total gasto no banco
+      if (customer && customer.id) {
+        const { data: customerData } = await supabase.from('customers').select('total_spent').eq('id', customer.id).single();
+        const currentTotal = Number(customerData?.total_spent) || 0;
+        const newTotal = currentTotal + total;
+        await supabase.from('customers').update({ total_spent: newTotal }).eq('id', customer.id);
+      }
 
       const saleItems = cart.map(item => ({
         user_id: user.id,
