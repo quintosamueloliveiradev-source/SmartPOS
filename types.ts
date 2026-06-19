@@ -11,6 +11,15 @@ export interface Product {
   barcode?: string;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  contact: string;
+  cpf: string;
+  createdAt: string;
+  totalSpent: number;
+}
+
 export interface CartItem extends Product {
   quantity: number;
 }
@@ -29,7 +38,7 @@ export interface Sale {
   status?: 'completed' | 'canceled';
 }
 
-export type ViewState = 'dashboard' | 'pos' | 'inventory' | 'history' | 'settings' | 'admin' | 'subscription';
+export type ViewState = 'dashboard' | 'pos' | 'inventory' | 'history' | 'customers' | 'settings' | 'admin' | 'subscription';
 
 export interface Profile {
   id: string;

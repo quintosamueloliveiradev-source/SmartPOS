@@ -36,6 +36,7 @@ export const Settings: React.FC = () => {
   // Estados do histórico de faturas
   const [payments, setPayments] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
+  const [activeTab, setActiveTab] = useState<'subscription' | 'security' | 'maintenance'>('subscription');
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -152,280 +153,225 @@ export const Settings: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl pb-12">
       <header>
-        <h2 className="text-headline-lg font-headline-lg text-slate-900">Configurações do Sistema</h2>
-        <p className="text-body-md font-body-md text-slate-500 mt-1">Gerencie segurança, integridade de dados e backups.</p>
+        <h2 className="text-2xl font-light text-slate-900">Configurações</h2>
+        <p className="text-sm text-slate-500 mt-0.5">Gerenciamento de conta, segurança e dados.</p>
       </header>
 
-      <div className="grid gap-8">
-        {/* Minha Assinatura & Histórico de Faturas */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100">
-                <Receipt size={28} />
-              </div>
-              <div>
-                <h3 className="text-title-md font-title-md text-slate-800">Minha Assinatura & Histórico</h3>
-                <p className="text-body-md font-body-md text-slate-500">Acompanhe seu status e acesse comprovantes de faturas integradas pelo Asaas.</p>
-              </div>
-            </div>
-            
-            <button 
-              onClick={async () => {
-                if (!profile?.id) return;
-                setLoadingPayments(true);
-                try {
-                  const r = await fetch(`/api/asaas/payments/${profile.id}`);
-                  if (r.ok) {
-                    const d = await r.json();
-                    if (d.success) setPayments(d.payments || []);
-                  }
-                  addToast('Histórico de faturas updated!', 'success');
-                } catch {
-                  addToast('Erro ao atualizar faturas', 'error');
-                } finally {
-                  setLoadingPayments(false);
-                }
-              }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-label-sm font-label-sm font-semibold text-slate-600 transition-colors"
-            >
-              <RefreshCw size={14} className={loadingPayments ? 'animate-spin' : ''} />
-              Atualizar Lista
-            </button>
-          </div>
+      {/* Abas de Navegação */}
+      <div className="flex border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('subscription')}
+          className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+            activeTab === 'subscription'
+              ? 'border-emerald-500 text-emerald-600'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Assinatura
+        </button>
+        <button
+          onClick={() => setActiveTab('security')}
+          className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+            activeTab === 'security'
+              ? 'border-emerald-500 text-emerald-600'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Segurança
+        </button>
+        <button
+          onClick={() => setActiveTab('maintenance')}
+          className={`flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+            activeTab === 'maintenance'
+              ? 'border-emerald-500 text-emerald-600'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Manutenção
+        </button>
+      </div>
 
-          {/* Status Geral */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8 pt-2">
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                <CreditCard size={20} />
+      <div className="w-full">
+        {/* Conteúdo: Assinatura */}
+        {activeTab === 'subscription' && (
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6 animate-fade-in w-full max-w-2xl mx-auto">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+                  <Receipt size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-800">Assinatura do SmartPOS</h3>
+                  <p className="text-xs text-slate-500">Detalhes e status do seu plano ativo</p>
+                </div>
               </div>
-              <div>
-                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Status do Acesso</span>
-                <span className="text-body-md font-body-md font-bold text-slate-800 flex items-center gap-1.5 mt-0.5">
+              <button 
+                onClick={async () => {
+                  if (!profile?.id) return;
+                  setLoadingPayments(true);
+                  try {
+                    const r = await fetch(`/api/asaas/payments/${profile.id}`);
+                    if (r.ok) {
+                      const d = await r.json();
+                      if (d.success) setPayments(d.payments || []);
+                    }
+                    addToast('Histórico atualizado!', 'success');
+                  } catch {
+                    addToast('Erro ao atualizar', 'error');
+                  } finally {
+                    setLoadingPayments(false);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 transition-colors"
+              >
+                <RefreshCw size={12} className={loadingPayments ? 'animate-spin' : ''} />
+                Atualizar Dados
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</span>
+                <span className="text-sm font-bold text-slate-800 flex items-center gap-1">
                   {profile?.subscriptionStatus === 'active' || profile?.subscription_status === 'active' ? (
                     <span className="text-emerald-600 flex items-center gap-1"><Sparkles size={14} /> Ativo</span>
                   ) : profile?.subscriptionStatus === 'trial' || profile?.subscription_status === 'trial' ? (
                     <span className="text-indigo-600">Período de Testes</span>
                   ) : (
-                    <span className="text-rose-600">Expirado / Inativo</span>
+                    <span className="text-rose-600">Inativo</span>
                   )}
                 </span>
               </div>
-            </div>
-
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-              <div className="p-3 bg-sky-50 text-sky-600 rounded-xl">
-                <Calendar size={20} />
-              </div>
-              <div>
-                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Validade / Expiração</span>
-                <span className="text-body-md font-body-md font-bold font-debug-mono text-slate-800 mt-0.5 block">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Vencimento</span>
+                <span className="text-sm font-bold text-slate-800">
                   {profile?.subscription_expiry ? (
                     new Date(profile.subscription_expiry).toLocaleDateString('pt-BR')
                   ) : profile?.trialEndDate ? (
                     new Date(profile.trialEndDate).toLocaleDateString('pt-BR')
-                  ) : (
-                    'N/D'
-                  )}
+                  ) : 'Não disponível'}
+                </span>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">ID Cliente Asaas</span>
+                <span className="text-sm font-bold text-slate-800 truncate block">
+                  {profile?.asaasCustomerId || profile?.asaas_customer_id || 'N/A'}
                 </span>
               </div>
             </div>
+          </div>
+        )}
 
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                <AlertCircle size={20} />
+        {/* Conteúdo: Segurança */}
+        {activeTab === 'security' && (
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6 animate-fade-in w-full max-w-2xl mx-auto">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100">
+                <Shield size={20} />
               </div>
               <div>
-                <span className="block text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">Mapeamento Asaas</span>
-                <span className="text-body-md font-body-md font-bold font-debug-mono text-slate-800 mt-0.5 block truncate max-w-[180px]">
-                  {profile?.asaasCustomerId || profile?.asaas_customer_id || 'Não vinculado'}
-                </span>
+                <h3 className="text-base font-semibold text-slate-800">Segurança da Conta</h3>
+                <p className="text-xs text-slate-500">Altere sua senha de acesso administrativo</p>
               </div>
             </div>
-          </div>
 
-          {/* Tabela ou Lista de Cobranças */}
-          {loadingPayments ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-3">
-              <RefreshCw size={24} className="text-indigo-600 animate-spin" />
-              <p className="text-label-sm font-label-sm text-slate-400">Buscando faturas no Asaas Sandbox...</p>
-            </div>
-          ) : payments.length === 0 ? (
-            <div className="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-              <Receipt size={36} className="text-slate-300 mx-auto mb-3" />
-              <h4 className="text-title-md font-title-md text-slate-700">Nenhuma fatura encontrada</h4>
-              <p className="text-body-md font-body-md text-slate-500 mt-1 max-w-sm mx-auto">Sua assinatura corporativa ou histórico de lançamentos do Asaas será exibido aqui assim que forem gerados.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-200/80">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">
-                    <th className="py-4 px-5">ID Cobrança</th>
-                    <th className="py-4 px-5">Emissão</th>
-                    <th className="py-4 px-5">Vencimento</th>
-                    <th className="py-4 px-5">Valor</th>
-                    <th className="py-4 px-5">Método de Pgto</th>
-                    <th className="py-4 px-5">Status</th>
-                    <th className="py-4 px-5 text-right">Comprovante</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-150">
-                  {payments.map((p) => (
-                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-600">
-                        {p.id}
-                      </td>
-                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-600">
-                        {p.dateCreated ? new Date(p.dateCreated).toLocaleDateString('pt-BR') : '-'}
-                      </td>
-                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-semibold text-slate-500">
-                        {p.dueDate ? new Date(p.dueDate).toLocaleDateString('pt-BR') : '-'}
-                      </td>
-                      <td className="py-4 px-5 text-label-sm font-label-sm font-debug-mono font-bold text-slate-900">
-                        R$ {Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-4 px-5 text-label-sm font-label-sm font-semibold text-slate-500">
-                        {getPaymentMethodLabel(p.billingType)}
-                      </td>
-                      <td className="py-4 px-5">
-                        {getStatusBadge(p.status)}
-                      </td>
-                      <td className="py-4 px-5 text-right">
-                        {p.invoiceUrl || p.transactionReceiptUrl || p.bankSlipUrl ? (
-                          <a 
-                            href={p.transactionReceiptUrl || p.invoiceUrl || p.bankSlipUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-label-sm font-label-sm font-semibold tracking-tight transition-colors"
-                          >
-                            Visualizar <ExternalLink size={11} />
-                          </a>
-                        ) : (
-                          <span className="text-label-sm font-label-sm font-semibold text-slate-300">Nenhum</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100">
-           <div className="flex items-start gap-4 mb-8">
-            <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
-              <Shield size={28} />
-            </div>
-            <div>
-              <h3 className="text-title-md font-title-md text-slate-800">Segurança de Acesso</h3>
-              <p className="text-body-md font-body-md text-slate-500">Proteja ações críticas alterando sua senha de administrador.</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleChangePassword} className="max-w-xl bg-slate-50 p-8 rounded-3xl border-2 border-slate-200 space-y-6">
-             {pwdMessage && (
-              <div className={`p-4 rounded-xl text-sm font-bold animate-fade-in flex items-center gap-3 ${pwdMessage.type === 'success' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
-                {pwdMessage.type === 'success' ? <RefreshCw size={16} /> : <AlertTriangle size={16} />}
-                {pwdMessage.text}
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider flex items-center gap-2 font-semibold">
-                <Key size={14} className="text-indigo-500" /> Senha Atual do Administrador
-              </label>
-              <input 
-                type="password" 
-                placeholder="••••••••"
-                value={pwdForm.current}
-                onChange={e => setPwdForm({...pwdForm, current: e.target.value})}
-                className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider font-semibold">Nova Senha</label>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {pwdMessage && (
+                <div className={`p-3 rounded-xl text-xs font-bold animate-fade-in flex items-center gap-2 border ${pwdMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                  {pwdMessage.type === 'success' ? <RefreshCw size={14} className="animate-spin" /> : <AlertTriangle size={14} />}
+                  {pwdMessage.text}
+                </div>
+              )}
+              
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Senha Atual</label>
                 <input 
                   type="password" 
-                  placeholder="Mín. 4 dígitos"
-                  value={pwdForm.new}
-                  onChange={e => setPwdForm({...pwdForm, new: e.target.value})}
-                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
+                  placeholder="Digite sua senha atual"
+                  value={pwdForm.current}
+                  onChange={e => setPwdForm({...pwdForm, current: e.target.value})}
+                  className="w-full px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none placeholder:text-slate-200"
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-label-sm font-label-sm text-slate-500 uppercase tracking-wider font-semibold">Confirmar Nova</label>
-                <input 
-                  type="password" 
-                  placeholder="Repita a nova"
-                  value={pwdForm.confirm}
-                  onChange={e => setPwdForm({...pwdForm, confirm: e.target.value})}
-                  className="w-full px-5 py-4 bg-white border-2 border-slate-300 rounded-2xl text-body-md font-body-md font-bold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all placeholder:text-slate-200 font-debug-mono text-debug-mono"
-                  required
-                />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nova Senha</label>
+                  <input 
+                    type="password" 
+                    placeholder="Min. 4 Caracteres"
+                    value={pwdForm.new}
+                    onChange={e => setPwdForm({...pwdForm, new: e.target.value})}
+                    className="w-full px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none placeholder:text-slate-200"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Confirmar Nova Senha</label>
+                  <input 
+                    type="password" 
+                    placeholder="Repita a nova senha"
+                    value={pwdForm.confirm}
+                    onChange={e => setPwdForm({...pwdForm, confirm: e.target.value})}
+                    className="w-full px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none placeholder:text-slate-200"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
+                Alterar Senha
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Conteúdo: Manutenção */}
+        {activeTab === 'maintenance' && (
+          <div className="space-y-6 w-full max-w-2xl mx-auto animate-fade-in">
+            {/* Manutenção de Dados */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+              <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+                  <Save size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-800">Manutenção de Banco de Dados</h3>
+                  <p className="text-xs text-slate-500">Exporte ou monte backups integrados dos seus dados</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onClick={handleExportBackup} className="flex items-center justify-center gap-2.5 bg-slate-900 text-white p-4 rounded-xl hover:bg-slate-800 transition-all shadow-md active:scale-[0.99]">
+                  <Download size={18} className="text-blue-400" />
+                  <span className="font-bold text-xs uppercase tracking-wider">Exportar Backup</span>
+                </button>
+
+                <button onClick={() => fileInputRef.current?.click()} className="flex items-center justify-center gap-2.5 bg-white border border-slate-300 text-slate-700 p-4 rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-[0.99]">
+                  <Upload size={18} className="text-slate-500" />
+                  <span className="font-bold text-xs uppercase tracking-wider">Importar Backup</span>
+                </button>
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
               </div>
             </div>
 
-            <button type="submit" className="w-full px-6 py-4 bg-indigo-600 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98]">
-              Confirmar Alteração de Senha
-            </button>
-          </form>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100">
-          <div className="flex items-start gap-4 mb-8">
-            <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100">
-              <Save size={28} />
-            </div>
-            <div>
-              <h3 className="text-title-md font-title-md text-slate-800">Manutenção de Dados</h3>
-              <p className="text-body-md font-body-md text-slate-500">Exporte ou restaure suas informações em arquivos locais.</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-6">
-            <button onClick={handleExportBackup} className="flex-1 flex items-center justify-center gap-4 bg-slate-900 text-white px-8 py-6 rounded-3xl hover:bg-slate-800 transition-all shadow-xl active:scale-[0.98]">
-              <Download size={24} className="text-blue-400" />
-              <div className="text-left">
-                <span className="block font-title-md uppercase tracking-wider text-xs">Fazer Backup</span>
-                <span className="text-label-sm font-label-sm text-slate-500 font-bold block mt-0.5">Gerar arquivo .JSON</span>
+            {/* Área Crítica */}
+            <div className="bg-red-50 p-6 rounded-2xl border border-red-200 space-y-4">
+              <div className="flex items-center gap-3 pb-2 border-b border-red-100">
+                <div className="p-2 bg-white text-red-600 rounded-xl shadow-sm border border-red-100">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-red-955">Área Crítica (Ações Irreversíveis)</h3>
+                  <p className="text-xs text-red-600">Confirme para resetar os registros locais do banco de dados</p>
+                </div>
               </div>
-            </button>
-
-            <button onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-4 bg-white border-2 border-slate-300 text-slate-700 px-8 py-6 rounded-3xl hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-[0.98] group">
-              <Upload size={24} className="group-hover:text-emerald-500" />
-              <div className="text-left">
-                <span className="block font-title-md uppercase tracking-wider text-xs">Importar Dados</span>
-                <span className="text-label-sm font-label-sm text-slate-400 font-bold block mt-0.5">Substituir dados atuais</span>
-              </div>
-            </button>
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
-          </div>
-        </div>
-
-        <div className="bg-red-50 p-8 rounded-3xl border-2 border-red-100 relative overflow-hidden group">
-          <div className="absolute -top-6 -right-6 opacity-5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-            <AlertTriangle size={180} className="text-red-600" />
-          </div>
-          <div className="flex items-start gap-4 mb-6 relative z-10">
-            <div className="p-4 bg-white text-red-600 rounded-2xl shadow-sm">
-              <Trash2 size={28} />
-            </div>
-            <div>
-              <h3 className="text-title-md font-red-900 font-semibold">Área Crítica</h3>
-              <p className="text-body-md font-body-md text-red-700">Ações irreversíveis que limpam todo o histórico de operações.</p>
+              <button onClick={() => setModalType(isDefaultPassword ? 'reset-initial' : 'reset')} className="w-full px-4 py-3 bg-red-650 bg-red-600 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm">
+                <RefreshCw size={16} /> Reset de Fábrica do Sistema
+              </button>
             </div>
           </div>
-          <button onClick={() => setModalType(isDefaultPassword ? 'reset-initial' : 'reset')} className="relative z-10 w-full md:w-auto px-10 py-4 bg-red-600 text-white rounded-2xl font-title-md uppercase tracking-wider text-xs hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-[0.98] flex items-center justify-center gap-3">
-            <RefreshCw size={18} /> Reset de Fábrica
-          </button>
-        </div>
+        )}
       </div>
 
       {modalType && (

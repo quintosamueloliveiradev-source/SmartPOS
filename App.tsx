@@ -5,12 +5,13 @@ import { Dashboard } from './components/Dashboard';
 import { POS } from './components/POS';
 import { Inventory } from './components/Inventory';
 import { SalesHistory } from './components/SalesHistory';
+import { Clientes } from './components/Clientes';
 import { Settings } from './components/Settings';
 import { AdminPanel } from './components/AdminPanel';
 import { Login } from './components/Login';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { ViewState } from './types';
-import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone, AlertTriangle, Sparkles } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone, AlertTriangle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { PixCheckoutModal } from './components/PixCheckoutModal';
 
@@ -33,13 +34,13 @@ const GlobalBanner = () => {
   if (!announcement || !visible) return null;
 
   return (
-    <div className="bg-amber-500 text-white py-2 px-4 shadow-md sticky top-0 z-[60] flex items-center justify-between">
+    <div className="bg-amber-500 text-white py-1.5 px-4 shadow-sm sticky top-0 z-[60] flex items-center justify-between">
       <div className="flex items-center gap-2 max-w-7xl mx-auto">
-        <Megaphone size={18} className="animate-bounce" />
-        <p className="text-sm font-bold">{announcement}</p>
+        <Megaphone size={14} className="animate-bounce" />
+        <p className="text-xs font-medium">{announcement}</p>
       </div>
       <button onClick={() => setVisible(false)} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
-        <X size={16} />
+        <X size={14} />
       </button>
     </div>
   );
@@ -134,6 +135,7 @@ const MainContent: React.FC = () => {
       case 'pos': return <POS />;
       case 'inventory': return <Inventory />;
       case 'history': return <SalesHistory />;
+      case 'customers': return <Clientes />;
       case 'settings': return <Settings />;
       case 'admin': {
         const isMasterAdmin = user?.email === 'backup02atelietetemimos@gmail.com';
@@ -149,29 +151,28 @@ const MainContent: React.FC = () => {
       <div className="flex flex-1">
         <Sidebar currentView={currentView} setView={setCurrentView} />
         
-        <main className="flex-1 ml-20 lg:ml-64 p-4 lg:p-8 transition-all duration-300 flex flex-col">
+        <main className="flex-1 ml-20 lg:ml-64 p-4 lg:p-6 transition-all duration-300 flex flex-col">
           {/* Warning Pre-Expiry Trial Banner */}
           {showTrialBanner && (
-            <div className="mb-6 bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-orange-500/30 animate-fade-in animate-pulse-subtle">
+            <div className="mb-5 bg-orange-50/65 border border-orange-200/80 border-l-4 border-l-orange-500 p-3 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 animate-fade-in shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
-                  <AlertTriangle size={20} className="animate-bounce" />
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                  <AlertTriangle size={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-black tracking-tight leading-snug">
-                    Sua demonstração gratuita do Vendeei expira em {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}.
+                  <p className="text-xs font-medium text-slate-800 tracking-tight leading-snug">
+                    Sua demonstração gratuita do Vendeei expira em <span className="font-semibold text-orange-700">{daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'}</span>.
                   </p>
-                  <p className="text-xs text-white/85 mt-0.5 font-semibold">
+                  <p className="text-[11px] text-slate-500 mt-0.5 font-normal">
                     Evite bloqueios indesejados e ative sua assinatura mensal por apenas R$ 14,90!
                   </p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsCheckoutOpen(true)}
-                className="px-5 py-2.5 bg-white hover:bg-amber-50 text-orange-700 hover:text-orange-800 rounded-2xl text-xs font-black transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 border border-orange-200 text-orange-600 bg-white hover:bg-orange-50 hover:text-orange-700 rounded-lg text-[11px] font-medium transition-all active:scale-95 flex items-center justify-center cursor-pointer shrink-0"
               >
-                <Sparkles size={14} className="text-orange-500" />
-                <span>Ativar Agora</span>
+                Ativar Agora
               </button>
             </div>
           )}

@@ -5,11 +5,11 @@ import { Product } from '../types';
 import { Search, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, ShoppingBasket, User, Tag, Percent, Barcode, Printer, CheckCircle2, Ticket, FileText, X } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 import { Sale } from '../types';
+import { motion } from 'motion/react';
 
 export const POS: React.FC = () => {
   const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [barcodeSearch, setBarcodeSearch] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [discount, setDiscount] = useState<number>(0);
   const [cardTaxPercent, setCardTaxPercent] = useState<number>(0);
@@ -19,7 +19,10 @@ export const POS: React.FC = () => {
 
   const isSearching = searchTerm.trim().length > 0;
   const filteredProducts = isSearching 
-    ? products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    ? products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (p.barcode && p.barcode === searchTerm.trim())
+      )
     : [];
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -49,50 +52,21 @@ export const POS: React.FC = () => {
     setReceivedAmount(0);
   };
 
-  const handleBarcodeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!barcodeSearch.trim()) return;
-
-    const product = products.find(p => p.barcode === barcodeSearch.trim());
-    if (product) {
-      if (product.stock > 0) {
-        addToCart(product);
-        addToast(`${product.name} adicionado!`, 'success');
-      } else {
-        addToast(`Produto sem estoque!`, 'error');
-      }
-    } else {
-      addToast(`Produto não encontrado!`, 'error');
-    }
-    setBarcodeSearch('');
-  };
-
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-2rem)] gap-6 overflow-hidden">
       <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+        <div className="p-2.5 border-b border-slate-100 bg-slate-50/30">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={16} />
             <input 
               type="text" 
-              placeholder="Buscar produto pelo nome..." 
-              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-400 rounded-2xl text-body-md font-body-md font-bold text-slate-900 placeholder:text-slate-600 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all shadow-md"
+              placeholder="Buscar produto por nome ou bipar código de barras..." 
+              className="w-full pl-9 pr-3 py-1.5 bg-white border-2 border-slate-400 rounded-xl text-sm font-bold text-slate-900 placeholder:text-slate-600 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all shadow-md"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               autoFocus
             />
           </div>
-          
-          <form onSubmit={handleBarcodeSubmit} className="relative w-full md:w-64">
-            <Barcode className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-700" size={20} />
-            <input 
-              type="text" 
-              placeholder="Escanear Código..." 
-              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-400 rounded-2xl font-debug-mono text-debug-mono focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all shadow-md text-indigo-700"
-              value={barcodeSearch}
-              onChange={(e) => setBarcodeSearch(e.target.value)}
-            />
-          </form>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
@@ -108,10 +82,10 @@ export const POS: React.FC = () => {
             </div>
           ) : !isSearching ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-400">
-              <div className="p-8 bg-slate-100 rounded-full mb-6 border-2 border-slate-200">
-                <Search size={64} className="text-slate-300" />
+              <div className="p-4 bg-slate-100 rounded-full mb-3 border-2 border-slate-200">
+                <Search size={32} className="text-slate-300" />
               </div>
-              <p className="text-title-md font-title-md text-slate-400 uppercase tracking-wider">Digite acima para buscar produtos</p>
+              <p className="text-xs font-light text-slate-500 uppercase tracking-wider">Digite acima para buscar produtos</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -130,7 +104,7 @@ export const POS: React.FC = () => {
                     <h4 className="text-body-md font-body-md font-bold text-slate-800 truncate">{p.name}</h4>
                     <p className="text-label-sm font-label-sm text-slate-500 mb-2 uppercase tracking-wider">{p.category}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-debug-mono font-debug-mono font-bold text-emerald-600">R$ {p.price.toFixed(2)}</span>
+                      <span className="text-sm font-mono font-medium tracking-tight text-emerald-600">R$ {p.price.toFixed(2)}</span>
                       <span className={`text-debug-mono font-debug-mono px-1.5 py-0.5 rounded font-bold ${p.stock < 5 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'}`}>{p.stock} un</span>
                     </div>
                   </div>
@@ -142,15 +116,98 @@ export const POS: React.FC = () => {
       </div>
 
       <div className="w-full lg:w-96 flex flex-col bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <div className="p-5 bg-slate-800 text-white">
-          <h2 className="font-title-md font-title-md flex items-center gap-2">
-            <ShoppingBasket size={20} className="text-emerald-400" />
-            Carrinho
-          </h2>
-          <p className="text-label-sm font-label-sm text-slate-400 mt-0.5">{cart.length} itens no pedido atual</p>
+        {/* Bloco de fechamento de cima fixo */}
+        <div className="p-2.5 bg-white border-b border-slate-100 space-y-2 shadow-sm z-10">
+          {/* Sessão de Identificação do Cliente */}
+          <div className="relative group">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-emerald-600 transition-colors" size={14} />
+            <input 
+              type="text" 
+              placeholder="Cliente (Opcional)" 
+              className="w-full pl-8 pr-3 py-1.5 bg-white border-2 border-slate-400 rounded-xl text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none transition-all leading-relaxed shadow-md text-slate-900 placeholder:text-slate-500"
+              value={customerName}
+              onChange={e => setCustomerName(e.target.value)}
+            />
+          </div>
+
+          <div className="bg-slate-900 rounded-xl overflow-hidden shadow-md ring-1 ring-white/10">
+            <div className="px-3 py-1.5 bg-emerald-500 text-white flex items-center justify-between relative">
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase tracking-wide leading-none opacity-90">Total Final</span>
+                <span className="text-xl font-mono font-semibold tracking-tight mt-0.5">R$ {total.toFixed(2)}</span>
+              </div>
+              {receivedAmount > total && (
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.7, ease: "easeInOut" }}
+                  className="bg-slate-600 text-white px-2.5 py-1 rounded-lg border border-slate-700 shadow text-right text-sm font-mono flex flex-col items-end gap-0.5"
+                >
+                  <span className="text-[9px] uppercase tracking-wider leading-none text-slate-200">Troco</span>
+                  <span className="text-sm font-semibold leading-none">R$ {change.toFixed(2)}</span>
+                </motion.div>
+              )}
+            </div>
+
+            <div className="px-2.5 py-2 grid grid-cols-12 gap-1.5 bg-slate-900">
+              {/* Desconto */}
+              <div className="col-span-3 relative group">
+                <Tag className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-400 transition-colors" size={10} />
+                <input 
+                  type="number" 
+                  placeholder="Desc." 
+                  className="w-full pl-5 pr-1 py-1.5 bg-slate-800 border-2 border-white/20 rounded-lg text-xs font-bold text-red-400 focus:border-red-450 focus:border-red-400 focus:outline-none transition-all placeholder:text-slate-500 font-mono shadow-sm"
+                  value={discount || ''}
+                  onChange={e => setDiscount(Number(e.target.value))}
+                />
+              </div>
+
+              {/* % Taxa */}
+              <div className="col-span-3 relative group">
+                <Percent className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-400 transition-colors" size={10} />
+                <input 
+                  type="number" 
+                  placeholder="Taxa" 
+                  className="w-full pl-5 pr-1 py-1.5 bg-slate-800 border-2 border-white/20 rounded-lg text-xs font-bold text-indigo-400 focus:border-indigo-450 focus:border-indigo-400 focus:outline-none transition-all placeholder:text-slate-500 font-mono shadow-sm"
+                  value={cardTaxPercent || ''}
+                  onChange={e => setCardTaxPercent(Number(e.target.value))}
+                />
+              </div>
+
+              {/* Valor Recebido */}
+              <div className="col-span-6 relative group">
+                <Banknote className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-400 transition-colors" size={12} />
+                <input 
+                  type="number" 
+                  className="w-full pl-6 pr-2 py-1.5 bg-slate-800 border-2 border-white/20 rounded-lg text-xs sm:text-sm font-bold text-white focus:border-emerald-400 focus:outline-none transition-all placeholder:text-slate-500 font-mono text-emerald-400"
+                  placeholder="Recebido"
+                  value={receivedAmount || ''}
+                  onChange={e => setReceivedAmount(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => handleComplete('pix')} disabled={cart.length === 0} className="py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-1 uppercase tracking-wider border border-slate-900 shadow-md group">
+              <QrCode size={16} className="text-teal-400 group-hover:scale-110 transition-transform" /> Pix
+            </button>
+            <button onClick={() => handleComplete('credit')} disabled={cart.length === 0} className="py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-1 uppercase tracking-wider border border-slate-900 shadow-md group">
+              <CreditCard size={16} className="text-indigo-400 group-hover:scale-110 transition-transform" /> Cartão
+            </button>
+            <button onClick={() => handleComplete('cash')} disabled={cart.length === 0} className="py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-1 uppercase tracking-wider border border-slate-900 shadow-md group">
+              <Banknote size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" /> Dinheiro
+            </button>
+          </div>
         </div>
 
+        {/* Área de listagem de produtos embaixo que ocupa o restante do espaço com scroll vertical */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-100/50">
+          {cart.length > 0 && (
+            <div className="flex items-center justify-between pb-1 border-b border-slate-200/60">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Itens Selecionados</span>
+              <span className="text-[10px] font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-full">{cart.length === 1 ? '1 item' : `${cart.length} itens no pedido atual`}</span>
+            </div>
+          )}
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-500">
               <ShoppingBasket size={64} className="mb-4 text-slate-200" />
@@ -162,95 +219,17 @@ export const POS: React.FC = () => {
                 <img src={item.imageUrl} className="w-14 h-14 rounded-lg object-cover shadow-sm border border-slate-100" />
                 <div className="flex-1 min-w-0">
                   <p className="text-body-md font-body-md font-bold text-slate-900 truncate leading-tight">{item.name}</p>
-                  <p className="text-debug-mono font-debug-mono text-emerald-700 font-bold mt-0.5">R$ {item.price.toFixed(2)}</p>
+                  <p className="text-sm font-mono font-medium tracking-tight text-emerald-700 mt-0.5">R$ {item.price.toFixed(2)}</p>
                 </div>
                 <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border-2 border-slate-300">
                   <button onClick={() => updateCartQuantity(item.id, -1)} className="p-1 hover:bg-white hover:text-red-500 rounded-lg transition-all shadow-sm"><Minus size={14}/></button>
-                  <span className="text-debug-mono font-debug-mono font-bold w-6 text-center text-slate-900">{item.quantity}</span>
+                  <span className="text-sm font-mono text-slate-900 w-6 text-center">{item.quantity}</span>
                   <button onClick={() => updateCartQuantity(item.id, 1)} className="p-1 hover:bg-white hover:text-emerald-500 rounded-lg transition-all shadow-sm"><Plus size={14}/></button>
                 </div>
                 <button onClick={() => removeFromCart(item.id)} className="text-slate-300 hover:text-red-500 p-1.5 transition-colors"><Trash2 size={18}/></button>
               </div>
             ))
           )}
-        </div>
-
-        <div className="p-4 bg-white border-t border-slate-100 space-y-3 shadow-2xl z-10">
-          {/* Sessão de Ajustes Rápidos */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="relative group">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-emerald-600 transition-colors" size={14} />
-              <input 
-                type="text" 
-                placeholder="Cliente" 
-                className="w-full pl-9 pr-3 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-label-sm font-label-sm focus:border-emerald-500 focus:outline-none transition-all font-bold text-slate-900 placeholder:text-slate-500 shadow-sm"
-                value={customerName}
-                onChange={e => setCustomerName(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <div className="relative flex-1 group">
-                <Tag className="absolute left-[6px] top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-red-500 transition-colors" size={12} />
-                <input 
-                  type="number" 
-                  placeholder="Desc." 
-                  className="w-full pl-[22px] pr-1 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-label-sm font-label-sm font-black text-red-600 focus:border-red-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
-                  value={discount || ''}
-                  onChange={e => setDiscount(Number(e.target.value))}
-                />
-              </div>
-              <div className="relative flex-1 group">
-                <Percent className="absolute left-[6px] top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors" size={12} />
-                <input 
-                  type="number" 
-                  placeholder="Taxa" 
-                  className="w-full pl-[22px] pr-1 py-2.5 bg-white border-2 border-slate-400 rounded-xl text-label-sm font-label-sm font-black text-indigo-600 focus:border-indigo-500 focus:outline-none transition-all placeholder:text-slate-500 shadow-sm"
-                  value={cardTaxPercent || ''}
-                  onChange={e => setCardTaxPercent(Number(e.target.value))}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-slate-900 rounded-2xl overflow-hidden shadow-xl ring-1 ring-white/10">
-            <div className="p-3 bg-emerald-500 text-white flex justify-between items-center">
-              <div className="flex flex-col">
-                <span className="text-label-sm font-label-sm uppercase tracking-wide leading-none opacity-80">Total Final</span>
-                <span className="text-display-lg font-display-lg font-extrabold tracking-tight">R$ {total.toFixed(2)}</span>
-              </div>
-              {receivedAmount > total && (
-                <div className="bg-slate-600 text-white px-4 py-2 rounded-2xl border-2 border-slate-700 shadow-lg animate-bounce text-right ring-4 ring-slate-500/20">
-                  <span className="text-label-sm font-label-sm uppercase tracking-wider block leading-none mb-1 text-slate-200">Troco</span>
-                  <span className="text-headline-lg font-headline-lg font-extrabold leading-none">R$ {change.toFixed(2)}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="p-3 pt-4">
-              <div className="relative">
-                <Banknote className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="number" 
-                  className="w-full pl-10 pr-4 py-3 bg-slate-800 border-2 border-white/20 rounded-xl text-body-md font-body-md font-bold text-white focus:border-emerald-400 focus:outline-none transition-all placeholder:text-slate-500 font-debug-mono"
-                  placeholder="Valor Recebido"
-                  value={receivedAmount || ''}
-                  onChange={e => setReceivedAmount(Number(e.target.value))}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => handleComplete('pix')} disabled={cart.length === 0} className="py-4 bg-slate-900 text-white rounded-2xl text-label-sm font-label-sm font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-2 uppercase tracking-widest border-2 border-slate-900 shadow-xl group">
-              <QrCode size={24} className="text-teal-400 group-hover:scale-110 transition-transform" /> Pix
-            </button>
-            <button onClick={() => handleComplete('credit')} disabled={cart.length === 0} className="py-4 bg-slate-900 text-white rounded-2xl text-label-sm font-label-sm font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-2 uppercase tracking-widest border-2 border-slate-900 shadow-xl group">
-              <CreditCard size={24} className="text-indigo-400 group-hover:scale-110 transition-transform" /> Cartão
-            </button>
-            <button onClick={() => handleComplete('cash')} disabled={cart.length === 0} className="py-4 bg-slate-900 text-white rounded-2xl text-label-sm font-label-sm font-bold hover:bg-black transition-all active:scale-95 disabled:opacity-40 flex flex-col items-center justify-center gap-2 uppercase tracking-widest border-2 border-slate-900 shadow-xl group">
-              <Banknote size={24} className="text-emerald-400 group-hover:scale-110 transition-transform" /> Dinheiro
-            </button>
-          </div>
         </div>
       </div>
 

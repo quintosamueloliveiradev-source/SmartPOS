@@ -88,67 +88,67 @@ export const SalesHistory: React.FC = () => {
   }, [filteredSales]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <div className="space-y-4 animate-fade-in">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <div>
-          <h2 className="text-headline-lg font-headline-lg text-slate-800">Histórico de Movimentação</h2>
-          <p className="text-body-md font-body-md text-slate-500">Consulte vendas, estorne pagamentos e gere relatórios.</p>
+          <h2 className="text-xl font-semibold font-sans text-slate-800">Histórico de Movimentação</h2>
+          <p className="text-sm font-sans text-slate-500">Consulte vendas, estorne pagamentos e gere relatórios.</p>
         </div>
-        <button onClick={exportSalesToCSV} className="flex items-center gap-3 px-6 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-all shadow-md font-title-md text-xs uppercase tracking-wider active:scale-95">
-          <FileDown size={18} className="text-emerald-400" /> Relatório CSV
+        <button onClick={exportSalesToCSV} className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-all shadow-sm font-sans font-medium text-xs uppercase tracking-wider active:scale-95">
+          <FileDown size={14} className="text-emerald-400" /> Relatório CSV
         </button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
-          <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Vendas (Período)</p>
-          <p className="text-headline-lg font-headline-lg font-bold font-debug-mono text-slate-800">{stats.count}</p>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Vendas (Período)</p>
+          <p className="text-lg font-mono font-semibold text-slate-800">{stats.count}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
-          <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Faturamento</p>
-          <p className="text-headline-lg font-headline-lg font-bold font-debug-mono text-emerald-600">R$ {stats.revenue.toFixed(2)}</p>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Faturamento</p>
+          <p className="text-lg font-mono font-semibold text-slate-800">R$ {stats.revenue.toFixed(2)}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
-          <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Itens Vendidos</p>
-          <p className="text-headline-lg font-headline-lg font-bold font-debug-mono text-indigo-600">{stats.items}</p>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-all">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Itens Vendidos</p>
+          <p className="text-lg font-mono font-semibold text-slate-800">{stats.items}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-indigo-200 transition-all">
-          <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide mb-1">Lucro Estimado</p>
-          <p className="text-headline-lg font-headline-lg font-bold font-debug-mono text-blue-600">R$ {stats.profit.toFixed(2)}</p>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm group hover:border-indigo-200 transition-all">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Lucro Estimado</p>
+          <p className="text-lg font-mono font-semibold text-slate-800">R$ {stats.profit.toFixed(2)}</p>
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col xl:flex-row items-center gap-6">
-        <div className="flex items-center gap-3 text-slate-500 font-label-sm font-label-sm uppercase tracking-wider min-w-[150px]">
-          <Filter size={18} className="text-indigo-500" /> Filtros de Busca
+      <div className="bg-white px-4 py-2.5 rounded-xl border-2 border-slate-200 shadow-sm flex flex-col xl:flex-row items-center gap-4">
+        <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider min-w-[130px]">
+          <Filter size={14} className="text-indigo-500" /> Filtros de Busca
         </div>
 
         <div className="relative flex-1 w-full min-w-[200px] group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 group-focus-within:scale-110 transition-all" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-all" size={14} />
           <input 
             type="text" 
             placeholder="Buscar por ID (ex: #1778) ou Cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-6 py-3 bg-white border-2 border-slate-300 rounded-xl text-body-md font-body-md text-slate-700 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all shadow-sm placeholder:font-medium placeholder:text-slate-400"
+            className="w-full pl-9 pr-4 py-1.5 bg-white border-2 border-slate-300 rounded-lg text-sm text-slate-700 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all shadow-sm placeholder:font-normal placeholder:text-slate-400"
           />
         </div>
 
-        <div className="flex p-1.5 bg-slate-100 rounded-2xl w-full md:w-auto border border-slate-200">
-          <button onClick={() => setFilterMode('24h')} className={`px-6 py-2.5 rounded-xl text-label-sm font-label-sm font-bold uppercase tracking-wider transition-all ${filterMode === '24h' ? 'bg-white text-emerald-600 shadow-md' : 'text-slate-500 hover:text-slate-800'}`}>Últimas 24h</button>
-          <button onClick={() => setFilterMode('custom')} className={`px-6 py-2.5 rounded-xl text-label-sm font-label-sm font-bold uppercase tracking-wider transition-all ${filterMode === 'custom' ? 'bg-white text-emerald-600 shadow-md' : 'text-slate-500 hover:text-slate-800'}`}>Personalizado</button>
+        <div className="flex p-0.5 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
+          <button onClick={() => setFilterMode('24h')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${filterMode === '24h' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Últimas 24h</button>
+          <button onClick={() => setFilterMode('custom')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${filterMode === 'custom' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Personalizado</button>
         </div>
 
         {filterMode === 'custom' && (
-          <div className="flex items-center gap-4 w-full md:w-auto animate-fade-in">
-            <ChevronRight size={20} className="text-slate-300 hidden md:block" />
+          <div className="flex items-center gap-3 w-full md:w-auto animate-fade-in">
+            <ChevronRight size={16} className="text-slate-300 hidden md:block" />
             <div className="relative flex-1 md:flex-none group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 group-focus-within:scale-110 transition-transform" size={18} />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500" size={14} />
               <input 
                 type="date" 
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="pl-12 pr-6 py-3 bg-white border-2 border-slate-300 rounded-xl text-body-md font-body-md font-bold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all cursor-pointer shadow-sm"
+                className="pl-9 pr-3 py-1.5 bg-white border-2 border-slate-300 rounded-lg text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all cursor-pointer shadow-sm"
               />
             </div>
           </div>
@@ -172,67 +172,67 @@ export const SalesHistory: React.FC = () => {
           {filteredSales.map(sale => {
             const isCanceled = sale.status === 'canceled';
             return (
-              <div key={sale.id} className={`bg-white border-2 ${isCanceled ? 'border-red-100 bg-red-50/20 grayscale opacity-60' : 'border-slate-100'} rounded-2xl p-5 shadow-sm flex flex-col lg:flex-row gap-6 items-start lg:items-center relative transition-all hover:shadow-md`}>
-                <div className="flex items-center gap-4 min-w-[180px]">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${isCanceled ? 'bg-red-50 border-red-200 text-red-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}><Clock size={24} /></div>
+              <div key={sale.id} className={`bg-white border-2 ${isCanceled ? 'border-red-100 bg-red-50/20 grayscale opacity-60' : 'border-slate-100'} rounded-xl p-3 shadow-sm flex flex-col lg:flex-row gap-4 items-start lg:items-center relative transition-all hover:shadow-md`}>
+                <div className="flex items-center gap-3 min-w-[160px]">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border-2 ${isCanceled ? 'bg-red-50 border-red-200 text-red-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}><Clock size={16} /></div>
                   <div>
-                    <p className="font-debug-mono font-debug-mono font-bold text-slate-900 leading-tight">#{sale.id}</p>
-                    <p className="text-label-sm font-label-sm text-slate-400 uppercase tracking-wide">{new Date(sale.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(sale.timestamp).toLocaleDateString()}</p>
+                    <p className="font-mono font-bold text-slate-900 leading-tight text-sm">#{sale.id}</p>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider">{new Date(sale.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(sale.timestamp).toLocaleDateString()}</p>
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-2">
-                  <div className="flex flex-wrap gap-2">
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {sale.items.map((item, idx) => (
-                      <span key={idx} className="inline-flex items-center px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-label-sm font-label-sm text-slate-600 font-semibold">
+                      <span key={idx} className="inline-flex items-center px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-xs text-slate-600 font-semibold leading-none">
                         {item.quantity}x {item.name}
                       </span>
                     ))}
                   </div>
-                  <div className="flex flex-wrap gap-4">
-                    {sale.customerName && <div className="flex items-center gap-1.5 text-label-sm font-label-sm font-semibold text-slate-400 uppercase tracking-wider"><User size={12} className="text-indigo-400" /> Cliente: {sale.customerName}</div>}
-                    {sale.surcharge > 0 && <div className="flex items-center gap-1.5 text-label-sm font-label-sm font-semibold text-indigo-500 uppercase tracking-wider font-debug-mono"><PlusCircle size={12} /> Taxa Cartão: R$ {sale.surcharge.toFixed(2)}</div>}
+                  <div className="flex flex-wrap gap-3">
+                    {sale.customerName && <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider"><User size={10} className="text-indigo-400" /> Cliente: {sale.customerName}</div>}
+                    {sale.surcharge > 0 && <div className="flex items-center gap-1.5 text-[10px] font-semibold text-indigo-500 uppercase tracking-wider font-mono"><PlusCircle size={10} /> Taxa Cartão: R$ {sale.surcharge.toFixed(2)}</div>}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-end border-t border-slate-100 lg:border-none pt-4 lg:pt-0">
-                  <div className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-2">
+                <div className="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end border-t border-slate-100 lg:border-none pt-2.5 lg:pt-0">
+                  <div className="bg-slate-50 px-2   py-1 rounded-lg border border-slate-200 flex items-center gap-1.5">
                      {getPaymentIcon(sale.paymentMethod)}
-                     <span className="text-label-sm font-label-sm uppercase tracking-wider text-slate-500">{sale.paymentMethod}</span>
+                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{sale.paymentMethod}</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-label-sm font-label-sm tracking-wide text-slate-400 uppercase mb-0.5">Total Recebido</p>
-                    <p className={`text-title-md font-title-md font-debug-mono font-bold ${isCanceled ? 'text-red-400 line-through' : 'text-emerald-600'}`}>R$ {sale.total.toFixed(2)}</p>
+                    <p className="text-[10px] tracking-wide text-slate-400 uppercase mb-0.5">Total Recebido</p>
+                    <p className={`text-sm font-mono font-medium tracking-tight ${isCanceled ? 'text-red-400 line-through' : 'text-emerald-600'}`}>R$ {sale.total.toFixed(2)}</p>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     {!isCanceled && (
                       <>
                         <button 
                           onClick={() => printReceipt(sale, 'thermal')} 
-                          className="p-3 text-emerald-600 hover:bg-emerald-50 border border-emerald-100 rounded-2xl transition-all shadow-sm group relative"
+                          className="w-8 h-8 flex items-center justify-center text-emerald-600 hover:bg-emerald-50 border border-emerald-100 rounded-lg transition-all shadow-sm group relative shrink-0"
                           title="Imprimir Cupom 58mm"
                         >
-                          <Ticket size={20} />
-                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Térmica 58mm</span>
+                          <Ticket size={16} />
+                          <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[8px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Térmica 58mm</span>
                         </button>
                         
                         <button 
                           onClick={() => printReceipt(sale, 'a4')} 
-                          className="p-3 text-indigo-600 hover:bg-indigo-50 border border-indigo-100 rounded-2xl transition-all shadow-sm group relative"
+                          className="w-8 h-8 flex items-center justify-center text-indigo-600 hover:bg-indigo-50 border border-indigo-100 rounded-lg transition-all shadow-sm group relative shrink-0"
                           title="Imprimir A4"
                         >
-                          <FileText size={20} />
-                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Relatório A4</span>
+                          <FileText size={16} />
+                          <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[8px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Relatório A4</span>
                         </button>
                         
                         <button 
                           onClick={() => setSaleToCancel(sale.id)} 
-                          className="p-3 text-amber-500 hover:bg-amber-50 border border-amber-100 rounded-2xl transition-all shadow-sm group relative"
+                          className="w-8 h-8 flex items-center justify-center text-amber-500 hover:bg-amber-50 border border-amber-100 rounded-lg transition-all shadow-sm group relative shrink-0"
                           title="Estornar Venda"
                         >
-                          <RotateCcw size={20} />
-                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Estornar</span>
+                          <RotateCcw size={16} />
+                          <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[8px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Estornar</span>
                         </button>
                       </>
                     )}
