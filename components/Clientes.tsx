@@ -6,6 +6,7 @@ import { useStore } from '../context/StoreContext';
 
 export const Clientes: React.FC = () => {
   const { user, loading } = useStore();
+  const [loadingState, setLoadingState] = useState(true);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -16,7 +17,11 @@ export const Clientes: React.FC = () => {
   const [cpf, setCpf] = useState('');
 
   const fetchCustomers = async () => {
-    if (!user) return;
+    setLoadingState(true);
+    if (!user) {
+      setLoadingState(false);
+      return;
+    }
     const { data, error } = await supabase
       .from('customers')
       .select('*')
@@ -25,6 +30,7 @@ export const Clientes: React.FC = () => {
 
     if (error) {
       console.error('Erro ao buscar clientes:', error);
+      setLoadingState(false);
       return;
     }
 
@@ -38,6 +44,7 @@ export const Clientes: React.FC = () => {
         totalSpent: Number(c.total_spent)
       })));
     }
+    setLoadingState(false);
   };
 
   useEffect(() => {
@@ -174,16 +181,22 @@ export const Clientes: React.FC = () => {
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100">
               <tr>
-                <th className="pb-3 font-semibold">Nome</th>
-                <th className="pb-3 font-semibold">Contato</th>
-                <th className="pb-3 font-semibold">CPF</th>
-                <th className="pb-3 font-semibold">Data de Cadastro</th>
-                <th className="pb-3 font-semibold">Total Gasto</th>
-                <th className="pb-3 font-semibold text-right">Ações</th>
+                <th className="pb-3 font-semibold w-[35%]">Nome</th>
+                <th className="pb-3 font-semibold w-[15%]">Contato</th>
+                <th className="pb-3 font-semibold w-[15%]">CPF</th>
+                <th className="pb-3 font-semibold w-[15%]">Data de Cadastro</th>
+                <th className="pb-3 font-semibold w-[10%]">Total Gasto</th>
+                <th className="pb-3 font-semibold text-right w-[10%]">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {customers.length === 0 ? (
+              {loadingState ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                    Carregando clientes...
+                  </td>
+                </tr>
+              ) : customers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-slate-400">
                     Nenhum cliente cadastrado ainda.
