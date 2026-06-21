@@ -7,6 +7,7 @@ import { printReceipt } from '../services/receiptService';
 import { Sale } from '../types';
 import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
+import { CustomerFormModal } from './CustomerFormModal';
 
 export const POS: React.FC = () => {
   const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast, user } = useStore();
@@ -20,6 +21,7 @@ export const POS: React.FC = () => {
   const [receivedAmount, setReceivedAmount] = useState<number>(0);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
   useEffect(() => {
     if (customerSearch.length < 2 || selectedCustomer) {
@@ -166,25 +168,35 @@ export const POS: React.FC = () => {
             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-emerald-600 transition-colors" size={14} />
             <input 
               type="text" 
-              placeholder="Cliente (Opcional)" 
-              className="w-full pl-8 pr-8 py-1.5 bg-white border-2 border-slate-400 rounded-xl text-xs sm:text-sm font-bold uppercase focus:border-emerald-500 focus:outline-none transition-all leading-relaxed shadow-md text-slate-900 placeholder:text-slate-500"
+              placeholder="Buscar cliente por nome, CPF ou telefone..." 
+              className="w-full pl-8 pr-16 py-1.5 bg-white border-2 border-slate-300 rounded-xl text-sm text-slate-600 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-all shadow-sm"
               value={selectedCustomer ? selectedCustomer.name : customerSearch}
               onChange={e => {
                 setCustomerSearch(e.target.value);
                 setSelectedCustomer(null);
               }}
             />
-            {selectedCustomer && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
               <button 
-                onClick={() => {
-                  setSelectedCustomer(null);
-                  setCustomerSearch('');
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"
+                title="Cadastrar Novo Cliente"
+                onClick={() => setIsCustomerModalOpen(true)}
+                className="p-1 hover:bg-emerald-100 rounded-lg text-emerald-600 transition-colors"
+                type="button"
               >
-                <X size={14} />
+                <Plus size={16} />
               </button>
-            )}
+              {selectedCustomer && (
+                <button 
+                  onClick={() => {
+                    setSelectedCustomer(null);
+                    setCustomerSearch('');
+                  }}
+                  className="text-slate-400 hover:text-red-500"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
             {showDropdown && customerResults.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-xl mt-1 shadow-lg z-50 overflow-hidden">
@@ -360,6 +372,42 @@ export const POS: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+      {isCustomerModalOpen && (
+        <CustomerFormModal 
+          isOpen={isCustomerModalOpen}
+          onClose={() => setIsCustomerModalOpen(false)}
+          onSave={async (name, contact, cpf) => {
+            if (!user) return;
+            try {
+              const { data, error } = await supabase
+                .from('customers')
+                .insert([{
+                  user_id: user.id,
+                  name: name.toUpperCase().trim(),
+                  phone: contact,
+                  cpf
+                }])
+                .select()
+                .single();
+
+              if (error) throw error;
+              
+              setSelectedCustomer({
+                id: data.id,
+                name: data.name,
+                contact: data.phone,
+                cpf: data.cpf,
+                createdAt: data.created_at,
+                totalSpent: 0
+              });
+              setIsCustomerModalOpen(false);
+            } catch (e: any) {
+              console.error(e);
+              alert("Erro ao cadastrar cliente: " + (e.message || 'Erro inesperado'));
+            }
+          }}
+        />
       )}
     </div>
   );
