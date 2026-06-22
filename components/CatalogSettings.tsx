@@ -10,7 +10,6 @@ export const CatalogSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. TRAVA DE AUTENTICAÇÃO:
     if (!user) {
       setLoading(false);
       return;
@@ -29,7 +28,6 @@ export const CatalogSettings: React.FC = () => {
 
         if (data) {
           if (data.value) setWhatsapp(data.value.whatsapp_number || '');
-          // Garantindo que seja booleano
           setIsCatalogOpen(data.catalog_open ?? true);
         }
       } catch (err) {
@@ -41,23 +39,34 @@ export const CatalogSettings: React.FC = () => {
     fetchSettings();
   }, [user]);
 
-  const handleSave = async () => {
+  const handleUpdate = async (newCatalogOpen: boolean, newWhatsapp: string) => {
     if (!user) return;
-    setLoading(true);
+    
+    // Optimistic update
+    const previousState = isCatalogOpen;
+    setIsCatalogOpen(newCatalogOpen);
+    
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
-        value: { whatsapp_number: whatsapp },
-        catalog_open: isCatalogOpen
+        value: { whatsapp_number: newWhatsapp },
+        catalog_open: newCatalogOpen
       });
       if (error) throw error;
-      addToast('Configurações salvas!', 'success');
+      addToast('Catálogo atualizado!', 'success');
     } catch (err: any) {
       console.error('Erro ao salvar:', err);
-      addToast(`Erro ao salvar: ${err.message || 'Erro desconhecido'}`, 'error');
-    } finally {
-      setLoading(false);
+      setIsCatalogOpen(previousState);
+      addToast(`Erro ao atualizar: ${err.message || 'Erro desconhecido'}`, 'error');
     }
+  };
+
+  const handleSaveAll = async () => {
+    await handleUpdate(isCatalogOpen, whatsapp);
+  };
+
+  const toggleCatalog = () => {
+    handleUpdate(!isCatalogOpen, whatsapp);
   };
 
   if (loading) {
@@ -81,24 +90,31 @@ export const CatalogSettings: React.FC = () => {
     <div className="space-y-6 max-w-lg">
       <h2 className="text-xl font-bold">Catálogo Online</h2>
       
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
         <label className="block text-sm font-semibold">WhatsApp para Pedidos</label>
-        <div className="flex gap-2">
-            <input 
-                value={whatsapp} 
-                onChange={e => setWhatsapp(e.target.value)}
-                placeholder="(00) 00000-0000"
-                className="flex-1 p-2 border rounded-lg"
-            />
+        <input 
+            value={whatsapp} 
+            onChange={e => setWhatsapp(e.target.value)}
+            placeholder="(00) 00000-0000"
+            className="w-full p-2 border rounded-lg"
+        />
+
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="font-semibold text-sm">Status do Catálogo</span>
+            <button 
+                onClick={toggleCatalog}
+                className={`w-14 h-7 rounded-full p-1 transition-all flex items-center ${isCatalogOpen ? 'bg-emerald-500' : 'bg-slate-300'}`}
+            >
+                <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${isCatalogOpen ? 'translate-x-7' : 'translate-x-0'}`}></div>
+            </button>
         </div>
+        
+        <p className={`text-xs font-bold text-center ${isCatalogOpen ? 'text-emerald-600' : 'text-slate-500'}`}>
+            Catálogo {isCatalogOpen ? 'Aberto' : 'Fechado'}
+        </p>
 
-        <label className="flex items-center justify-between p-3 border rounded-lg">
-            <span className="font-semibold text-sm">Catálogo Aberto</span>
-            <input type="checkbox" checked={isCatalogOpen} onChange={e => setIsCatalogOpen(e.target.checked)} className="toggle" />
-        </label>
-
-        <button onClick={handleSave} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
-            <Save size={18}/> Salvar Configurações
+        <button onClick={handleSaveAll} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
+            <Save size={18}/> Salvar WhatsApp
         </button>
       </div>
 
