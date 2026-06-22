@@ -120,23 +120,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setLoading(true);
       console.log('Carregando perfil para:', user.email);
       try {
-        // 1. Tentar buscar perfil existente
-        console.log('Buscando perfil no banco...');
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id);
+        let currentProfile = null;
+        let retries = 3;
+        
+        while (retries > 0 && !currentProfile) {
+          console.log(`Buscando perfil no banco... (Tentativas restantes: ${retries})`);
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id);
 
-        if (profileError) {
-          console.error('Erro ao buscar perfil:', profileError);
-        }
+          if (profileError) {
+            console.error('Erro ao buscar perfil:', profileError);
+          }
 
-        let currentProfile = (profileData && profileData.length > 0) ? profileData[0] : null;
+          currentProfile = (profileData && profileData.length > 0) ? profileData[0] : null;
 
-        // 2. Se não existir, algo está errado, mas não tente criar no front-end para evitar conflitos com a trigger
-        if (!currentProfile) {
-          console.warn('Perfil não encontrado no banco de dados. Tentando aguardar...');
-          // Pode ter ocorrido uma demora na trigger
+          if (!currentProfile) {
+            retries--;
+            if (retries > 0) {
+              console.warn('Perfil não encontrado, aguardando trigger (1s)...');
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+          }
         }
 
         if (currentProfile) {

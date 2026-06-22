@@ -129,3 +129,17 @@ COMMIT;
 -- 7. Garantir seu acesso de Admin IMEDIATAMENTE e limpar outros
 UPDATE profiles SET role = 'customer' WHERE email != 'backup02atelietetemimos@gmail.com';
 UPDATE profiles SET role = 'admin', subscription_status = 'active' WHERE email = 'backup02atelietetemimos@gmail.com';
+
+-- 8. Tabela de Lojas (Stores)
+CREATE TABLE IF NOT EXISTS stores (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  store_name TEXT NOT NULL,
+  whatsapp TEXT DEFAULT '',
+  is_open BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "stores_owner_all" ON stores FOR ALL USING (auth.uid() = user_id);

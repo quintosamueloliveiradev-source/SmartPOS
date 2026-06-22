@@ -343,7 +343,9 @@ export const Login: React.FC = () => {
           // Store insertion
           const { error: storeError } = await supabase.from('stores').insert({
             user_id: authData.user.id,
-            name: storeName || 'Minha Loja'
+            store_name: storeName || 'Minha Loja',
+            whatsapp: '',
+            is_open: true
           });
           if (storeError) {
              console.error('Erro detalhado ao criar loja:', storeError);
