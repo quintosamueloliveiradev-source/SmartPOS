@@ -26,10 +26,9 @@ export const Catalog: React.FC = () => {
   // Real-time state
   const [isOpen, setIsOpen] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState('');
+  const storeId = new URLSearchParams(window.location.search).get('store') || '';
 
   useEffect(() => {
-    const storeId = new URLSearchParams(window.location.search).get('store');
-    
     if (!storeId) {
         setLoading(false);
         return;
@@ -48,16 +47,15 @@ export const Catalog: React.FC = () => {
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: settingsData, error: settingsError } = await supabase
-            .from('app_settings')
-            .select('value, catalog_open')
-            .eq('key', 'catalog_settings_' + storeId)
+        const { data: profile, error: err } = await supabase
+            .from('profiles')
+            .select('catalog_open, whatsapp_number')
+            .eq('id', storeId)
             .maybeSingle();
             
-        if (settingsData) {
-            const open = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
-            setIsOpen(Boolean(open));
-            if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
+        if (profile) {
+            setIsOpen(Boolean(profile.catalog_open));
+            if (profile.whatsapp_number) setWhatsappNumber(profile.whatsapp_number);
         }
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
@@ -68,25 +66,30 @@ export const Catalog: React.FC = () => {
 
     fetchProducts();
 
-    // Subscribe to real-time changes
+    // Canal de escuta em tempo real focado em atualizações da linha desta loja
     const channel = supabase
-      .channel('catalog-settings-changes-' + storeId)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'app_settings',
-        filter: `key=eq.catalog_settings_${storeId}`
-      }, (payload) => {
-        const newData = payload.new as any;
-        const open = newData.catalog_open ?? (newData.value?.is_open ?? true);
-        setIsOpen(Boolean(open));
-      })
+      .channel('public-catalog-status')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${storeId}`
+        },
+        (payload) => {
+          // Assume que o campo que controla se está aberto chama-se 'catalog_open'
+          if (payload.new && typeof payload.new.catalog_open !== 'undefined') {
+            setIsOpen(payload.new.catalog_open);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [storeId]);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
