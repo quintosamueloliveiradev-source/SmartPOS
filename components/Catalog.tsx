@@ -79,6 +79,19 @@ export const Catalog: React.FC = () => {
   useEffect(() => {
     if (!storeId) return;
 
+    // Função para buscar o estado mais atual
+    const fetchCatalogStatus = async () => {
+        const { data } = await supabase
+            .from('profiles')
+            .select('catalog_open')
+            .eq('id', storeId)
+            .maybeSingle();
+        
+        if (data) {
+            setCatalogSettings({ isOpen: data.catalog_open ?? true });
+        }
+    };
+
     const channel = supabase
       .channel('schema-db-changes')
       .on('postgres_changes', { 
@@ -87,9 +100,13 @@ export const Catalog: React.FC = () => {
         table: 'profiles',
         filter: `id=eq.${storeId}`
       }, (payload) => {
-        console.log('Mudança em tempo real:', payload);
-        const newIsOpen = payload.new.catalog_open;
-        setCatalogSettings({ isOpen: newIsOpen ?? true });
+        console.log('Mudança em tempo real recebida:', payload);
+        if (payload.new && typeof payload.new.catalog_open !== 'undefined') {
+            setCatalogSettings({ isOpen: payload.new.catalog_open ?? true });
+        } else {
+            // Caso falhe ou não venha no payload, força nova busca
+            fetchCatalogStatus();
+        }
       })
       .subscribe();
 
