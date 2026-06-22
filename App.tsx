@@ -10,6 +10,7 @@ import { Settings } from './components/Settings';
 import { AdminPanel } from './components/AdminPanel';
 import { Login } from './components/Login';
 import { SubscriptionGate } from './components/SubscriptionGate';
+import { Catalog } from './components/Catalog';
 import { ViewState } from './types';
 import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone, AlertTriangle } from 'lucide-react';
 import { supabase } from './lib/supabase';
@@ -193,6 +194,9 @@ const MainContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  if (window.location.pathname === '/catalogo') {
+    return <Catalog />;
+  }
   return (
     <StoreProvider>
       <MainContent />
