@@ -27,21 +27,34 @@ export const Catalog: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+      const storeId = new URLSearchParams(window.location.search).get('store');
+      
+      if (!storeId) {
+          setLoading(false);
+          return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('products')
           .select('*')
+          .eq('user_id', storeId)
           .gt('stock', 0);
         
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings').maybeSingle();
+        const { data: settingsData } = await supabase
+            .from('app_settings')
+            .select('value')
+            .eq('key', 'catalog_settings_' + storeId)
+            .maybeSingle();
+            
         if (settingsData?.value) {
             setCatalogSettings({ whatsapp: settingsData.value.whatsapp_number, isOpen: settingsData.value.is_open });
         }
       } catch (err) {
-        console.error('Erro ao buscar produtos:', err);
+        console.error('Erro ao buscar produtos/configurações:', err);
       } finally {
         setLoading(false);
       }

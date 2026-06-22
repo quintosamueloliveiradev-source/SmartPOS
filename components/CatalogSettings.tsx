@@ -4,14 +4,15 @@ import { Save, Copy, Store, Smartphone } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export const CatalogSettings: React.FC = () => {
-  const { addToast } = useStore();
+  const { addToast, user } = useStore();
   const [whatsapp, setWhatsapp] = useState('');
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     const fetchSettings = async () => {
-      const { data } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings').maybeSingle();
+      const { data } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings_' + user.id).maybeSingle();
       if (data?.value) {
         setWhatsapp(data.value.whatsapp_number || '');
         setIsOpen(data.value.is_open !== false);
@@ -19,13 +20,14 @@ export const CatalogSettings: React.FC = () => {
       setLoading(false);
     };
     fetchSettings();
-  }, []);
+  }, [user]);
 
   const handleSave = async () => {
+    if (!user) return;
     setLoading(true);
     try {
       const { error } = await supabase.from('app_settings').upsert({
-        key: 'catalog_settings',
+        key: 'catalog_settings_' + user.id,
         value: { whatsapp_number: whatsapp, is_open: isOpen }
       });
       if (error) throw error;
@@ -66,9 +68,9 @@ export const CatalogSettings: React.FC = () => {
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
         <h3 className="font-bold flex items-center gap-2"><Store size={18}/> Link do seu Catálogo</h3>
         <code className="bg-slate-100 p-3 rounded-lg block text-sm break-all font-mono">
-            {window.location.origin}/catalogo
+            {window.location.origin}/catalogo?store={user?.id}
         </code>
-        <button onClick={() => {navigator.clipboard.writeText(`${window.location.origin}/catalogo`); addToast('Link copiado!', 'info');}} className="w-full border p-2 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold">
+        <button onClick={() => {navigator.clipboard.writeText(`${window.location.origin}/catalogo?store=${user?.id}`); addToast('Link copiado!', 'info');}} className="w-full border p-2 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold">
             <Copy size={16}/> Copiar Link
         </button>
       </div>
