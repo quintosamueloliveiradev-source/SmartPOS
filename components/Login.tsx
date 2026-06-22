@@ -345,6 +345,7 @@ export const Login: React.FC = () => {
             name: storeName || 'Minha Loja'
           });
           if (storeError) {
+             console.error('Erro detalhado ao criar loja:', storeError);
              throw new Error('Falha ao criar loja: ' + storeError.message);
           }
         }
