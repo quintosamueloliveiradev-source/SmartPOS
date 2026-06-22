@@ -39,19 +39,43 @@ export const CatalogSettings: React.FC = () => {
     fetchSettings();
   }, [user]);
 
+  const formatWhatsApp = (value: string) => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '');
+    
+    // Se começar com 55, remove para re-processar uniformemente
+    let cleanNumbers = numbers;
+    if (cleanNumbers.startsWith('55') && cleanNumbers.length > 10) {
+      cleanNumbers = cleanNumbers.substring(2);
+    }
+
+    // Limita a 11 dígitos (DDD + Número)
+    cleanNumbers = cleanNumbers.substring(0, 11);
+
+    // Aplica a máscara
+    if (cleanNumbers.length === 0) return '';
+    if (cleanNumbers.length <= 2) return `+55 (${cleanNumbers}`;
+    if (cleanNumbers.length <= 7) return `+55 (${cleanNumbers.substring(0, 2)}) ${cleanNumbers.substring(2)}`;
+    return `+55 (${cleanNumbers.substring(0, 2)}) ${cleanNumbers.substring(2, 7)}-${cleanNumbers.substring(7)}`;
+  };
+
   const handleUpdate = async (newCatalogOpen: boolean, newWhatsapp: string) => {
     if (!user) return;
     
-    console.log('Tentando atualizar catálogo:', { newCatalogOpen, newWhatsapp });
+    // Garante que o valor salvo está formatado antes de enviar
+    const formattedWhatsapp = formatWhatsApp(newWhatsapp);
+    
+    console.log('Tentando atualizar catálogo:', { newCatalogOpen, formattedWhatsapp });
 
     // Optimistic update
     const previousState = isCatalogOpen;
     setIsCatalogOpen(newCatalogOpen);
+    setWhatsapp(formattedWhatsapp);
     
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
-        value: { whatsapp_number: newWhatsapp },
+        value: { whatsapp_number: formattedWhatsapp },
         catalog_open: newCatalogOpen
       });
       if (error) {
@@ -65,6 +89,11 @@ export const CatalogSettings: React.FC = () => {
       setIsCatalogOpen(previousState);
       addToast(`Erro ao atualizar: ${err.message || 'Erro desconhecido'}`, 'error');
     }
+  };
+
+  const handleWhatsappChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatWhatsApp(e.target.value);
+    setWhatsapp(formatted);
   };
 
   const handleSaveAll = async () => {
@@ -117,9 +146,10 @@ export const CatalogSettings: React.FC = () => {
           <label className="block text-sm font-semibold">WhatsApp para Pedidos</label>
           <input 
               value={whatsapp} 
-              onChange={e => setWhatsapp(e.target.value)}
-              placeholder="(00) 00000-0000"
-              className="w-full p-2 border rounded-lg"
+              onChange={handleWhatsappChange}
+              onBlur={() => setWhatsapp(formatWhatsApp(whatsapp))}
+              placeholder="+55 (00) 00000-0000"
+              className="w-full p-2 border rounded-lg font-mono"
           />
 
           <button onClick={handleSaveAll} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
