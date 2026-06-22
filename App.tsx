@@ -109,7 +109,7 @@ const MainContent: React.FC = () => {
     return diffDays;
   };
 
-  if (loading || !profile) {
+  if (loading || (user && !profile)) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8 text-center space-y-6">
         <div className="relative">

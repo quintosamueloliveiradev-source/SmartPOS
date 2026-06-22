@@ -10,15 +10,33 @@ export const CatalogSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    const fetchSettings = async () => {
-      const { data } = await supabase.from('app_settings').select('value, catalog_open').eq('key', 'catalog_settings_' + user.id).maybeSingle();
-      if (data) {
-        if (data.value) setWhatsapp(data.value.whatsapp_number || '');
-        // Garantindo que seja booleano
-        setIsCatalogOpen(data.catalog_open ?? true);
-      }
+    // 1. TRAVA DE AUTENTICAÇÃO:
+    if (!user) {
       setLoading(false);
+      return;
+    }
+
+    const fetchSettings = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('app_settings')
+          .select('value, catalog_open')
+          .eq('key', 'catalog_settings_' + user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          if (data.value) setWhatsapp(data.value.whatsapp_number || '');
+          // Garantindo que seja booleano
+          setIsCatalogOpen(data.catalog_open ?? true);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar configurações do catálogo:', err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchSettings();
   }, [user]);
@@ -41,6 +59,10 @@ export const CatalogSettings: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <div className="p-4 text-center">Carregando...</div>;
+  }
 
   return (
     <div className="space-y-6 max-w-lg">
