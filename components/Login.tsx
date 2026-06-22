@@ -345,9 +345,8 @@ export const Login: React.FC = () => {
             full_name: fullName,
             store_name: storeName || 'Minha Loja'
           });
-          if (profileError) {
+          if (profileError && profileError.code !== '23505') {
              console.error('Perfil não criado automaticamente:', profileError);
-             // We don't throw because the user was created, but we should inform
           }
         }
 

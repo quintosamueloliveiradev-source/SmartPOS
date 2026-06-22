@@ -55,6 +55,7 @@ export const AdminPanel: React.FC = () => {
   });
 
   useEffect(() => {
+    console.log('Profile atual no AdminPanel:', profile);
     // 1. TRAVA DE AUTENTICAÇÃO: Se não há usuário logado, força loading false imediatamente
     if (!user) {
       setLoading(false);
@@ -109,6 +110,7 @@ export const AdminPanel: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Dados dos usuários retornados pelo Supabase:', data);
       setUsers(data || []);
       
       // Calculate Stats
