@@ -1,11 +1,8 @@
-
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar, Loader2 } from 'lucide-react';
 
-// Dashboard view - Forces save
-// Dashboard view - Forces save
 export const Dashboard: React.FC = () => {
   const { products, sales, loading } = useStore();
   const [period, setPeriod] = useState<'today' | '7days' | 'month'>('7days');
@@ -175,7 +172,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Card Faturamento */}
         <div className="bg-white p-3 md:p-3.5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
           <div className="p-2 bg-emerald-100 text-emerald-600 rounded-full shrink-0">
