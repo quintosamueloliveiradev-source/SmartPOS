@@ -69,40 +69,23 @@ export const Catalog: React.FC = () => {
     fetchProducts();
   }, [storeId]);
 
-  // Novo useEffect para Realtime
+  // Novo useEffect para Realtime (Depuração)
   useEffect(() => {
     if (!storeId) return;
 
-    // Função para buscar o estado mais atual
-    const fetchCatalogStatus = async () => {
-        const { data } = await supabase
-            .from('app_settings')
-            .select('catalog_open')
-            .eq('key', 'catalog_settings_' + storeId)
-            .maybeSingle();
-        
-        if (data) {
-            setCatalogSettings({ isOpen: data.catalog_open ?? true });
-        }
-    };
+    console.log('Iniciando subscrição Realtime para depuração...');
 
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel('any')
       .on('postgres_changes', { 
-        event: '*', 
+        event: 'UPDATE', 
         schema: 'public', 
-        table: 'app_settings',
-        filter: `key=eq.catalog_settings_${storeId}`
+        table: 'profiles' 
       }, (payload) => {
-        console.log('Mudança em tempo real recebida:', payload);
-        // Use a newIsOpen variable if payload.new exists, otherwise try payload.old
-        const newCatalogOpen = payload.new ? payload.new.catalog_open : (payload.old ? payload.old.catalog_open : null);
-        
-        if (newCatalogOpen !== null) {
-            setCatalogSettings({ isOpen: newCatalogOpen ?? true });
-        } else {
-            // Caso falhe ou não venha no payload, força nova busca
-            fetchCatalogStatus();
+        console.log('EVENTO REALTIME RECEBIDO:', payload);
+        // Se o ID do payload for igual ao da URL, atualize o estado
+        if (payload.new && payload.new.id === storeId) {
+            setCatalogSettings({ isOpen: payload.new.catalog_open ?? true });
         }
       })
       .subscribe();
