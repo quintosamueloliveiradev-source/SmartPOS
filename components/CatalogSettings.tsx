@@ -6,7 +6,7 @@ import { useStore } from '../context/StoreContext';
 export const CatalogSettings: React.FC = () => {
   const { addToast, user } = useStore();
   const [whatsapp, setWhatsapp] = useState('');
-  const [isOpen, setIsOpen] = useState(true);
+  const [isCatalogOpen, setIsCatalogOpen] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,7 +15,8 @@ export const CatalogSettings: React.FC = () => {
       const { data } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings_' + user.id).maybeSingle();
       if (data?.value) {
         setWhatsapp(data.value.whatsapp_number || '');
-        setIsOpen(data.value.is_open !== false);
+        // Garantindo que seja booleano
+        setIsCatalogOpen(data.value.is_open === undefined ? true : !!data.value.is_open);
       }
       setLoading(false);
     };
@@ -28,7 +29,7 @@ export const CatalogSettings: React.FC = () => {
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
-        value: { whatsapp_number: whatsapp, is_open: isOpen }
+        value: { whatsapp_number: whatsapp, is_open: isCatalogOpen }
       });
       if (error) throw error;
       addToast('Configurações salvas!', 'success');
@@ -57,7 +58,7 @@ export const CatalogSettings: React.FC = () => {
 
         <label className="flex items-center justify-between p-3 border rounded-lg">
             <span className="font-semibold text-sm">Catálogo Aberto</span>
-            <input type="checkbox" checked={isOpen} onChange={e => setIsOpen(e.target.checked)} className="toggle" />
+            <input type="checkbox" checked={isCatalogOpen} onChange={e => setIsCatalogOpen(e.target.checked)} className="toggle" />
         </label>
 
         <button onClick={handleSave} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
