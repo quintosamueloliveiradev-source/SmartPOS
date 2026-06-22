@@ -12,11 +12,11 @@ export const CatalogSettings: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     const fetchSettings = async () => {
-      const { data } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings_' + user.id).maybeSingle();
-      if (data?.value) {
-        setWhatsapp(data.value.whatsapp_number || '');
+      const { data } = await supabase.from('app_settings').select('value, catalog_open').eq('key', 'catalog_settings_' + user.id).maybeSingle();
+      if (data) {
+        if (data.value) setWhatsapp(data.value.whatsapp_number || '');
         // Garantindo que seja booleano
-        setIsCatalogOpen(data.value.is_open === undefined ? true : !!data.value.is_open);
+        setIsCatalogOpen(data.catalog_open ?? true);
       }
       setLoading(false);
     };
@@ -29,7 +29,8 @@ export const CatalogSettings: React.FC = () => {
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
-        value: { whatsapp_number: whatsapp, is_open: isCatalogOpen }
+        value: { whatsapp_number: whatsapp },
+        catalog_open: isCatalogOpen
       });
       if (error) throw error;
       addToast('Configurações salvas!', 'success');
