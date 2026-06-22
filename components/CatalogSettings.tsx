@@ -29,14 +29,15 @@ export const CatalogSettings: React.FC = () => {
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
+        user_id: user.id,
         value: { whatsapp_number: whatsapp },
         catalog_open: isCatalogOpen
       });
       if (error) throw error;
       addToast('Configurações salvas!', 'success');
-    } catch (err) {
-      console.error(err);
-      addToast('Erro ao salvar', 'error');
+    } catch (err: any) {
+      console.error('Erro ao salvar:', err);
+      addToast(`Erro ao salvar: ${err.message || 'Erro desconhecido'}`, 'error');
     } finally {
       setLoading(false);
     }
