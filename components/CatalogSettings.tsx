@@ -42,6 +42,8 @@ export const CatalogSettings: React.FC = () => {
   const handleUpdate = async (newCatalogOpen: boolean, newWhatsapp: string) => {
     if (!user) return;
     
+    console.log('Tentando atualizar catálogo:', { newCatalogOpen, newWhatsapp });
+
     // Optimistic update
     const previousState = isCatalogOpen;
     setIsCatalogOpen(newCatalogOpen);
@@ -52,7 +54,11 @@ export const CatalogSettings: React.FC = () => {
         value: { whatsapp_number: newWhatsapp },
         catalog_open: newCatalogOpen
       });
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no Supabase:', error);
+        throw error;
+      }
+      console.log('Atualização enviada com sucesso!');
       addToast('Catálogo atualizado!', 'success');
     } catch (err: any) {
       console.error('Erro ao salvar:', err);

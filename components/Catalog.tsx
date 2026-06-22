@@ -80,15 +80,18 @@ export const Catalog: React.FC = () => {
       .on('postgres_changes', { 
         event: 'UPDATE', 
         schema: 'public', 
-        table: 'profiles' 
+        table: 'app_settings',
+        filter: `key=eq.catalog_settings_${storeId}`
       }, (payload) => {
         console.log('EVENTO REALTIME RECEBIDO:', payload);
-        // Se o ID do payload for igual ao da URL, atualize o estado
-        if (payload.new && payload.new.id === storeId) {
+        if (payload.new && payload.new.catalog_open !== undefined) {
             setCatalogSettings({ isOpen: payload.new.catalog_open ?? true });
         }
       })
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') console.log('Conectado ao Realtime em app_settings!');
+        if (status === 'CHANNEL_ERROR') console.error('Erro de conexão ao Realtime:', err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
