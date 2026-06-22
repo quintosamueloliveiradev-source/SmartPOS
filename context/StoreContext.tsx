@@ -107,28 +107,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, []);
 
-  // Realtime: Ouve updates no perfil
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const channel = supabase
-      .channel('public:profiles')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'profiles',
-        filter: `id=eq.${user.id}`
-      }, (payload: any) => {
-        console.log('Realtime change detected in profiles:', payload);
-        setProfile(prev => prev ? { ...prev, ...payload.new } : null);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
-
   // Carregar Perfil e Dados quando o usuário mudar
   useEffect(() => {
     if (!user?.id) {

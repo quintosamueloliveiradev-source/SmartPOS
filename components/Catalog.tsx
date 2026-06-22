@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight, Lock } from 'lucide-react';
+import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 
@@ -22,20 +22,18 @@ export const Catalog: React.FC = () => {
   const [reference, setReference] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cash' | 'card'>('pix');
   const [changeFor, setChangeFor] = useState('');
-  
-  // Real-time state
-  const [isOpen, setIsOpen] = useState(true);
+  const [catalogSettings, setCatalogSettings] = useState({ isOpen: true });
   const [whatsappNumber, setWhatsappNumber] = useState('');
-  const storeId = new URLSearchParams(window.location.search).get('store') || '';
 
   useEffect(() => {
-    if (!storeId) {
-        setLoading(false);
-        return;
-    }
-
     const fetchProducts = async () => {
       setLoading(true);
+      const storeId = new URLSearchParams(window.location.search).get('store');
+      
+      if (!storeId) {
+          setLoading(false);
+          return;
+      }
 
       try {
         const { data, error } = await supabase
@@ -47,15 +45,18 @@ export const Catalog: React.FC = () => {
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: profile, error: err } = await supabase
-            .from('profiles')
-            .select('catalog_open, whatsapp_number')
-            .eq('id', storeId)
+        const { data: settingsData, error: settingsError } = await supabase
+            .from('app_settings')
+            .select('value, catalog_open')
+            .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
-        if (profile) {
-            setIsOpen(Boolean(profile.catalog_open));
-            if (profile.whatsapp_number) setWhatsappNumber(profile.whatsapp_number);
+        console.log('Settings fetch result:', settingsData);
+            
+        if (settingsData) {
+            const isOpen = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
+            setCatalogSettings({ isOpen: Boolean(isOpen) });
+            if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
         }
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
@@ -63,33 +64,8 @@ export const Catalog: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchProducts();
-
-    // Canal de escuta em tempo real focado em atualizações da loja
-    const channel = supabase
-      .channel(`catalog-status-${storeId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${storeId}`
-        },
-        (payload) => {
-          console.log('Realtime catalog update:', payload);
-          if (payload.new && 'catalog_open' in payload.new) {
-            setIsOpen(Boolean(payload.new.catalog_open));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [storeId]);
+  }, []);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -143,17 +119,13 @@ export const Catalog: React.FC = () => {
     window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans font-bold">Carregando...</div>;
-  }
-
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold font-sans">Vendeei Shop</h1>
-          <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
-             {isOpen ? 'Aberto' : 'Fechado'}
+          <h1 className="text-xl font-bold font-vendeei">Vendeei Shop</h1>
+          <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${catalogSettings.isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
+            {catalogSettings.isOpen ? '🟢 Aberto' : '🔴 Fechado'}
           </span>
         </div>
         <div className="max-w-4xl mx-auto mt-4">
@@ -168,9 +140,16 @@ export const Catalog: React.FC = () => {
       </header>
 
       <main className="p-4 max-w-4xl mx-auto pb-24">
-         {isOpen ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-                {products.map(p => (
+        {loading ? (
+            <p className="text-center text-slate-500">Carregando...</p>
+        ) : !catalogSettings.isOpen ? (
+             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto text-center mt-10">
+               <h2 className="text-xl font-bold mb-4">Catálogo Fechado</h2>
+               <p className="text-slate-600">No momento este catálogo está fechado. Por favor, volte mais tarde ou entre em contato pelo WhatsApp.</p>
+             </div>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {products.map(p => (
                 <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
                     <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
                         <img 
@@ -183,23 +162,15 @@ export const Catalog: React.FC = () => {
                     <div className="flex items-center justify-between mt-auto">
                         <span className="text-green-600 font-black text-lg">R$ {p.price.toFixed(2)}</span>
                         <button 
-                        onClick={() => addToCart(p)}
-                        className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
+                         onClick={() => addToCart(p)}
+                         className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
                             <Plus size={18} />
                         </button>
                     </div>
                 </div>
-                ))}
+              ))}
             </div>
-         ) : (
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 text-center animate-fade-in">
-                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Lock className="text-white" size={40} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Loja Fechada</h2>
-                  <p className="text-slate-500 mb-6 font-medium">Catálogo Fechado no Momento. Esta loja não está recebendo pedidos agora.</p>
-            </div>
-         )}
+        )}
       </main>
 
       {/* Cart Drawer/Modal */}
