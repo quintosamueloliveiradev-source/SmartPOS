@@ -289,7 +289,7 @@ export const Inventory: React.FC = () => {
                   required 
                   type="text" 
                   className="w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-bold focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all placeholder:text-slate-400 text-sm" 
-                  placeholder="Ex: Café Espresso Especial"
+                  placeholder="Nome do produto"
                   value={formData.name} 
                   onChange={e => setFormData({...formData, name: e.target.value})} 
                 />
@@ -317,7 +317,7 @@ export const Inventory: React.FC = () => {
                     required 
                     type="number" 
                     className="w-full p-2 bg-white border border-slate-300 rounded-lg text-amber-600 font-bold focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 focus:outline-none transition-all text-sm" 
-                    placeholder="Ex: 50"
+                    placeholder="%"
                     value={formData.margin || ''} 
                     onChange={e => handleMarginChange(parseFloat(e.target.value) || 0)}
                   />
@@ -361,7 +361,7 @@ export const Inventory: React.FC = () => {
                     required 
                     type="text" 
                     className="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all text-sm" 
-                    placeholder="Ex: Bebidas"
+                    placeholder=""
                     value={formData.category} 
                     onChange={e => setFormData({...formData, category: e.target.value})} 
                   />
