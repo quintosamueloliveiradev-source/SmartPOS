@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -8,6 +9,8 @@ interface CartItem extends Product {
 }
 
 export const Catalog: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const storeId = searchParams.get('store');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -25,9 +28,6 @@ export const Catalog: React.FC = () => {
   const [catalogSettings, setCatalogSettings] = useState({ isOpen: true });
   const [whatsappNumber, setWhatsappNumber] = useState('');
   
-  // Extração do storeId fora do useEffect
-  const storeId = new URLSearchParams(window.location.search).get('store');
-
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);

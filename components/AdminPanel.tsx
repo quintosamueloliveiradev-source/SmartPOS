@@ -37,7 +37,7 @@ import { Profile } from '../types';
 import { supabase } from '../lib/supabase';
 
 export const AdminPanel: React.FC = () => {
-  const { user, addToast } = useStore();
+  const { user, profile, addToast } = useStore();
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -282,7 +282,9 @@ export const AdminPanel: React.FC = () => {
     <div className="space-y-8 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-headline-lg font-headline-lg text-slate-900">Painel do Administrador</h1>
+          <h1 className="text-headline-lg font-headline-lg text-slate-900">
+            Painel do Administrador {profile?.store_name && `- ${profile.store_name}`}
+          </h1>
           <p className="text-body-md font-body-md text-slate-500">Gestão de assinaturas e usuários da plataforma</p>
         </div>
         <div className="flex gap-2">

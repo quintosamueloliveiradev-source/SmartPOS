@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS app_settings CASCADE;
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
+  full_name TEXT, -- <--- Adicionado
   role TEXT NOT NULL DEFAULT 'customer',
   subscription_status TEXT NOT NULL DEFAULT 'trial',
   subscription_expiry TIMESTAMPTZ,
@@ -21,6 +22,25 @@ CREATE TABLE profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Trigger para criar perfil automaticamente no signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, store_name)
+  VALUES (
+    new.id, 
+    new.email, 
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'store_name'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- 3. Tabela de Produtos
 CREATE TABLE products (

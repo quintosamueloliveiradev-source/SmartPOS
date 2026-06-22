@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../context/StoreContext';
 import { LogIn, UserPlus, Info, BarChart3, Store, ShieldCheck, Mail, Lock, Eye, EyeOff, Check, ArrowRight, Loader2, LogOut, LayoutDashboard, ShoppingCart, Package, Leaf, Hexagon, CircleDashed, SquareDashed, Sprout, Grid, ArrowUpRight, Sun, Home, Wheat, Layers, Coffee, Flame, Heart, ShoppingBag, Crown, Power, Zap } from 'lucide-react';
@@ -306,6 +307,7 @@ const MarqueeLogos = () => {
 };
 
 export const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -323,7 +325,7 @@ export const Login: React.FC = () => {
         if (password.length < 6) {
           throw new Error('A senha deve ter pelo menos 6 caracteres');
         }
-        const { error } = await supabase.auth.signUp({ 
+        const { data: authData, error: authError } = await supabase.auth.signUp({ 
           email, 
           password,
           options: {
@@ -333,12 +335,24 @@ export const Login: React.FC = () => {
             }
           }
         });
-        if (error) throw error;
+        if (authError) throw authError;
+
+        // Manual profile creation if database trigger is missing
+        if (authData.user) {
+          const { error: profileError } = await supabase.from('profiles').insert({
+            id: authData.user.id,
+            email: email,
+            full_name: fullName,
+            store_name: storeName || 'Minha Loja'
+          });
+          if (profileError) {
+             console.error('Perfil não criado automaticamente:', profileError);
+             // We don't throw because the user was created, but we should inform
+          }
+        }
+
         addToast('Conta criada com sucesso! Redirecionando...', 'success');
-        // Some servers automatically login or require email confirm
-        // To be safe we switch back to login
-        setIsSignUp(false);
-        setPassword('');
+        navigate('/dashboard');
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
@@ -348,6 +362,7 @@ export const Login: React.FC = () => {
           throw error;
         }
         addToast('Bem-vindo de volta!', 'success');
+        navigate('/dashboard');
       }
     } catch (err: any) {
       addToast(err.message || 'Erro na autenticação', 'error');
