@@ -177,30 +177,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           };
 
           setProfile(augmentedProfile);
-
-          // 1.5. Buscar Dados da Loja (Nova tabela stores)
-          console.log('Buscando dados da loja na tabela stores para:', user.id);
-          const { data: storesData, error: storesError } = await supabase
-            .from('stores')
-            .select('store_name')
-            .eq('user_id', user.id);
-
-          if (storesError) {
-            console.error('Erro ao buscar dados da loja:', storesError);
-          }
-
-          if (storesData && storesData.length > 0) {
-            const storeName = storesData[0].store_name;
-            console.log('Nome da loja encontrado na tabela stores:', storeName);
-            if (storeName) {
-              setProfile(prev => prev ? { ...prev, store_name: storeName } : null);
-            } else {
-              console.warn('Linha encontrada na tabela stores mas store_name está vazio');
-            }
-          } else {
-            console.warn('Nenhuma linha encontrada na tabela stores para este usuário');
-          }
-
           // Atualizar última atividade de forma silenciosa
           supabase.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', user.id).then();
           console.log('Perfil carregado com sucesso:', augmentedProfile.role, augmentedProfile.subscriptionStatus);
