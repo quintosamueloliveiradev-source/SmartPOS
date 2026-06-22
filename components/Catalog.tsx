@@ -47,24 +47,18 @@ export const Catalog: React.FC = () => {
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('catalog_open')
-            .eq('id', storeId)
-            .maybeSingle();
-
-        if (profileData) {
-            setCatalogSettings({ isOpen: profileData.catalog_open ?? true });
-        }
-        
-        // Mantendo busca de settings originais caso precise
-        const { data: settingsData } = await supabase
+        // Buscar configurações do catálogo (status e whatsapp) na tabela app_settings
+        const { data: settingsData, error: settingsError } = await supabase
             .from('app_settings')
-            .select('value')
+            .select('value, catalog_open')
             .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
-        if (settingsData && settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
+        if (settingsData) {
+            if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
+            setCatalogSettings({ isOpen: settingsData.catalog_open ?? true });
+        }
+
         
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
@@ -82,9 +76,9 @@ export const Catalog: React.FC = () => {
     // Função para buscar o estado mais atual
     const fetchCatalogStatus = async () => {
         const { data } = await supabase
-            .from('profiles')
+            .from('app_settings')
             .select('catalog_open')
-            .eq('id', storeId)
+            .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
         
         if (data) {
@@ -97,8 +91,8 @@ export const Catalog: React.FC = () => {
       .on('postgres_changes', { 
         event: 'UPDATE', 
         schema: 'public', 
-        table: 'profiles',
-        filter: `id=eq.${storeId}`
+        table: 'app_settings',
+        filter: `key=eq.catalog_settings_${storeId}`
       }, (payload) => {
         console.log('Mudança em tempo real recebida:', payload);
         if (payload.new && typeof payload.new.catalog_open !== 'undefined') {
