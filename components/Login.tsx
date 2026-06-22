@@ -352,7 +352,7 @@ export const Login: React.FC = () => {
 
           // 2. Insert into stores
           const { error: storeError } = await supabase.from('stores').insert({
-            owner_id: authData.user.id,
+            user_id: authData.user.id,
             name: storeName || 'Minha Loja'
           });
           if (storeError) {
