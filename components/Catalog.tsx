@@ -22,6 +22,7 @@ export const Catalog: React.FC = () => {
   const [reference, setReference] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cash' | 'card'>('pix');
   const [changeFor, setChangeFor] = useState('');
+  const [catalogSettings, setCatalogSettings] = useState({ whatsapp: '', isOpen: true });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +35,11 @@ export const Catalog: React.FC = () => {
         
         if (error) throw error;
         setProducts(data || []);
+        
+        const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'catalog_settings').maybeSingle();
+        if (settingsData?.value) {
+            setCatalogSettings({ whatsapp: settingsData.value.whatsapp_number, isOpen: settingsData.value.is_open });
+        }
       } catch (err) {
         console.error('Erro ao buscar produtos:', err);
       } finally {
@@ -65,7 +71,7 @@ export const Catalog: React.FC = () => {
   const itemCount = cart.reduce((sum, p) => sum + p.quantity, 0);
 
   const sendWhatsAppOrder = () => {
-    const phone = '5511999999999'; // REPLACE WITH STORE PHONE
+    const phone = catalogSettings.whatsapp || '5511999999999'; 
     const addressStr = deliveryType === 'delivery' 
         ? `\n*Endereço:* ${address}, ${number} - ${neighborhood}${reference ? ` (${reference})` : ''}` 
         : '';
@@ -94,7 +100,9 @@ export const Catalog: React.FC = () => {
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold font-vendeei">Vendeei Shop</h1>
-          <span className="bg-green-600 text-[10px] uppercase px-2 py-1 rounded-full font-bold">🟢 Aberto</span>
+          <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${catalogSettings.isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
+            {catalogSettings.isOpen ? '🟢 Aberto' : '🔴 Fechado'}
+          </span>
         </div>
         <div className="max-w-4xl mx-auto mt-4">
           <div className="relative">

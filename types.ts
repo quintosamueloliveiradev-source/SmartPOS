@@ -38,7 +38,7 @@ export interface Sale {
   status?: 'completed' | 'canceled';
 }
 
-export type ViewState = 'dashboard' | 'pos' | 'inventory' | 'history' | 'customers' | 'settings' | 'admin' | 'subscription';
+export type ViewState = 'dashboard' | 'pos' | 'inventory' | 'history' | 'customers' | 'settings' | 'admin' | 'subscription' | 'catalog';
 
 export interface Profile {
   id: string;

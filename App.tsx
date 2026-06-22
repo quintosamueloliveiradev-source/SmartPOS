@@ -11,6 +11,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { Login } from './components/Login';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { Catalog } from './components/Catalog';
+import { CatalogSettings } from './components/CatalogSettings';
 import { ViewState } from './types';
 import { X, CheckCircle, AlertCircle, Info, Loader2, Megaphone, AlertTriangle } from 'lucide-react';
 import { supabase } from './lib/supabase';
@@ -137,6 +138,7 @@ const MainContent: React.FC = () => {
       case 'inventory': return <Inventory />;
       case 'history': return <SalesHistory />;
       case 'customers': return <Clientes />;
+      case 'catalog': return <CatalogSettings />;
       case 'settings': return <Settings />;
       case 'admin': {
         const isMasterAdmin = user?.email === 'backup02atelietetemimos@gmail.com';

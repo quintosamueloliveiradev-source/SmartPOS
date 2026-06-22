@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewState } from '../types';
-import { LayoutDashboard, ShoppingCart, Package, History, Users, Store, Settings, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, History, Users, Store, Settings, ShieldCheck, LogOut, Share2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 interface SidebarProps {
@@ -17,6 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
     { id: 'inventory', label: 'Estoque', icon: <Package size={18} /> },
     { id: 'history', label: 'Vendas', icon: <History size={18} /> },
     { id: 'customers', label: 'Clientes', icon: <Users size={18} /> },
+    { id: 'catalog', label: 'Catálogo Online', icon: <Share2 size={18} /> },
     { id: 'settings', label: 'Configurações', icon: <Settings size={18} /> },
     { 
       id: 'admin', 
