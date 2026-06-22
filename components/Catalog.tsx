@@ -45,15 +45,16 @@ export const Catalog: React.FC = () => {
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: settingsData } = await supabase
+        const { data: settingsData, error: settingsError } = await supabase
             .from('app_settings')
             .select('value')
-            .eq('user_id', storeId)
-            .eq('key', 'catalog_settings')
+            .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
+        console.log('Settings fetch result:', settingsData);
+            
         if (settingsData?.value) {
-            setCatalogSettings({ isOpen: settingsData.value.is_open });
+            setCatalogSettings({ isOpen: settingsData.value.is_open !== false });
             setWhatsappNumber(settingsData.value.whatsapp_number || '');
         }
       } catch (err) {
