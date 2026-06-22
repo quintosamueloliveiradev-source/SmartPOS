@@ -47,15 +47,16 @@ export const Catalog: React.FC = () => {
         
         const { data: settingsData, error: settingsError } = await supabase
             .from('app_settings')
-            .select('value')
+            .select('value, catalog_open')
             .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
         console.log('Settings fetch result:', settingsData);
             
-        if (settingsData?.value) {
-            setCatalogSettings({ isOpen: settingsData.value.is_open !== false });
-            setWhatsappNumber(settingsData.value.whatsapp_number || '');
+        if (settingsData) {
+            const isOpen = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
+            setCatalogSettings({ isOpen: Boolean(isOpen) });
+            if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
         }
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
@@ -141,6 +142,11 @@ export const Catalog: React.FC = () => {
       <main className="p-4 max-w-4xl mx-auto pb-24">
         {loading ? (
             <p className="text-center text-slate-500">Carregando...</p>
+        ) : !catalogSettings.isOpen ? (
+             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto text-center mt-10">
+               <h2 className="text-xl font-bold mb-4">Catálogo Fechado</h2>
+               <p className="text-slate-600">No momento este catálogo está fechado. Por favor, volte mais tarde ou entre em contato pelo WhatsApp.</p>
+             </div>
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {products.map(p => (
