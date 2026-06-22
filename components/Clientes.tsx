@@ -3,6 +3,7 @@ import { Users, Search, Plus, X, User, Phone, CreditCard, Pencil, Trash2, Loader
 import { Customer } from '../types';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../context/StoreContext';
+import { CustomerFormModal } from './CustomerFormModal';
 
 export const Clientes: React.FC = () => {
   const { user, loading } = useStore();
@@ -88,7 +89,7 @@ export const Clientes: React.FC = () => {
       setName('');
       setContact('');
       setCpf('');
-      fetchCustomers();
+      await fetchCustomers(); // Ensure it updates after fetch
     } catch (error: any) {
       console.error('Erro ao salvar cliente:', error);
       alert("Erro ao salvar cliente: " + (error.message || JSON.stringify(error)));
