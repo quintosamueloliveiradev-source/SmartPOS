@@ -37,7 +37,7 @@ import { Profile } from '../types';
 import { supabase } from '../lib/supabase';
 
 export const AdminPanel: React.FC = () => {
-  const { addToast } = useStore();
+  const { user, addToast } = useStore();
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,6 +55,12 @@ export const AdminPanel: React.FC = () => {
   });
 
   useEffect(() => {
+    // 1. TRAVA DE AUTENTICAÇÃO: Se não há usuário logado, força loading false imediatamente
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     fetchUsers();
     fetchSettings();
 
@@ -62,9 +68,10 @@ export const AdminPanel: React.FC = () => {
     const handleClickOutside = () => setOpenMenuId(null);
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
-  }, []);
+  }, [user]);
 
   const fetchSettings = async () => {
+    if (!user) return;
     try {
       const { data } = await supabase.from('app_settings').select('*');
       if (data) {
@@ -90,6 +97,10 @@ export const AdminPanel: React.FC = () => {
   };
 
   const fetchUsers = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const { data, error } = await supabase

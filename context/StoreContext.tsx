@@ -62,10 +62,27 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     // Busca a sessão inicial IMEDIATAMENTE
     const initSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (mounted && session?.user) {
-        console.log('Sessão inicial detectada:', session.user.email);
-        setUser(session.user);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          if (session?.user) {
+            console.log('Sessão inicial detectada:', session.user.email);
+            setUser(session.user);
+          } else {
+            // TRAVA DE AUTENTICAÇÃO: Se não houver usuário, force imediatamente loading false
+            console.log('Nenhuma sessão inicial encontrada.');
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar sessão inicial no Supabase:', error);
+        if (mounted) {
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+        }
       }
     };
     initSession();
@@ -77,6 +94,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setUser(session?.user ?? null);
         
         if (!session?.user) {
+          // Caso do Logout: limpa estados e descarta loading imediatamente
           setProfile(null);
           setLoading(false);
         }
