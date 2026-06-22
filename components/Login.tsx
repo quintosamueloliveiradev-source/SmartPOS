@@ -337,8 +337,9 @@ export const Login: React.FC = () => {
         });
         if (authError) throw authError;
 
-        // Manual store creation
+        // Manual store creation - with delay to allow database trigger to complete
         if (authData.user) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
           // Store insertion
           const { error: storeError } = await supabase.from('stores').insert({
             user_id: authData.user.id,
