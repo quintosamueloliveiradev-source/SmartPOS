@@ -47,7 +47,8 @@ export const Catalog: React.FC = () => {
         const { data: settingsData } = await supabase
             .from('app_settings')
             .select('value')
-            .eq('key', 'catalog_settings_' + storeId)
+            .eq('user_id', storeId)
+            .eq('key', 'catalog_settings')
             .maybeSingle();
             
         if (settingsData?.value) {
@@ -135,8 +136,12 @@ export const Catalog: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {products.map(p => (
                 <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
-                    <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400">
-                        {p.imageUrl ? <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover rounded-xl" /> : "Sem imagem"}
+                    <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
+                        <img 
+                            src={p.imageUrl || (p as any).image_url || (p as any).image || 'https://placehold.co/200x200?text=Sem+Imagem'}
+                            alt={p.name} 
+                            className="w-full h-full object-cover" 
+                        />
                     </div>
                     <h3 className="font-bold text-slate-900 uppercase text-sm">{p.name}</h3>
                     <div className="flex items-center justify-between mt-auto">
