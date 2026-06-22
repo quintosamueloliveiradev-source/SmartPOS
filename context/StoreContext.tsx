@@ -133,37 +133,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         let currentProfile = (profileData && profileData.length > 0) ? profileData[0] : null;
 
-        // 2. Se não existir, criar um novo ou usar emergência
+        // 2. Se não existir, algo está errado, mas não tente criar no front-end para evitar conflitos com a trigger
         if (!currentProfile) {
-          console.log('Perfil não encontrado. Tentando criar...');
-          const isAdmin = user.email === 'backup02atelietetemimos@gmail.com';
-          
-          const fallbackProfile = { 
-            id: user.id, 
-            email: user.email, 
-            role: isAdmin ? 'admin' : 'customer',
-            subscription_status: isAdmin ? 'active' : 'trial',
-            subscription_expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-            store_name: 'Minha Loja'
-          };
-
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .upsert([fallbackProfile])
-            .select()
-            .maybeSingle();
-          
-          if (createError) {
-            console.error('Erro ao criar perfil no banco:', createError);
-            if (isAdmin) {
-              console.warn('Admin detectado: ignorando erro de banco e entrando em modo emergência');
-              currentProfile = fallbackProfile as any;
-            } else {
-              throw createError;
-            }
-          } else {
-            currentProfile = newProfile;
-          }
+          console.warn('Perfil não encontrado no banco de dados. Tentando aguardar...');
+          // Pode ter ocorrido uma demora na trigger
         }
 
         if (currentProfile) {
