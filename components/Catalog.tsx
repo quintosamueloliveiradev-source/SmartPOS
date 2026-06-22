@@ -22,7 +22,8 @@ export const Catalog: React.FC = () => {
   const [reference, setReference] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cash' | 'card'>('pix');
   const [changeFor, setChangeFor] = useState('');
-  const [catalogSettings, setCatalogSettings] = useState({ whatsapp: '', isOpen: true });
+  const [catalogSettings, setCatalogSettings] = useState({ isOpen: true });
+  const [whatsappNumber, setWhatsappNumber] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -52,7 +53,8 @@ export const Catalog: React.FC = () => {
             .maybeSingle();
             
         if (settingsData?.value) {
-            setCatalogSettings({ whatsapp: settingsData.value.whatsapp_number, isOpen: settingsData.value.is_open });
+            setCatalogSettings({ isOpen: settingsData.value.is_open });
+            setWhatsappNumber(settingsData.value.whatsapp_number || '');
         }
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
@@ -85,7 +87,13 @@ export const Catalog: React.FC = () => {
   const itemCount = cart.reduce((sum, p) => sum + p.quantity, 0);
 
   const sendWhatsAppOrder = () => {
-    const phone = catalogSettings.whatsapp || '5511999999999'; 
+    const cleanPhone = whatsappNumber.replace(/\D/g, ''); 
+    
+    if (!cleanPhone || cleanPhone === '5511999999999' || cleanPhone.length < 10) {
+        alert('O número de WhatsApp da loja não está configurado corretamente.');
+        return;
+    }
+
     const addressStr = deliveryType === 'delivery' 
         ? `\n*Endereço:* ${address}, ${number} - ${neighborhood}${reference ? ` (${reference})` : ''}` 
         : '';
@@ -106,7 +114,7 @@ export const Catalog: React.FC = () => {
       `*Total:* R$ ${total.toFixed(2)}\n` +
       `*Forma de Pagamento:* ${paymentStr}`;
 
-    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
