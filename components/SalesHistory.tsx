@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { Clock, CreditCard, Banknote, QrCode, AlertTriangle, X, RotateCcw, Ban, ShieldCheck, ShieldAlert, Key, Info, Calendar, Filter, ChevronRight, FileDown, User, PlusCircle, Printer, Ticket, FileText, Search, Loader2 } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 
+// SalesHistory view - Forces save
 export const SalesHistory: React.FC = () => {
   const { sales, cancelSale, isDefaultPassword, updateAdminPassword, exportSalesToCSV, loading } = useStore();
   const [saleToCancel, setSaleToCancel] = useState<string | null>(null);

@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { CustomerFormModal } from './CustomerFormModal';
 
+// POS view - Forces save
 export const POS: React.FC = () => {
   const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast, user, loading } = useStore();
   const [searchTerm, setSearchTerm] = useState('');

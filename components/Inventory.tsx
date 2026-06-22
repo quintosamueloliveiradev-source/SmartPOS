@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
 import { Plus, Search, Edit2, Trash2, X, Box, Image as ImageIcon, Filter, ChevronDown, ChevronUp, DollarSign, Tag, Archive, AlertCircle, Barcode, Loader2 } from 'lucide-react';
 
+// Inventory view - Forces save
 export const Inventory: React.FC = () => {
   const { products, deleteProduct, addProduct, updateProduct, loading } = useStore();
   const [searchTerm, setSearchTerm] = useState('');

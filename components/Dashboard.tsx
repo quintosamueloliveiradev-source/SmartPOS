@@ -4,6 +4,8 @@ import { useStore } from '../context/StoreContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar, Loader2 } from 'lucide-react';
 
+// Dashboard view - Forces save
+// Dashboard view - Forces save
 export const Dashboard: React.FC = () => {
   const { products, sales, loading } = useStore();
   const [period, setPeriod] = useState<'today' | '7days' | 'month'>('7days');
