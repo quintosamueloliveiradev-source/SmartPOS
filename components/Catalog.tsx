@@ -24,11 +24,13 @@ export const Catalog: React.FC = () => {
   const [changeFor, setChangeFor] = useState('');
   const [catalogSettings, setCatalogSettings] = useState({ isOpen: true });
   const [whatsappNumber, setWhatsappNumber] = useState('');
+  
+  // Extração do storeId fora do useEffect
+  const storeId = new URLSearchParams(window.location.search).get('store');
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const storeId = new URLSearchParams(window.location.search).get('store');
       
       if (!storeId) {
           setLoading(false);
@@ -45,19 +47,25 @@ export const Catalog: React.FC = () => {
         if (error) throw error;
         setProducts(data || []);
         
-        const { data: settingsData, error: settingsError } = await supabase
+        const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('catalog_open')
+            .eq('id', storeId)
+            .maybeSingle();
+
+        if (profileData) {
+            setCatalogSettings({ isOpen: Boolean(profileData.catalog_open) });
+        }
+        
+        // Mantendo busca de settings originais caso precise
+        const { data: settingsData } = await supabase
             .from('app_settings')
-            .select('value, catalog_open')
+            .select('value')
             .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
-        console.log('Settings fetch result:', settingsData);
-            
-        if (settingsData) {
-            const isOpen = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
-            setCatalogSettings({ isOpen: Boolean(isOpen) });
-            if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
-        }
+        if (settingsData && settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
+        
       } catch (err) {
         console.error('Erro ao buscar produtos/configurações:', err);
       } finally {
@@ -65,7 +73,32 @@ export const Catalog: React.FC = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [storeId]);
+
+  // Novo useEffect para Realtime
+  useEffect(() => {
+    if (!storeId) return;
+
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles',
+        filter: `id=eq.${storeId}`
+      }, (payload) => {
+        console.log('Mudança em tempo real:', payload);
+        const newIsOpen = payload.new.catalog_open;
+        if (newIsOpen !== undefined) {
+         setCatalogSettings({ isOpen: Boolean(newIsOpen) });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [storeId]);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
