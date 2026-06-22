@@ -54,7 +54,7 @@ export const Catalog: React.FC = () => {
             .maybeSingle();
 
         if (profileData) {
-            setCatalogSettings({ isOpen: Boolean(profileData.catalog_open) });
+            setCatalogSettings({ isOpen: profileData.catalog_open ?? true });
         }
         
         // Mantendo busca de settings originais caso precise
@@ -89,9 +89,7 @@ export const Catalog: React.FC = () => {
       }, (payload) => {
         console.log('Mudança em tempo real:', payload);
         const newIsOpen = payload.new.catalog_open;
-        if (newIsOpen !== undefined) {
-         setCatalogSettings({ isOpen: Boolean(newIsOpen) });
-        }
+        setCatalogSettings({ isOpen: newIsOpen ?? true });
       })
       .subscribe();
 
