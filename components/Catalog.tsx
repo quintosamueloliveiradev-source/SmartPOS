@@ -66,9 +66,9 @@ export const Catalog: React.FC = () => {
 
     fetchProducts();
 
-    // Canal de escuta em tempo real focado em atualizações da linha desta loja
+    // Canal de escuta em tempo real focado em atualizações da loja
     const channel = supabase
-      .channel('public-catalog-status')
+      .channel(`catalog-status-${storeId}`)
       .on(
         'postgres_changes',
         {
@@ -78,9 +78,9 @@ export const Catalog: React.FC = () => {
           filter: `id=eq.${storeId}`
         },
         (payload) => {
-          // Assume que o campo que controla se está aberto chama-se 'catalog_open'
-          if (payload.new && typeof payload.new.catalog_open !== 'undefined') {
-            setIsOpen(payload.new.catalog_open);
+          console.log('Realtime catalog update:', payload);
+          if (payload.new && 'catalog_open' in payload.new) {
+            setIsOpen(Boolean(payload.new.catalog_open));
           }
         }
       )
