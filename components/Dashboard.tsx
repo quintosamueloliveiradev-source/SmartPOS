@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar } from 'lucide-react';
+import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar, Loader2 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { products, sales, loading } = useStore();
@@ -57,10 +57,16 @@ export const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-medium animate-pulse">Sincronizando com Supabase...</p>
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-16 space-y-6 animate-fade-in">
+        <div className="relative">
+          <Loader2 className="animate-spin text-emerald-600" size={64} />
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-lg font-bold text-slate-800 tracking-tight text-center">Carregando Dashboard</p>
+          <p className="font-semibold text-slate-500 uppercase tracking-widest text-[9px] text-slate-400 font-mono text-center">
+            SINCRONIZANDO COM O SUPABASE...
+          </p>
         </div>
       </div>
     );

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Product, Customer } from '../types';
-import { Search, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, ShoppingBasket, User, Tag, Percent, Barcode, Printer, CheckCircle2, Ticket, FileText, X } from 'lucide-react';
+import { Search, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, ShoppingBasket, User, Tag, Percent, Barcode, Printer, CheckCircle2, Ticket, FileText, X, Loader2 } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 import { Sale } from '../types';
 import { motion } from 'motion/react';
@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase';
 import { CustomerFormModal } from './CustomerFormModal';
 
 export const POS: React.FC = () => {
-  const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast, user } = useStore();
+  const { products, cart, addToCart, removeFromCart, updateCartQuantity, completeSale, addToast, user, loading } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
   const [customerResults, setCustomerResults] = useState<Customer[]>([]);
@@ -96,6 +96,23 @@ export const POS: React.FC = () => {
     setSearchTerm('');
     setReceivedAmount(0);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-16 space-y-6 animate-fade-in">
+        <div className="relative">
+          <Loader2 className="animate-spin text-emerald-600" size={64} />
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-lg font-bold text-slate-800 tracking-tight text-center">Carregando PDV</p>
+          <p className="font-semibold text-slate-500 uppercase tracking-widest text-[9px] text-slate-400 font-mono text-center">
+            SINCRONIZANDO COM O SUPABASE...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-2rem)] gap-6 overflow-hidden">

@@ -2,10 +2,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
-import { Plus, Search, Edit2, Trash2, X, Box, Image as ImageIcon, Filter, ChevronDown, ChevronUp, DollarSign, Tag, Archive, AlertCircle, Barcode } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Box, Image as ImageIcon, Filter, ChevronDown, ChevronUp, DollarSign, Tag, Archive, AlertCircle, Barcode, Loader2 } from 'lucide-react';
 
 export const Inventory: React.FC = () => {
-  const { products, deleteProduct, addProduct, updateProduct } = useStore();
+  const { products, deleteProduct, addProduct, updateProduct, loading } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(() => {
     return sessionStorage.getItem('inventory_modal_open') === 'true';
@@ -85,6 +85,23 @@ export const Inventory: React.FC = () => {
       setDeleteTarget(null);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-16 space-y-6 animate-fade-in">
+        <div className="relative">
+          <Loader2 className="animate-spin text-emerald-600" size={64} />
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-lg font-bold text-slate-800 tracking-tight text-center">Carregando Estoque</p>
+          <p className="font-semibold text-slate-500 uppercase tracking-widest text-[9px] text-slate-400 font-mono text-center">
+            SINCRONIZANDO COM O SUPABASE...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-fade-in">

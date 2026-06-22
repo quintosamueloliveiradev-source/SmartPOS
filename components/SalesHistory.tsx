@@ -1,11 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Clock, CreditCard, Banknote, QrCode, AlertTriangle, X, RotateCcw, Ban, ShieldCheck, ShieldAlert, Key, Info, Calendar, Filter, ChevronRight, FileDown, User, PlusCircle, Printer, Ticket, FileText, Search } from 'lucide-react';
+import { Clock, CreditCard, Banknote, QrCode, AlertTriangle, X, RotateCcw, Ban, ShieldCheck, ShieldAlert, Key, Info, Calendar, Filter, ChevronRight, FileDown, User, PlusCircle, Printer, Ticket, FileText, Search, Loader2 } from 'lucide-react';
 import { printReceipt } from '../services/receiptService';
 
 export const SalesHistory: React.FC = () => {
-  const { sales, cancelSale, isDefaultPassword, updateAdminPassword, exportSalesToCSV } = useStore();
+  const { sales, cancelSale, isDefaultPassword, updateAdminPassword, exportSalesToCSV, loading } = useStore();
   const [saleToCancel, setSaleToCancel] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<'24h' | 'custom'>('24h');
   const [startDate, setStartDate] = useState<string>(() => {
@@ -86,6 +86,23 @@ export const SalesHistory: React.FC = () => {
       return acc;
     }, { revenue: 0, profit: 0, items: 0, count: 0 });
   }, [filteredSales]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-16 space-y-6 animate-fade-in">
+        <div className="relative">
+          <Loader2 className="animate-spin text-emerald-600" size={64} />
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-lg font-bold text-slate-800 tracking-tight text-center">Carregando Vendas</p>
+          <p className="font-semibold text-slate-500 uppercase tracking-widest text-[9px] text-slate-400 font-mono text-center">
+            SINCRONIZANDO COM O SUPABASE...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-fade-in">
