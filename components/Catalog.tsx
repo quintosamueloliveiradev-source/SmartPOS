@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 
@@ -26,14 +26,15 @@ export const Catalog: React.FC = () => {
   const [whatsappNumber, setWhatsappNumber] = useState('');
 
   useEffect(() => {
+    const storeId = new URLSearchParams(window.location.search).get('store');
+    
+    if (!storeId) {
+        setLoading(false);
+        return;
+    }
+
     const fetchProducts = async () => {
       setLoading(true);
-      const storeId = new URLSearchParams(window.location.search).get('store');
-      
-      if (!storeId) {
-          setLoading(false);
-          return;
-      }
 
       try {
         const { data, error } = await supabase
@@ -51,8 +52,6 @@ export const Catalog: React.FC = () => {
             .eq('key', 'catalog_settings_' + storeId)
             .maybeSingle();
             
-        console.log('Settings fetch result:', settingsData);
-            
         if (settingsData) {
             const isOpen = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
             setCatalogSettings({ isOpen: Boolean(isOpen) });
@@ -64,7 +63,27 @@ export const Catalog: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('catalog-settings-changes-' + storeId)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'app_settings',
+        filter: `key=eq.catalog_settings_${storeId}`
+      }, (payload) => {
+        const newData = payload.new as any;
+        const isOpen = newData.catalog_open ?? (newData.value?.is_open ?? true);
+        setCatalogSettings({ isOpen: Boolean(isOpen) });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const addToCart = (product: Product) => {
@@ -119,13 +138,31 @@ export const Catalog: React.FC = () => {
     window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50">Carregando...</div>;
+  }
+
+  if (!catalogSettings.isOpen) {
+      return (
+          <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6 text-center">
+              <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 max-w-sm w-full">
+                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
+                     <Lock className="text-white" size={40} />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Loja Fechada</h2>
+                  <p className="text-slate-500 mb-6 font-medium">Catálogo Fechado no Momento. Esta loja não está recebendo pedidos agora.</p>
+              </div>
+          </div>
+      );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold font-vendeei">Vendeei Shop</h1>
-          <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${catalogSettings.isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
-            {catalogSettings.isOpen ? '🟢 Aberto' : '🔴 Fechado'}
+          <span className="text-[10px] uppercase px-2 py-1 rounded-full font-bold bg-green-600">
+             Aberto
           </span>
         </div>
         <div className="max-w-4xl mx-auto mt-4">
@@ -140,37 +177,28 @@ export const Catalog: React.FC = () => {
       </header>
 
       <main className="p-4 max-w-4xl mx-auto pb-24">
-        {loading ? (
-            <p className="text-center text-slate-500">Carregando...</p>
-        ) : !catalogSettings.isOpen ? (
-             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto text-center mt-10">
-               <h2 className="text-xl font-bold mb-4">Catálogo Fechado</h2>
-               <p className="text-slate-600">No momento este catálogo está fechado. Por favor, volte mais tarde ou entre em contato pelo WhatsApp.</p>
-             </div>
-        ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {products.map(p => (
-                <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
-                    <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
-                        <img 
-                            src={p.imageUrl || (p as any).image_url || (p as any).image || 'https://placehold.co/200x200?text=Sem+Imagem'}
-                            alt={p.name} 
-                            className="w-full h-full object-cover" 
-                        />
-                    </div>
-                    <h3 className="font-bold text-slate-900 uppercase text-sm">{p.name}</h3>
-                    <div className="flex items-center justify-between mt-auto">
-                        <span className="text-green-600 font-black text-lg">R$ {p.price.toFixed(2)}</span>
-                        <button 
-                         onClick={() => addToCart(p)}
-                         className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
-                            <Plus size={18} />
-                        </button>
-                    </div>
-                </div>
-              ))}
-            </div>
-        )}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {products.map(p => (
+              <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
+                  <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
+                      <img 
+                          src={p.imageUrl || (p as any).image_url || (p as any).image || 'https://placehold.co/200x200?text=Sem+Imagem'}
+                          alt={p.name} 
+                          className="w-full h-full object-cover" 
+                      />
+                  </div>
+                  <h3 className="font-bold text-slate-900 uppercase text-sm">{p.name}</h3>
+                  <div className="flex items-center justify-between mt-auto">
+                      <span className="text-green-600 font-black text-lg">R$ {p.price.toFixed(2)}</span>
+                      <button 
+                       onClick={() => addToCart(p)}
+                       className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
+                          <Plus size={18} />
+                      </button>
+                  </div>
+              </div>
+            ))}
+         </div>
       </main>
 
       {/* Cart Drawer/Modal */}
