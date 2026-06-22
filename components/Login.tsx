@@ -337,8 +337,9 @@ export const Login: React.FC = () => {
         });
         if (authError) throw authError;
 
-        // Manual profile creation if database trigger is missing
+        // Manual profile and store creation if database trigger is missing
         if (authData.user) {
+          // 1. Insert into profiles
           const { error: profileError } = await supabase.from('profiles').insert({
             id: authData.user.id,
             email: email,
@@ -346,7 +347,16 @@ export const Login: React.FC = () => {
             store_name: storeName || 'Minha Loja'
           });
           if (profileError && profileError.code !== '23505') {
-             console.error('Perfil não criado automaticamente:', profileError);
+             throw new Error('Falha ao criar perfil: ' + profileError.message);
+          }
+
+          // 2. Insert into stores
+          const { error: storeError } = await supabase.from('stores').insert({
+            owner_id: authData.user.id,
+            name: storeName || 'Minha Loja'
+          });
+          if (storeError) {
+             throw new Error('Falha ao criar loja: ' + storeError.message);
           }
         }
 
