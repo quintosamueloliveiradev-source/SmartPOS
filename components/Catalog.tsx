@@ -22,7 +22,9 @@ export const Catalog: React.FC = () => {
   const [reference, setReference] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cash' | 'card'>('pix');
   const [changeFor, setChangeFor] = useState('');
-  const [catalogSettings, setCatalogSettings] = useState({ isOpen: true });
+  
+  // Real-time state
+  const [isOpen, setIsOpen] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState('');
 
   useEffect(() => {
@@ -53,8 +55,8 @@ export const Catalog: React.FC = () => {
             .maybeSingle();
             
         if (settingsData) {
-            const isOpen = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
-            setCatalogSettings({ isOpen: Boolean(isOpen) });
+            const open = settingsData.catalog_open ?? (settingsData.value?.is_open ?? true);
+            setIsOpen(Boolean(open));
             if (settingsData.value) setWhatsappNumber(settingsData.value.whatsapp_number || '');
         }
       } catch (err) {
@@ -76,8 +78,8 @@ export const Catalog: React.FC = () => {
         filter: `key=eq.catalog_settings_${storeId}`
       }, (payload) => {
         const newData = payload.new as any;
-        const isOpen = newData.catalog_open ?? (newData.value?.is_open ?? true);
-        setCatalogSettings({ isOpen: Boolean(isOpen) });
+        const open = newData.catalog_open ?? (newData.value?.is_open ?? true);
+        setIsOpen(Boolean(open));
       })
       .subscribe();
 
@@ -139,30 +141,16 @@ export const Catalog: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50">Carregando...</div>;
-  }
-
-  if (!catalogSettings.isOpen) {
-      return (
-          <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6 text-center">
-              <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 max-w-sm w-full">
-                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Lock className="text-white" size={40} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Loja Fechada</h2>
-                  <p className="text-slate-500 mb-6 font-medium">Catálogo Fechado no Momento. Esta loja não está recebendo pedidos agora.</p>
-              </div>
-          </div>
-      );
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans font-bold">Carregando...</div>;
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold font-vendeei">Vendeei Shop</h1>
-          <span className="text-[10px] uppercase px-2 py-1 rounded-full font-bold bg-green-600">
-             Aberto
+          <h1 className="text-xl font-bold font-sans">Vendeei Shop</h1>
+          <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
+             {isOpen ? 'Aberto' : 'Fechado'}
           </span>
         </div>
         <div className="max-w-4xl mx-auto mt-4">
@@ -177,28 +165,38 @@ export const Catalog: React.FC = () => {
       </header>
 
       <main className="p-4 max-w-4xl mx-auto pb-24">
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {products.map(p => (
-              <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
-                  <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
-                      <img 
-                          src={p.imageUrl || (p as any).image_url || (p as any).image || 'https://placehold.co/200x200?text=Sem+Imagem'}
-                          alt={p.name} 
-                          className="w-full h-full object-cover" 
-                      />
+         {isOpen ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+                {products.map(p => (
+                <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2">
+                    <div className="h-40 bg-slate-200 rounded-xl mb-2 flex items-center justify-center text-slate-400 overflow-hidden">
+                        <img 
+                            src={p.imageUrl || (p as any).image_url || (p as any).image || 'https://placehold.co/200x200?text=Sem+Imagem'}
+                            alt={p.name} 
+                            className="w-full h-full object-cover" 
+                        />
+                    </div>
+                    <h3 className="font-bold text-slate-900 uppercase text-sm">{p.name}</h3>
+                    <div className="flex items-center justify-between mt-auto">
+                        <span className="text-green-600 font-black text-lg">R$ {p.price.toFixed(2)}</span>
+                        <button 
+                        onClick={() => addToCart(p)}
+                        className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
+                            <Plus size={18} />
+                        </button>
+                    </div>
+                </div>
+                ))}
+            </div>
+         ) : (
+            <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 text-center animate-fade-in">
+                  <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Lock className="text-white" size={40} />
                   </div>
-                  <h3 className="font-bold text-slate-900 uppercase text-sm">{p.name}</h3>
-                  <div className="flex items-center justify-between mt-auto">
-                      <span className="text-green-600 font-black text-lg">R$ {p.price.toFixed(2)}</span>
-                      <button 
-                       onClick={() => addToCart(p)}
-                       className="bg-slate-900 text-white p-2 rounded-full hover:bg-slate-800 transition">
-                          <Plus size={18} />
-                      </button>
-                  </div>
-              </div>
-            ))}
-         </div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Loja Fechada</h2>
+                  <p className="text-slate-500 mb-6 font-medium">Catálogo Fechado no Momento. Esta loja não está recebendo pedidos agora.</p>
+            </div>
+         )}
       </main>
 
       {/* Cart Drawer/Modal */}
