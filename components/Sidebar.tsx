@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         </div>
         <div className="hidden lg:block overflow-hidden flex-1 self-center">
           <div className="flex items-center gap-1.55">
-            <h1 className="text-base font-bold tracking-tight text-white leading-tight font-vendeei">Vendeei</h1>
+            <h1 className="text-base font-bold tracking-tight text-white leading-tight font-vendeei">{profile?.store_name || 'Vendeei'}</h1>
             <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1 py-0.5 rounded font-bold uppercase tracking-wider leading-none">
               {profile?.role === 'admin' ? 'Admin' : 'Pro'}
             </span>

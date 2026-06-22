@@ -1,11 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar, Loader2 } from 'lucide-react';
+import { DollarSign, ShoppingBag, AlertTriangle, TrendingUp, Trophy, PieChart, Calendar, Loader2, Store } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
-  const { products, sales, loading } = useStore();
+  const { products, sales, loading, profile } = useStore();
   const [period, setPeriod] = useState<'today' | '7days' | 'month'>('7days');
+
+  // Log de depuração do nome da loja conforme solicitado
+  React.useEffect(() => {
+    if (profile) {
+      console.log('Dashboard: Verificando store_name no perfil:', profile.store_name);
+    }
+  }, [profile]);
 
   const activeSales = useMemo(() => sales.filter(s => s.status !== 'canceled'), [sales]);
   const totalStockValue = useMemo(() => products.reduce((acc, p) => acc + (p.price * p.stock), 0), [products]);
@@ -155,6 +162,10 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-5 animate-fade-in">
       <header className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+             <Store size={16} className="text-emerald-600" />
+             <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">{profile?.store_name || 'Minha Loja'}</span>
+          </div>
           <h2 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">Visão Geral do Negócio</h2>
           <p className="text-xs lg:text-sm text-slate-500 mt-0.5">Métricas de faturamento, lucro e estoque em tempo real.</p>
         </div>
