@@ -97,31 +97,35 @@ export const CatalogSettings: React.FC = () => {
       <h2 className="text-xl font-bold">Catálogo Online</h2>
       
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
-        <label className="block text-sm font-semibold">WhatsApp para Pedidos</label>
-        <input 
-            value={whatsapp} 
-            onChange={e => setWhatsapp(e.target.value)}
-            placeholder="(00) 00000-0000"
-            className="w-full p-2 border rounded-lg"
-        />
-
-        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <span className="font-semibold text-sm">Status do Catálogo</span>
-            <button 
-                onClick={toggleCatalog}
-                className={`w-14 h-7 rounded-full p-1 transition-all flex items-center ${isCatalogOpen ? 'bg-emerald-500' : 'bg-slate-300'}`}
-            >
-                <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${isCatalogOpen ? 'translate-x-7' : 'translate-x-0'}`}></div>
-            </button>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <span className="font-semibold text-sm">Status do Catálogo</span>
+              <button 
+                  onClick={toggleCatalog}
+                  className={`w-14 h-7 rounded-full p-1 transition-all flex items-center ${isCatalogOpen ? 'bg-emerald-500' : 'bg-slate-300'}`}
+              >
+                  <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${isCatalogOpen ? 'translate-x-7' : 'translate-x-0'}`}></div>
+              </button>
+          </div>
+          
+          <p className={`text-xs font-bold text-center ${isCatalogOpen ? 'text-emerald-600' : 'text-slate-500'}`}>
+              Catálogo {isCatalogOpen ? 'Aberto' : 'Fechado'}
+          </p>
         </div>
-        
-        <p className={`text-xs font-bold text-center ${isCatalogOpen ? 'text-emerald-600' : 'text-slate-500'}`}>
-            Catálogo {isCatalogOpen ? 'Aberto' : 'Fechado'}
-        </p>
 
-        <button onClick={handleSaveAll} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
-            <Save size={18}/> Salvar WhatsApp
-        </button>
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold">WhatsApp para Pedidos</label>
+          <input 
+              value={whatsapp} 
+              onChange={e => setWhatsapp(e.target.value)}
+              placeholder="(00) 00000-0000"
+              className="w-full p-2 border rounded-lg"
+          />
+
+          <button onClick={handleSaveAll} className="w-full bg-emerald-600 text-white p-2 rounded-lg font-bold flex items-center justify-center gap-2">
+              <Save size={18}/> Salvar WhatsApp
+          </button>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">

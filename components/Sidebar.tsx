@@ -40,7 +40,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
               {profile?.role === 'admin' ? 'Admin' : 'Pro'}
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 truncate mt-0.5 font-medium" title={user?.email}>{user?.email}</p>
         </div>
       </div>
       
@@ -61,7 +60,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         ))}
       </nav>
 
-      <div className="p-3 space-y-3 border-t border-slate-700 mt-auto bg-slate-900/50">
+      <div className="p-3 space-y-2 border-t border-slate-700 mt-auto bg-slate-900/50">
+        <div className="hidden lg:block px-2.5 py-1">
+          <p className="text-[10px] text-slate-400 truncate font-medium" title={user?.email}>
+            {user?.email}
+          </p>
+        </div>
         <button 
           onClick={signOut}
           className="w-full flex items-center justify-center lg:justify-start gap-3 p-2 lg:p-2.5 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors font-title-md text-xs lg:text-sm font-medium tracking-wide"
