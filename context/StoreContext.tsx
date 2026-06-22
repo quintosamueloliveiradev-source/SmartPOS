@@ -252,7 +252,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         console.error('Erro ao carregar dados do usuário:', err);
         addToast(`Erro de perfil: ${err.message}`, 'error');
       } finally {
-        setTimeout(() => setLoading(false), 1200);
+        setLoading(false);
       }
     };
 
