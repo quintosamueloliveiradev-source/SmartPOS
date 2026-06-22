@@ -89,14 +89,17 @@ export const Catalog: React.FC = () => {
     const channel = supabase
       .channel('schema-db-changes')
       .on('postgres_changes', { 
-        event: 'UPDATE', 
+        event: '*', 
         schema: 'public', 
         table: 'app_settings',
         filter: `key=eq.catalog_settings_${storeId}`
       }, (payload) => {
         console.log('Mudança em tempo real recebida:', payload);
-        if (payload.new && typeof payload.new.catalog_open !== 'undefined') {
-            setCatalogSettings({ isOpen: payload.new.catalog_open ?? true });
+        // Use a newIsOpen variable if payload.new exists, otherwise try payload.old
+        const newCatalogOpen = payload.new ? payload.new.catalog_open : (payload.old ? payload.old.catalog_open : null);
+        
+        if (newCatalogOpen !== null) {
+            setCatalogSettings({ isOpen: newCatalogOpen ?? true });
         } else {
             // Caso falhe ou não venha no payload, força nova busca
             fetchCatalogStatus();
