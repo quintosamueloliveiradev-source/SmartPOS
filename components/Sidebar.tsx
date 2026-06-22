@@ -69,9 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
           <LogOut size={18} />
           <span className="hidden lg:block">Sair</span>
         </button>
-        <div className="text-center lg:text-left text-debug-mono font-debug-mono text-[9px] text-slate-350 opacity-70">
-          <span className="hidden lg:block uppercase">Build SaaS v2.0.1</span>
-        </div>
+
       </div>
     </div>
   );
