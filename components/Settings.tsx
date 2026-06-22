@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { 
@@ -17,11 +16,12 @@ import {
   ExternalLink, 
   Calendar, 
   Sparkles, 
-  AlertCircle 
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 
 export const Settings: React.FC = () => {
-  const { products, sales, importData, resetSystem, updateAdminPassword, isDefaultPassword, profile, addToast } = useStore();
+  const { products, sales, importData, resetSystem, updateAdminPassword, isDefaultPassword, profile, addToast, loading } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [modalType, setModalType] = useState<'restore' | 'reset' | 'reset-initial' | null>(null);
@@ -150,6 +150,23 @@ export const Settings: React.FC = () => {
 
   const isDanger = modalType === 'reset' || modalType === 'reset-initial';
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] py-16 space-y-6 animate-fade-in">
+        <div className="relative">
+          <Loader2 className="animate-spin text-emerald-600" size={64} />
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-lg font-bold text-slate-800 tracking-tight text-center">Carregando Configurações</p>
+          <p className="font-semibold text-slate-500 uppercase tracking-widest text-[9px] text-slate-400 font-mono text-center">
+            SINCRONIZANDO COM O SUPABASE...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl pb-12">
       <header>
@@ -223,6 +240,7 @@ export const Settings: React.FC = () => {
                   }
                 }}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 transition-colors"
+                disabled={loadingPayments}
               >
                 <RefreshCw size={12} className={loadingPayments ? 'animate-spin' : ''} />
                 Atualizar Dados
