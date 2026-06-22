@@ -16,10 +16,12 @@ export const CustomerFormModal: React.FC<Props> = ({ isOpen, onClose, onSave, ed
 
   useEffect(() => {
     if (editingCustomer) {
-      setName(editingCustomer.name);
+      console.log('Editing customer:', editingCustomer);
+      setName(editingCustomer.name || '');
       setContact(editingCustomer.contact || '');
       setCpf(editingCustomer.cpf || '');
     } else {
+      console.log('New customer mode');
       setName('');
       setContact('');
       setCpf('');
