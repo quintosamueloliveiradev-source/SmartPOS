@@ -29,7 +29,6 @@ export const CatalogSettings: React.FC = () => {
     try {
       const { error } = await supabase.from('app_settings').upsert({
         key: 'catalog_settings_' + user.id,
-        user_id: user.id,
         value: { whatsapp_number: whatsapp },
         catalog_open: isCatalogOpen
       });
