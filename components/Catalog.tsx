@@ -154,7 +154,12 @@ export const Catalog: React.FC = () => {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <img src="/logo-vendeei.png" alt="Vendeei" className="h-9 w-auto object-contain" />
+          <div className="flex items-center gap-2">
+            <div className="bg-emerald-500 p-1.5 rounded-lg">
+              <Store size={20} className="text-white" />
+            </div>
+            <h1 className="text-xl font-bold font-vendeei tracking-tight">Vendeei</h1>
+          </div>
           <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${catalogSettings.isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
             {catalogSettings.isOpen ? '🟢 Aberto' : '🔴 Fechado'}
           </span>
