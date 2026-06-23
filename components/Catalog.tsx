@@ -119,6 +119,84 @@ export const Catalog: React.FC = () => {
   const total = cart.reduce((sum, p) => sum + (p.price * p.quantity), 0);
   const itemCount = cart.reduce((sum, p) => sum + p.quantity, 0);
 
+  const [pixData, setPixData] = useState<{ payload: string; encodedImage: string } | null>(null);
+  const [checkingPayment, setCheckingPayment] = useState(false);
+
+  const generatePixOrder = async () => {
+    if (!name.trim()) {
+      alert('Por favor, informe seu nome para continuar.');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      // 1. Criar Venda no Supabase primeiro como 'pendente'
+      const orderId = `VND-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      if (storeId) {
+        const { error: saleError } = await supabase.from('sales').insert({
+          id: orderId,
+          user_id: storeId,
+          customer_name: name,
+          subtotal: total,
+          total: total,
+          profit: total, // Simplificado
+          payment_method: 'pix',
+          status: 'pendente'
+        });
+        
+        if (saleError) console.error('Erro ao registrar venda:', saleError);
+
+        // Registrar itens
+        const saleItems = cart.map(item => ({
+            user_id: storeId,
+            sale_id: orderId,
+            product_id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            price_at_sale: item.price,
+            cost_price_at_sale: 0 // Simplificado
+        }));
+
+        await supabase.from('sale_items').insert(saleItems);
+      }
+
+      // 2. Chamar API do Asaas
+      const response = await fetch('/api/asaas/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          value: total,
+          description: `Pedido no Vendeei - ${name}`,
+          orderId
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setPixData({
+          payload: data.payload,
+          encodedImage: data.encodedImage
+        });
+      } else {
+        throw new Error(data.message || 'Erro ao gerar Pix');
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert('Não foi possível gerar o Pix. Tente novamente ou mude a forma de pagamento.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyPixPayload = () => {
+    if (pixData?.payload) {
+      navigator.clipboard.writeText(pixData.payload);
+      alert('Código Pix copiado!');
+    }
+  };
+
   const sendWhatsAppOrder = () => {
     const cleanPhone = whatsappNumber.replace(/\D/g, ''); 
     
@@ -266,13 +344,59 @@ export const Catalog: React.FC = () => {
                     )}
 
                     <button 
-                        onClick={sendWhatsAppOrder}
-                        className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 flex items-center justify-center gap-2"
+                        onClick={paymentMethod === 'pix' ? generatePixOrder : sendWhatsAppOrder}
+                        disabled={loading}
+                        className={`w-full ${paymentMethod === 'pix' ? 'bg-emerald-600' : 'bg-green-600'} text-white py-3 rounded-xl font-bold hover:opacity-90 flex items-center justify-center gap-2 transition-all`}
                     >
-                        Finalizar via WhatsApp <ChevronRight size={18}/>
+                        {loading ? 'Processando...' : paymentMethod === 'pix' ? 'Gerar Pix e Finalizar' : 'Finalizar via WhatsApp'} 
+                        {!loading && <ChevronRight size={18}/>}
                     </button>
                 </div>
             </div>
+        </div>
+      )}
+
+      {/* Modal de Pagamento Pix */}
+      {pixData && (
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-in zoom-in duration-300">
+            <h2 className="text-xl font-bold mb-2">Pagamento via Pix</h2>
+            <p className="text-slate-500 text-sm mb-6">Escaneie o QR Code ou copie o código abaixo para pagar.</p>
+            
+            <div className="bg-slate-50 p-4 rounded-2xl mb-6 border border-slate-100 aspect-square flex items-center justify-center">
+              <img 
+                src={`data:image/png;base64,${pixData.encodedImage}`} 
+                alt="QR Code Pix"
+                className="w-full h-full"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <button 
+                onClick={copyPixPayload}
+                className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors"
+              >
+                Copiar Código Pix
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setPixData(null);
+                  sendWhatsAppOrder();
+                }}
+                className="w-full bg-emerald-50 text-emerald-700 py-3 rounded-xl font-bold hover:bg-emerald-100 transition-colors"
+              >
+                Já paguei, enviar pedido <ChevronRight size={16} className="inline"/>
+              </button>
+
+              <button 
+                onClick={() => setPixData(null)}
+                className="text-slate-400 text-sm font-medium hover:text-slate-600 pt-2"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

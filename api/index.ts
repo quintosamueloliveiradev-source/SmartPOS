@@ -314,7 +314,89 @@ app.get('/api/asaas/payments/:customerId', async (req, res) => {
   }
 });
 
-// Webhook
+// Checkout de Pedido (Pix) para o Catálogo Online
+app.post('/api/asaas/checkout', async (req, res) => {
+  try {
+    const { name, email, cpfCnpj, value, description, orderId } = req.body;
+    const apiKey = process.env.ASAAS_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ success: false, error: 'Configuração do Asaas ausente.' });
+    }
+
+    if (!name || !value || !orderId) {
+      return res.status(400).json({ success: false, message: 'Dados do pedido incompletos.' });
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'access_token': apiKey
+    };
+
+    const cleanCpfCnpj = (cpfCnpj || '00000000000').replace(/\D/g, '');
+
+    // 1. Criar ou buscar cliente (Simplificado para o checkout do catálogo)
+    // No catálogo, o cliente pode não estar logado, então usamos o e-mail se fornecido ou um placeholder
+    const customerEmail = email || `cliente-${Date.now()}@vende.ei`;
+    
+    let customerId = '';
+    const searchResponse = await fetch(`https://sandbox.asaas.com/api/v3/customers?email=${encodeURIComponent(customerEmail)}`, { headers });
+    const searchData = await searchResponse.json();
+
+    if (searchData.data && searchData.data.length > 0) {
+      customerId = searchData.data[0].id;
+    } else {
+      const createCustResponse = await fetch('https://sandbox.asaas.com/api/v3/customers', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name, email: customerEmail, cpfCnpj: cleanCpfCnpj, notificationDisabled: true })
+      });
+      const newCustData = await createCustResponse.json();
+      customerId = newCustData.id;
+    }
+
+    // 2. Criar Cobrança Pix
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dueDate = tomorrow.toISOString().split('T')[0];
+
+    const paymentResponse = await fetch('https://sandbox.asaas.com/api/v3/payments', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        customer: customerId,
+        billingType: 'PIX',
+        value,
+        dueDate,
+        description: description || `Pedido #${orderId}`,
+        externalReference: `ORDER_${orderId}` // Prefixo para diferenciar de assinaturas
+      })
+    });
+
+    const paymentData = await paymentResponse.json();
+    if (!paymentResponse.ok) throw new Error(paymentData.errors?.[0]?.description || 'Erro ao criar cobrança.');
+
+    const paymentId = paymentData.id;
+
+    // 3. Obter QR Code
+    const qrCodeResponse = await fetch(`https://sandbox.asaas.com/api/v3/payments/${paymentId}/pixQrCode`, { headers });
+    const qrCodeData = await qrCodeResponse.json();
+
+    return res.json({
+      success: true,
+      paymentId,
+      encodedImage: qrCodeData.encodedImage,
+      payload: qrCodeData.payload,
+      expirationDate: qrCodeData.expirationDate
+    });
+
+  } catch (error: any) {
+    console.error('Erro no checkout Asaas:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Webhook atualizado para tratar pedidos e assinaturas
 app.post('/api/asaas/webhook', async (req, res) => {
   try {
     const event = req.body;
@@ -322,20 +404,19 @@ app.post('/api/asaas/webhook', async (req, res) => {
 
     if (event && (event.event === 'PAYMENT_CONFIRMED' || event.event === 'PAYMENT_RECEIVED')) {
       const paymentData = event.payment;
-      if (!paymentData) {
-        console.warn('paymentData ausente no corpo do webhook.');
-        return res.status(400).json({ success: false, error: 'paymentData ausente.' });
-      }
+      const reference = paymentData.externalReference;
 
-      const userId = paymentData.externalReference;
-      if (userId) {
-        console.log(`Reconciliando pagamento do usuário ${userId}. Atualizando no banco...`);
+      if (!reference) return res.status(200).json({ received: true });
+
+      // Tratar Assinatura de Usuário
+      if (!reference.startsWith('ORDER_')) {
+        const userId = reference;
         if (supabaseClient) {
           const expiryDate = new Date();
           expiryDate.setDate(expiryDate.getDate() + 30);
           const ISOExpiry = expiryDate.toISOString();
 
-          const { data, error } = await supabaseClient
+          await supabaseClient
             .from('profiles')
             .update({ 
               subscription_status: 'active',
@@ -343,18 +424,19 @@ app.post('/api/asaas/webhook', async (req, res) => {
               expires_at: ISOExpiry
             })
             .eq('id', userId);
-
-          if (error) {
-            console.error(`Erro ao atualizar perfil do usuário ${userId} por webhook:`, error);
-            throw error;
-          }
-
-          console.log(`Sucesso na ativação do usuário: ${userId}.`);
-        } else {
-          console.warn('supabaseClient não pôde ser inicializado no backend. Chaves do Supabase ausentes.');
+          console.log(`Assinatura ativada para usuário: ${userId}`);
         }
-      } else {
-        console.warn('externalReference (userId) não encontrado no evento de pagamento do Asaas.');
+      } 
+      // Tratar Pedido do Catálogo
+      else {
+        const orderId = reference.replace('ORDER_', '');
+        if (supabaseClient) {
+          await supabaseClient
+            .from('sales') // Supondo que a tabela seja 'sales' ou 'orders'
+            .update({ status: 'pago', paid_at: new Date().toISOString() })
+            .eq('id', orderId);
+          console.log(`Pedido ${orderId} marcado como PAGO via webhook.`);
+        }
       }
     }
     return res.status(200).json({ received: true });
