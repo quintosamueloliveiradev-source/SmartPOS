@@ -403,8 +403,8 @@ export const Login: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="text-display-lg font-display-lg text-slate-800 mb-8"
           >
-            Gestão inteligente<br />
-            <span className="text-emerald-500">para o seu negócio</span>
+            Venda mais e gerencie<br />
+            <span className="text-emerald-500">seu negócio melhor</span>
           </motion.h1>
 
           <motion.p 
@@ -413,8 +413,8 @@ export const Login: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             className="text-slate-500 text-body-md font-body-md font-medium mb-12 max-w-lg leading-relaxed"
           >
-            Sistema completo para gestão de PDV, estoque, vendas e relatórios. 
-            Tudo o que você precisa em um só lugar.
+            PDV ágil, controle de estoque e Catálogo Online integrado para 
+            você vender muito mais direto pelo seu WhatsApp.
           </motion.p>
 
           <motion.div 
@@ -425,31 +425,31 @@ export const Login: React.FC = () => {
           >
             <div className="flex items-start gap-5">
               <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 text-emerald-500 shrink-0">
+                <Zap size={28} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">PDV Ágil</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Vendas ultrarrápidas com interface intuitiva <br className="hidden xl:block"/> para evitar filas e burocracia.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-5">
+              <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 text-emerald-500 shrink-0">
                 <BarChart3 size={28} strokeWidth={2.5} />
               </div>
               <div>
-                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Relatórios Inteligentes</h3>
-                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Dados em tempo real para decisões <br className="hidden xl:block"/> mais assertivas</p>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Gestão Inteligente</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Relatórios automáticos e controle total <br className="hidden xl:block"/> para decisões baseadas em lucro real.</p>
               </div>
             </div>
 
             <div className="flex items-start gap-5">
               <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 text-emerald-500 shrink-0">
-                <Store size={28} strokeWidth={2.5} />
+                <ShoppingBag size={28} strokeWidth={2.5} />
               </div>
               <div>
-                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Gestão Completa</h3>
-                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Controle de vendas, estoque, clientes <br className="hidden xl:block"/> e muito mais</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-5">
-              <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 text-emerald-500 shrink-0">
-                <ShieldCheck size={28} strokeWidth={2.5} />
-              </div>
-              <div>
-                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Seguro e Confiável</h3>
-                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Seus dados protegidos com as melhores <br className="hidden xl:block"/> práticas de segurança</p>
+                <h3 className="font-title-md font-bold text-slate-800 text-title-md mb-1">Catálogo Online</h3>
+                <p className="text-slate-500 text-body-md font-body-md font-medium leading-snug">Sua vitrine digital na web para receber pedidos <br className="hidden xl:block"/> organizados direto no seu WhatsApp.</p>
               </div>
             </div>
             
@@ -712,9 +712,9 @@ export const Login: React.FC = () => {
                 ${loading ? 'bg-slate-400 cursor-not-allowed shadow-none' : 'bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] shadow-emerald-500/25 hover:shadow-emerald-500/40'}
               `}
             >
-              {loading ? <Loader2 className="animate-spin" size={22} /> : (isSignUp ? 'Criar Conta' : 'Entrar no Sistema')}
+              {loading ? <Loader2 className="animate-spin" size={22} /> : (isSignUp ? 'Começar agora gratuitamente' : 'Entrar no Sistema')}
               {!loading && !isSignUp && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
-              {!loading && isSignUp && <UserPlus size={20} />}
+              {!loading && isSignUp && <Zap size={20} />}
             </button>
 
             <div className="relative flex items-center gap-4 my-8">
