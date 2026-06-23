@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, Plus, Minus, X, Trash2, ChevronRight, Store } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 
@@ -135,7 +135,7 @@ export const Catalog: React.FC = () => {
         ? `Dinheiro${changeFor ? ` (Troco para R$ ${changeFor})` : ''}`
         : paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
 
-    const message = `*🛍️ NOVO PEDIDO - Vendeei Shop*\n` +
+    const message = `*🛍️ NOVO PEDIDO - Vendeei*\n` +
       `--------------------------------\n` +
       `*Cliente:* ${name}\n` +
       `*Entrega:* ${deliveryType === 'pickup' ? 'Retirada no Balcão' : 'Entrega em Casa'}` +
@@ -154,7 +154,12 @@ export const Catalog: React.FC = () => {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-slate-900 text-white p-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold font-vendeei">Vendeei Shop</h1>
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-500 p-1.5 rounded-lg">
+              <Store size={20} className="text-white" />
+            </div>
+            <h1 className="text-xl font-bold font-vendeei tracking-tight">Vendeei</h1>
+          </div>
           <span className={`text-[10px] uppercase px-2 py-1 rounded-full font-bold ${catalogSettings.isOpen ? 'bg-green-600' : 'bg-red-600'}`}>
             {catalogSettings.isOpen ? '🟢 Aberto' : '🔴 Fechado'}
           </span>
